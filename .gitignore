@@ -114,3 +114,9 @@ media/
 # !**/migrations
 # !**/migrations/__init__.py
 @bouwehand
+
+*.xls
+*xlsx
+*.csv
+*.doc*
+.gitignore
