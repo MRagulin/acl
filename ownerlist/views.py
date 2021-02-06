@@ -2,7 +2,7 @@ from django.shortcuts import render
 from django.views.generic import View
 from django.http import HttpResponse, JsonResponse
 from .forms import UploadFileForm
-from .utils import upload_file_handler,ExcelHandler
+from .utils import upload_file_handler,ExcelHandler, ExtractDataXls
 
 
 # Create your views here.
@@ -10,10 +10,12 @@ from .utils import upload_file_handler,ExcelHandler
 
 class SearchView(View):
     def get(self, request):
+        vlan_fun = ExtractDataXls('D:\\Project\\acladmin-20210206T113742Z-001\\IP_LIST\\ip\\VLAN_DESCRIPTION.xls')
+        vlan_fun.ExtractVlanInfo()
         return render(request, 'index.html')
 
     def post(self, request):
-        response_data = upload_file_handler(request, ExcelHandler)
-        context = {'ip': response_data}
+        #response_data = upload_file_handler(request)
+        #context = {'ip': response_data}
         #print(response_data)
-        return render(request, 'index.html', context)
+        return render(request, 'index.html')

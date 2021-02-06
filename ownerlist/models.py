@@ -2,7 +2,7 @@ from django.db import models
 from .utils import IP2Int
 
 class Tags(models.Model):
-    name = models.CharField(blank=True, max_length=64, unique=True)
+    name = models.CharField(blank=True, max_length=128, unique=True)
 
 
 class Vlans(models.Model):

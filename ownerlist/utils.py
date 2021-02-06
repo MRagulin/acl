@@ -35,8 +35,10 @@ def upload_file_handler(request, functionhandler = None):
     if functionhandler is not None:
         return functionhandler(uploaded_file_url)
     else:
+        vlan_fun = ExtractDataXls(uploaded_file_url)
+        return vlan_fun.ExtractVlanInfo()
         #print("[E] Function handler not defined")
-        return result
+        #return result
 
 
 
@@ -92,11 +94,11 @@ def get_ip_from_page(page):
 
 
 class ExtractDataXls():
-    def __init__(self, filename = ''):
+    def __init__(self, filename= ''):
         self.ip_addr_idx = 1
         self.count_total = 0
         self.error_count = 0 #total errors
-        self.rb = xlrd.open_workbook(filename,formatting_info=True)
+        self.rb = xlrd.open_workbook(filename, formatting_info=True)
         self.current_page = ''
 
     def is_row_empty(self, row):
@@ -117,37 +119,65 @@ class ExtractDataXls():
 
     def ExtractVlanInfo(self):
         row_index = 0
+        internal_count = 0
         self.sheet_tags = self.rb.sheet_names()
-        Vlans = apps.get_model('Vlans')
-        Tags = apps.get_model('Tags')
+        Vlans = apps.get_model('ownerlist', 'Vlans')
+        Tags = apps.get_model('ownerlist', 'Tags')
         vlans_list = []
         for self.sheet_tag in self.sheet_tags:
             self.current_page = self.rb.sheet_by_name(self.sheet_tag)
             if self.current_page.nrows > 0: #Count row
                     for row_idx in range(self.current_page.nrows):
-                        if row_idx == 0:
-                            continue
                         row = self.current_page.row_values(row_idx)
+                        if row_idx == 0 or self.is_row_empty(row):
+                            continue
+
                         vlans_list.append(row[1])
-                        if str(row[3]).find('/') > 0:
-                                vlan = str(row[3]).split('/')[1]
-                                mask = int(str(row[3]).split('/')[2])
+                        if type(row[3]) == float:
+                            vlan = int(round(row[3]))
                         else:
-                            vlan =row[3]
-                            mask = row[4]
+                            if type(row[3]) == str:
+                                try:
+                                   vlan = int(round(float(row[3])))
+                                except ValueError:
+                                    vlan = 0
+
+                        if str(row[4]).find('/') > 0:
+                                subnet = str(row[4]).split('/')
+                                subnet, mask = subnet[0], int(subnet[1])
+                        else:
+                            try:
+                                if len(str(row[4])) > 15:
+                                    subnet = str(row[4]).split('\n')[0] #Bug fig, if a couple value in row
+                                else:
+                                    subnet = str(row[4])
+                            except ValueError:
+                                subnet = 0
+
+
+                            try:
+                                if len(str(row[5])) > 4:
+                                    mask = str(row[5]).split('\n')[0] #Bug fig, if a couple value in row
+                                    mask = int(round(float(mask)))
+                                else:
+                                    mask = int(round(float(row[5]))) or 0
+                            except ValueError:
+                                mask = 0
 
                         vlan_info, _ = Vlans.objects.get_or_create(
-                        name = row[1],
-                        location = row[2],
-
-                        vlan = vlan,
-                        mask = mask,
+                        name=str(row[1]),
+                        location=str(row[2]),
+                        vlan=vlan,
+                        subnet=subnet,
+                        mask=mask,
                         )
-
-
-                        if (row_idx == 7) or (row_idx == 8):
-                            if row[row_idx] != '':
-                                tag_info, _ = Tags.objects.get_or_create(row[row_idx])
-                                vlan_info.tags.add(tag_info)
+                        internal_count += 1
+                        try:
+                            for xtag in range(6,8,1):
+                                if row[xtag] != '':
+                                            tag_info, _ = Tags.objects.get_or_create(name=str(row[xtag]).rstrip())
+                                            vlan_info.tags.add(tag_info)
+                        except:
+                            pass
 
         return vlans_list
