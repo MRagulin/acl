@@ -5,10 +5,10 @@ from django.apps import apps
 import socket
 import re
 import xlrd
+from django.conf import settings
 #from .models import Vlans, Tags, Owners, Iplist
 
 BASE_DIR = Path(__file__).resolve().parent.parent
-
 
 #Function convert IP to integer
 def IP2Int(ip):
@@ -117,13 +117,14 @@ class ExtractDataXls():
             pass
         return ""
 
-    def ExtractVlanInfo(self):
-        row_index = 0
-        internal_count = 0
+    def ExtractVlanInfo(self) -> int:
+        """Парсер страницы с описанием VLAN"""
+        row_index: int = 0
+        internal_count: int = 0
         self.sheet_tags = self.rb.sheet_names()
         Vlans = apps.get_model('ownerlist', 'Vlans')
         Tags = apps.get_model('ownerlist', 'Tags')
-        vlans_list = []
+
         for self.sheet_tag in self.sheet_tags:
             self.current_page = self.rb.sheet_by_name(self.sheet_tag)
             if self.current_page.nrows > 0: #Count row
@@ -132,14 +133,12 @@ class ExtractDataXls():
                         if row_idx == 0 or self.is_row_empty(row):
                             continue
 
-                        vlans_list.append(row[1])
                         if type(row[3]) == float:
                             vlan = int(round(row[3]))
-                        else:
-                            if type(row[3]) == str:
-                                try:
+                        elif type(row[3]) == str:
+                             try:
                                    vlan = int(round(float(row[3])))
-                                except ValueError:
+                             except ValueError:
                                     vlan = 0
 
                         if str(row[4]).find('/') > 0:
@@ -177,7 +176,8 @@ class ExtractDataXls():
                                 if row[xtag] != '':
                                             tag_info, _ = Tags.objects.get_or_create(name=str(row[xtag]).rstrip())
                                             vlan_info.tags.add(tag_info)
+                                            internal_count += 1
                         except:
                             pass
 
-        return vlans_list
+        return internal_count

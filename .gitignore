@@ -120,3 +120,4 @@ media/
 *.csv
 *.doc*
 .gitignore
+.idea/
