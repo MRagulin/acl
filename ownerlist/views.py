@@ -10,8 +10,8 @@ from .utils import upload_file_handler,ExcelHandler, ExtractDataXls
 
 class SearchView(View):
     def get(self, request):
-        vlan_fun = ExtractDataXls('D:\\Project\\acladmin-20210206T113742Z-001\\IP_LIST\\ip\\VLAN_DESCRIPTION.xls')
-        vlan_fun.ExtractVlanInfo()
+        vlan_fun = ExtractDataXls('D:\\Project\\acladmin-20210206T113742Z-001\\IP_LIST\\ip\\VLAN_CORE_ACI.xls')
+        vlan_fun.execute_file_parsing()
         return render(request, 'index.html')
 
     def post(self, request):

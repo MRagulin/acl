@@ -8,6 +8,7 @@ import xlrd
 from django.conf import settings
 #from .models import Vlans, Tags, Owners, Iplist
 
+
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 #Function convert IP to integer
@@ -94,14 +95,24 @@ def get_ip_from_page(page):
 
 
 class ExtractDataXls():
-    def __init__(self, filename= ''):
+    def __init__(self, filename=''):
         self.ip_addr_idx = 1
-        self.count_total = 0
-        self.error_count = 0 #total errors
+        self.count_total: int = 0 #total records in db
+        self.error_count: int = 0 #total errors
         self.rb = xlrd.open_workbook(filename, formatting_info=True)
         self.current_page = ''
+        self.sheet_tags = self.rb.sheet_names()
 
-    def is_row_empty(self, row):
+    def execute_file_parsing(self):
+        """Выбираем парсер на основе имени страницы"""
+        for self.sheet_tag in self.sheet_tags:
+            if self.sheet_tag == 'VLAN DESCRIPTION':
+                self.ExtractVlanInfo()
+            elif self.sheet_tag == 'VLAN_CORE_ACI':
+                self.ExtractVlanInfo(name_idx=6, location_idx=3, vlan_idx=2, subnet_idx=4, mask_idx=5, tag1_idx=7, tag2_idx=8)
+
+    def is_row_empty(self, row) -> bool:
+        """ Проверяем пустая ли запись"""
         result = True
         for d in row:
             if d != '':
@@ -109,7 +120,8 @@ class ExtractDataXls():
                 break
         return result
 
-    def get_ip_from_page(self, page):
+    def get_ip_from_page(self, page) -> str:
+        """Получаем полный IP из имени страницы"""
         try:
             ip = re.findall(r"(\d{1,3})", page)
             return ".".join(ip)
@@ -117,67 +129,81 @@ class ExtractDataXls():
             pass
         return ""
 
-    def ExtractVlanInfo(self) -> int:
+    def ExtractVlanInfo(self, name_idx = 1, location_idx = 2, vlan_idx = 3, subnet_idx = 4, mask_idx = 5, tag1_idx = 6, tag2_idx = 7) -> int:
         """Парсер страницы с описанием VLAN"""
         row_index: int = 0
-        internal_count: int = 0
-        self.sheet_tags = self.rb.sheet_names()
+        tags: list = []
         Vlans = apps.get_model('ownerlist', 'Vlans')
         Tags = apps.get_model('ownerlist', 'Tags')
 
-        for self.sheet_tag in self.sheet_tags:
-            self.current_page = self.rb.sheet_by_name(self.sheet_tag)
-            if self.current_page.nrows > 0: #Count row
+        self.current_page = self.rb.sheet_by_name(self.sheet_tag)
+        if self.current_page.nrows > 0: #Count row
                     for row_idx in range(self.current_page.nrows):
                         row = self.current_page.row_values(row_idx)
                         if row_idx == 0 or self.is_row_empty(row):
                             continue
 
-                        if type(row[3]) == float:
-                            vlan = int(round(row[3]))
-                        elif type(row[3]) == str:
+                        if type(row[vlan_idx]) == float:
+                            vlan = int(round(row[vlan_idx]))
+                        elif type(row[vlan_idx]) == str:
                              try:
-                                   vlan = int(round(float(row[3])))
+                                   vlan = int(round(float(row[vlan_idx])))
                              except ValueError:
                                     vlan = 0
 
-                        if str(row[4]).find('/') > 0:
-                                subnet = str(row[4]).split('/')
+                        if str(row[subnet_idx]).find('/') > 0:
+                                subnet = str(row[subnet_idx]).split('/')
                                 subnet, mask = subnet[0], int(subnet[1])
                         else:
                             try:
-                                if len(str(row[4])) > 15:
-                                    subnet = str(row[4]).split('\n')[0] #Bug fig, if a couple value in row
+                                if len(str(row[subnet_idx])) > 15:
+                                    subnet = str(row[subnet_idx]).split('\n')[0] #Bug fig, if a couple value in row
                                 else:
-                                    subnet = str(row[4])
+                                    subnet = str(row[subnet_idx])
                             except ValueError:
                                 subnet = 0
 
 
                             try:
-                                if len(str(row[5])) > 4:
-                                    mask = str(row[5]).split('\n')[0] #Bug fig, if a couple value in row
+                                if len(str(row[mask_idx])) > 4:
+                                    mask = str(row[mask_idx]).split('\n')[0] #Bug fig, if a couple value in row
                                     mask = int(round(float(mask)))
                                 else:
-                                    mask = int(round(float(row[5]))) or 0
+                                    mask = int(round(float(row[mask_idx]))) or 0
                             except ValueError:
                                 mask = 0
 
                         vlan_info, _ = Vlans.objects.get_or_create(
-                        name=str(row[1]),
-                        location=str(row[2]),
+                        name=str(row[name_idx]),
+                        location=str(row[location_idx]),
                         vlan=vlan,
                         subnet=subnet,
                         mask=mask,
                         )
-                        internal_count += 1
+
+                        if _: #if created obj
+                                self.count_total += 1
+
                         try:
-                            for xtag in range(6,8,1):
-                                if row[xtag] != '':
-                                            tag_info, _ = Tags.objects.get_or_create(name=str(row[xtag]).rstrip())
-                                            vlan_info.tags.add(tag_info)
-                                            internal_count += 1
+                            tags.append(self.sheet_tag)
+                            tags.append(row[tag1_idx])
+                            tags.append(row[tag2_idx])
+
+                            for tag in tags:
+                                if (tag != '') and len(tag) > 1:
+                                            if len(str(tag).split('.')) >= 3:  # If tag as Gateway's IP
+                                                tag = "Gateway: {}".format(tag)
+                                            tag_info, _ = Tags.objects.get_or_create(name=str(tag).rstrip())
+                                            if tag_info not in vlan_info.tags.all():
+                                                vlan_info.tags.add(tag_info)
+                                                self.count_total += 1
                         except:
                             pass
 
-        return internal_count
+                        finally:
+                            tags.clear()
+
+        if settings.DEBUG == True:
+            print("Добавленно {} новых записей в БД.".format(self.count_total))
+
+        return self.count_total
