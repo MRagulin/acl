@@ -20,32 +20,42 @@ class Vlans(models.Model):
         return "VLAN: {}".format(self.name)
 
 class Owners(models.Model):
-    username = models.CharField(blank=True, max_length=64, verbose_name="Имя владельца")
+    username = models.CharField(blank=True, max_length=256, verbose_name="Имя владельца")
+
+    @classmethod
+    def get_default_owner(cls):
+        owner, obj = Owners.objects.get_or_create(username='Unknown')
+        return owner.pk
 
     def __str__(self):
         return "Владелец: {}".format(self.username)
 
-class IpTags(models.Model):
-    tagname = models.CharField(blank=True, max_length=64, unique=True)
+# class IpTags(models.Model):
+#     tagname = models.CharField(blank=True, max_length=64, unique=True)
 
 
 class Iplist(models.Model):
     ipv4 = models.GenericIPAddressField(protocol='IPv4', unique=True, verbose_name="IP адресс")
     ipv4_int = models.BigIntegerField(default=0, db_index=True)
     hostname = models.CharField(blank=True, max_length=64)
-    owner = models.ForeignKey(Owners, on_delete=models.CASCADE)
-    comment = models.CharField(blank=True, max_length=256)
+    owner = models.ForeignKey(Owners, null=True, on_delete=models.SET_NULL,  default=Owners.get_default_owner)
+    comment = models.TextField(blank=True, null=True)
     tags = models.ManyToManyField('Tags', null=True, blank=True, verbose_name='tags')
     vlan = models.ManyToManyField('Vlans', null=True, blank=True, verbose_name='vlans')
 
     def __str__(self):
         return "IP адрес: {}".format(self.ipv4)
 
+    """Переопределяем IP как Int значения"""
     def save(self, *args, **kwargs):
         if self.ipv4 != '':
             try:
                 self.ipv4_int = IP2Int(self.ipv4) or 0
             except:
                 pass
+
         super().save(*args, **kwargs)
+
+
+
 
