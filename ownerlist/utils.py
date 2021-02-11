@@ -1,4 +1,4 @@
-import os, sys
+import os
 from pathlib import Path
 from django.core.files.storage import FileSystemStorage
 from django.apps import apps
@@ -8,7 +8,6 @@ import xlrd
 from django.conf import settings
 from django.db.utils import IntegrityError, DataError
 
-#from .models import Vlans, Tags, Owners, Iplist
 
 
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -102,13 +101,16 @@ class ExtractDataXls():
         self.count_total: int = 0 #total records in db
         self.error_count: int = 0 #total errors
         self.rb = xlrd.open_workbook(filename, formatting_info=True)
-        self.current_page = ''
+        self.current_page = None
         self.sheet_tags = self.rb.sheet_names()
         self.Vlans = apps.get_model('ownerlist', 'Vlans')
         self.Tags = apps.get_model('ownerlist', 'Tags')
         self.Iplist = apps.get_model('ownerlist', 'Iplist')
         self.Owners = apps.get_model('ownerlist', 'Owners')
         self.page_headers = ['ответственный', 'комменты', 'ip address', 'Имя сервера','отвеcтвенный', 'nat inside']
+        self.fio_exclude_list = ['гусев','оксенюк','северцев','егоров','совинский','огнивцев','допиро','мюлекер','уволен','иренов','казаков','куслеев']
+
+
 
     def execute_file_parsing(self):
         """Выбираем парсер на основе имени страницы"""
@@ -133,18 +135,14 @@ class ExtractDataXls():
                 result += self.ExtractIPInfo(domain_idx=1, ip_idx=2, owner_idx=4, comment_idx=5)
             elif self.sheet_tag == 'активка 172.16.82.X':
                 result += self.ExtractIPInfo(domain_idx=1, ip_idx=0, owner_idx=2, comment_idx=3)
+            elif self.sheet_tag == '195.239.64.хх':
+                result += self.ExtractIPInfo(domain_idx=0, ip_idx=1, owner_idx=3, comment_idx=4)
             elif self.current_page.ncols == 4:
                     result += self.ExtractIPInfo()
             else:
                 if settings.DEBUG:
                         print("Страница содержит другое количество колонок <> 4, {} анализируем...".format(self.current_page.ncols))
                 result += self.PageStructAnalyzer(self.current_page)
-                # status = input('Всё корректно ?')
-                # if status == 'y':
-                #     continue
-                # else:
-                #     break
-
         return result
 
 
@@ -268,6 +266,7 @@ class ExtractDataXls():
 
         #print(self.sheet_tag)
         #return 0
+        self.count_total = 0
         for row_idx in range(self.current_page.nrows):
             row = self.current_page.row_values(row_idx)
             if not self.is_row_empty(row):
@@ -337,6 +336,25 @@ class ExtractDataXls():
                 if self.sheet_tag not in tags:
                     tags.append(self.sheet_tag)
 
+#-----------------------------------------------------------------------------------------------------------------------
+                try:
+                    if comment and re.match(r"([а-яА-Я\.\s()]){5,}", str(comment)):
+                        tmp = comment.lower().strip()
+                        exists = list(filter(lambda s: s in tmp, self.fio_exclude_list))
+                        #exists = any(substring in string for string in strings)
+                        #if comment.lower() in self.fio_exclude_list:
+                        if len(exists) > 0:
+                            owner, comment = comment, owner
+                except:
+                    pass
+#-----------------------------------------------------------------------------------------------------------------------
+
+                try:
+                    if owner:
+                        if owner.find('://') != -1:
+                            owner, comment = comment, owner
+                except:
+                    pass
 
                 if ip_addr != '':
                    # if not self.isvalidip(ip_addr):
@@ -349,7 +367,7 @@ class ExtractDataXls():
                         owner_info = None
                     else:
                         #try:
-                            owner_info, _ = self.Owners.objects.get_or_create(username = owner)
+                            owner_info, created = self.Owners.objects.get_or_create(username = owner)
                         #except:
                             #owner_info = self.Owners.get_default_owner()
 
@@ -393,7 +411,7 @@ class ExtractDataXls():
             print("Страница: {} записано: {}".format(self.sheet_tag, self.count_total))
         return self.count_total
 
-    def PageStructAnalyzer(self, page)-> None:
+    def PageStructAnalyzer(self, page, DEBUG = False)-> None:
         """Написанный на коленке анализатор данных на странице в xls"""
         is_domain = 0
         is_ip = 0
@@ -537,18 +555,15 @@ class ExtractDataXls():
 
                         #print("Page: {}| Col {}| possible empty, skipped".format(self.sheet_tag, idx_col))
                     #else:
-                    # print(
-                    #         "Page: {}| Col {}| possible: {}(d:{},i:{}, o:{},c:{},t:{})".format(self.sheet_tag, idx_col,
-                    #                                                                            max_v,
-                    #                                                                            col_stat['is_domain'],
-                    #                                                                            col_stat['is_ip'],
-                    #                                                                            col_stat['is_owner'],
-                    #                                                                            col_stat['is_comment'],
-                    #                                                                            col_stat['is_tag']))
+                    if DEBUG:
+                        print("Page: {}| Col {}| possible: {}(d:{},i:{}, o:{},c:{},t:{})".format(self.sheet_tag, idx_col,
+                                                                                                max_v,
+                                                                                                col_stat['is_domain'],
+                                                                                                col_stat['is_ip'],
+                                                                                                col_stat['is_owner'],
+                                                                                                col_stat['is_comment'],
+                                                                                                col_stat['is_tag']))
 
-
-        return self.ExtractIPInfo(domain_idx=col_index['domain'], ip_idx=col_index['ip'], owner_idx=col_index['owner'], comment_idx=col_index['comment'], stop_recurse=True, HasTags=Tags)
-        #return 0
-
-
-
+        if not DEBUG:
+            return self.ExtractIPInfo(domain_idx=col_index['domain'], ip_idx=col_index['ip'], owner_idx=col_index['owner'],
+                                  comment_idx=col_index['comment'], stop_recurse=True, HasTags=Tags)

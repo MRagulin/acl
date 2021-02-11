@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    {% load static %}
+  <link rel="stylesheet" href="{% static 'css/style.css' %}">
+{#  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-BmbxuPwQa2lc/FVzBcNJ7UAyJxM6wuqIj61tLrc4wSX0szH/Ev+nYRRuWlolflfl" crossorigin="anonymous">#}
+
+  <title>Distance</title>
+</head>
+<body>
+  <header class="header">
+    <div class="header-block">
+      <button class="m-menu">
+        <span class="line"></span>
+        <span class="line"></span>
+        <span class="line"></span>
+      </button>
+      <div class="search">
+        <input type="text" class="search-input" placeholder="Поиск IP или домена">
+      </div>
+   </div>
+</header>
+
+<div class="menu-sidebar">
+    <div class="menu-sidebar-text">
+      <nav class="nav-group">
+        <a href="#" class="nav-link">
+          <span class="nav-text">
+            Создание ACL
+          </span>
+        </a>
+        <a href="#" class="nav-link">
+          <span class="nav-text">
+            Ресурсы VPN
+          </span>
+        </a>
+        <a href="#" class="nav-link">
+          <span class="nav-text">
+            История обращений
+          </span>
+        </a>
+        <a href="#" class="nav-link">
+          <span class="nav-text">
+            IP- адреса
+          </span>
+        </a>
+      </nav>
+   </div>
+</div>
+
+
+  <div class="container">
+
+    <div class="main-feed">
+      <div class="create-post">
+        <div class="create-post-body">
+          <h1 class="create-post-input" contenteditable="true">Результаты Поиска: <span>127.0.0.1</span> </h1>
+          <h2 class="create-post-input__result">Время Выполнения Запроса 0.1 сек</h2>
+        </div>
+      </div>
+      <div class="post">
+          <div class="post-header">
+          <div class="post-header__row-top">
+            <div class="post-header__block">IP</div>
+            <div class="post-header__block-id">
+              <div class="post-header__block-IP">IP: <span>127.0.0.1</span></div>
+              <div class="post-header__block-name">Имя: <span>Localhost</span></div>
+            </div>
+            <div class="post-header__block-owners">
+              <div class="post-header__block-owner">Владелец:<span>Иванов И.В</span></div>
+              <div class="post-header__block-comments">Комментарий:
+                <span>Https://Exchange.Xforce.lbmcloud.Com/lp/45.155.205.108</span>
+              </div>
+            </div>
+          </div>
+          <div class="post-header__row-bottom">
+            <div class="post-header__block-icon"></div>
+            <span class="post-header__block-tab">Активка Localhost</span>
+            <span class="post-header__block-tab">VLAN <span>0</span></span>
+            <span class="post-header__block-tab">Добавил Admin</span>
+          </div>
+        </div>
+     </div>
+      <div class="post">
+        <div class="post-header">
+          <div class="post-header__row-top">
+            <div class="post-header__block">IP</div>
+            <div class="post-header__block-id">
+              <div class="post-header__block-IP">IP: <span>192.168.1.1</span></div>
+              <div class="post-header__block-name">Имя: <span>Localhost</span></div>
+            </div>
+            <div class="post-header__block-owners">
+              <div class="post-header__block-owner">Владелец:<span>Иванов И.В</span></div>
+              <div class="post-header__block-comments">Комментарий:
+                <span>Https://Exchange.Xforce.lbmcloud.Com/lp/45.155.205.108</span>
+              </div>
+            </div>
+          </div>
+          <div class="post-header__row-bottom">
+            <div class="post-header__block-icon"></div>
+            <span class="post-header__block-tab">Активка Localhost</span>
+            <span class="post-header__block-tab">VLAN <span>0</span></span>
+            <span class="post-header__block-tab">Добавил Admin</span>
+          </div>
+        </div>
+      </div>
+       <ul class="pagination">
+           <li class="pagination__item">
+           <a class="pagination__link pagination__link--current" href="#">1</a>
+         </li>
+           <li class="pagination__item">
+           <a class="pagination__link" href="#">2</a>
+         </li>
+           <li class="pagination__item">
+           <a class="pagination__link" href="#">3</a>
+         </li>
+           <li class="pagination__item">
+           <a class="pagination__link" href="#">4</a>
+         </li>
+       </ul>
+
+    </div>
+  </div>
+
+
+
+</body>
+
+</html>

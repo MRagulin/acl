@@ -37,8 +37,9 @@ class Owners(models.Model):
 class Iplist(models.Model):
     ipv4 = models.GenericIPAddressField(protocol='IPv4', unique=True, verbose_name="IP адресс")
     ipv4_int = models.BigIntegerField(default=0, db_index=True)
+    ipv4_str = models.CharField(blank=True, max_length=15)
     hostname = models.CharField(blank=True, max_length=64)
-    owner = models.ForeignKey(Owners, null=True, on_delete=models.SET_NULL,  default=Owners.get_default_owner)
+    owner = models.ForeignKey(Owners, null=True, on_delete=models.SET_NULL, default=Owners.get_default_owner)
     comment = models.TextField(blank=True, null=True)
     tags = models.ManyToManyField('Tags', null=True, blank=True, verbose_name='tags')
     vlan = models.ManyToManyField('Vlans', null=True, blank=True, verbose_name='vlans')
@@ -51,6 +52,11 @@ class Iplist(models.Model):
         if self.ipv4 != '':
             try:
                 self.ipv4_int = IP2Int(self.ipv4) or 0
+            except:
+                pass
+
+            try:
+                self.ipv4_str = ".".join(self.ipv4.split('.')[:3])
             except:
                 pass
 

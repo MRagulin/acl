@@ -121,3 +121,4 @@ media/
 *.doc*
 .gitignore
 .idea/
+/migrations/
