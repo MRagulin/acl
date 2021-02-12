@@ -1,0 +1,132 @@
+/* Описание верхней части меню*/
+.header {
+  padding-top: 6px;
+  padding-bottom: 6px;
+  background-color: #CE253D;
+  position: fixed;
+  top: 0px;
+  left: 0px;
+  width: 100%;
+  z-index: 99;
+}
+
+.header-block {
+  max-width: 1200px;
+  margin: auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.search {
+  width: 100%;
+}
+.search-input {
+  font-size: 14px;
+  line-height: 22px;
+  padding: 3px 30px 5px 35px;
+  min-width: 100%;
+  border-radius: 3px;
+  background: #fff;
+  border: 1px solid #777777;
+  background-image: url(../img/search.svg);
+  background-repeat: no-repeat;
+  background-position: left 12px center;
+  outline: none;
+}
+.search-input::placeholder {
+  color: #777777;
+  font-size: 12px;
+}
+
+.search-input:focus {
+  border: 1px solid #db698b;
+}
+/* Описание всей страницы*/
+
+
+body {
+  padding-top: 44px;
+}
+
+
+.wrapper{
+  display: flex;
+  width: 100%;
+  align-items: stretch;
+}
+
+.content{
+  width: 100%;
+  padding: 20px;
+  min-height: 90vh;
+  transition: all 0.3s;
+}
+
+/*Описание левого блока меню*/
+.menu-sidebar {
+  /*max-width: 200px;*/
+  /*margin-right: 12px;*/
+  /*height: 100%;*/
+  /*border-right: 1px solid #ccc;*/
+  /*flex: 1 250px;*/
+  /*position:fixed;*/
+  /*left:0;*/
+  /*top:0;*/
+  /*bottom:0;*/
+
+  min-width: 250px;
+  max-width: 250px;
+  background: #fff;
+  transition: all 0.3s;
+  border-right: 1px solid #ccc;
+}
+
+.menu-sidebar > .menu-sidebar-text {
+    margin-top: 130px;
+    margin-right: 50px;
+    width: 100%;
+}
+
+.nav-link {
+  display: flex;
+  align-items: center;
+  padding: 8px 4px;
+  text-decoration: none;
+  color: #595959;
+  line-height: 22px;
+  font-weight: 600;
+  font-size: 16px;
+  transition: background 1s ease-in-out,
+}
+.nav-link:focus {
+  background-color: #CE253D;
+  color:  #fff;
+}
+
+.nav-link:focus:hover {
+  background-color: #CE253D;
+  color:  #fff;
+}
+.nav-link:hover {
+  background-color: #fff;
+  color:  #595959;
+  font-weight: bold;
+  border-right: 5px solid #CE253D;
+}
+
+.nav-link:active {
+  background-color: #CE253D;
+  color:  #fff;
+}
+
+
+.nav-text {
+  margin-left: 8px;
+}
+
+.nav-text--span {
+  color: #1890FF;
+  margin-left: 12px;
+}
+

@@ -1,58 +1,7 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-    <title>ACL uploader</title>
+{% extends 'base.html' %}
 
- <style>
-    .custom-file-input.selected:lang(en)::after {
-      content: "" !important;
-    }
-
-    .custom-file {
-      overflow: hidden;
-    }
-
-    .custom-file-input {
-      white-space: nowrap;
-    }
-  </style>
-</head>
-<body>
-
-<div class="container">
-    <div class="input-group pt-5">
-        <form method="post" action="{% url 'ipconfig_urls'%}" enctype="multipart/form-data">
-              {% csrf_token %}
-              <div class="custom-file">
-                <input type="file" class="custom-file-input" id="FileInput" aria-describedby="customFileInput" name="FileInput">
-                <label class="custom-file-label" for="FileInput">Select file</label>
-              </div>
-              <div class="input-group-append">
-                <button class="btn btn-primary" type="submit" id="customFileInput">Upload</button>
-              </div>
-        </form>
+{% block content %}
+    <div class="col-lg-8 col-md-8 col-sm-12">
+        <p>Привет, меня зовут Иван</p>
     </div>
-
-  <div class="pt-5">
-    {% block content %}
-
-      <p>Добавлено: {{ count }}</p>
-
-    {% endblock %}
-  </div>
-</div>
-
-
-  <script>
-    document.querySelector('.custom-file-input').addEventListener('change', function (e) {
-      var name = document.getElementById("customFileInput").files[0].name;
-      var nextSibling = e.target.nextElementSibling
-      nextSibling.innerText = name
-    })
-  </script>
-
-</body>
-</html>
+{% endblock %}

@@ -1,8 +1,9 @@
 from django.urls import path
 from django.conf.urls import url
-from .views import SearchView
+from .views import SearchView, TreeView
 
 urlpatterns = [
     path("ipconfig/", SearchView.as_view(), name="ipconfig_urls"),
-    url(r'^$', SearchView.as_view(), name="ipconfig_urls"), #test, delete prod
+    url('search/', SearchView.as_view(), name="search"),
+    url(r'^$', TreeView.as_view(), name="ipconfig_urls"),
 ]
