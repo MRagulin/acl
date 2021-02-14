@@ -3,7 +3,7 @@ from django.views.generic import View
 from django.shortcuts import redirect
 from django.http import HttpResponse, JsonResponse
 from .forms import UploadFileForm
-from .utils import upload_file_handler, ExtractDataXls
+from .utils import upload_file_handler, ExtractDataXls, search_text
 
 
 # Create your views here.
@@ -21,10 +21,11 @@ class SearchView(View):
     def get(self, request):
         context = {}
         search = request.path.split('/')
-        if search[2] == '':
+        result = search[2].strip().lower()
+        if result == '':
                 return redirect('ipconfig_urls')
         if search is not None:
-            context = {'form': search[2]}
+            context = search_text(result)
         return render(request, 'search.html', context=context)
 
 

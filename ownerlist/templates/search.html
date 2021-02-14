@@ -4,10 +4,56 @@
     <div class="col-lg-8 col-md-8 col-sm-12">
        <div class="create-post">
             <div class="create-post-body">
-                  <h1 class="create-post-input" contenteditable="true">Результаты Поиска: <span>{{ form }}</span> </h1>
-                  <h2 class="create-post-input__result">Время Выполнения Запроса 0.1 сек</h2>
+                  <h1 class="create-post-input">Результаты Поиска: <span>{{ SearchFor }}</span> </h1>
+                  <h2 class="create-post-input__result">Время выполнения запроса: {{ TakeTime }} сек</h2>
             </div>
       </div>
+
+        {% if Data|length_is:"0" %}
+        <div class="post">
+            <div class="post-header">
+                <p>Ничего не найдено</p>
+            </div>
+        </div>
+
+        {% else %}
+            {% for el in Data %}
+          <div class="post text-wrap" style="overflow-wrap: break-word;  word-break: break-word">
+          <div class="post-header">
+          <div class="post-header__row-top">
+              <div class="col">
+                   <div class="post-header__block">IP</div>
+              </div>
+
+             <div class="col-4">
+                  <div class="post-header__block-id">
+              <div class="post-header__block-IP">IP: <span>{{ el.ipv4 }}</span></div>
+              <div class="post-header__block-name">Имя: <span>{{ el.hostname }}</span></div>
+            </div>
+             </div>
+
+
+              <div class="col-7">
+                   <div class="post-header__block-owners">
+                  <div class="post-header__block-owner">Владелец:<span>{{ el.owner.username }}</span></div>
+                  <div class="post-header__block-comments">Комментарий:<span>{{ el.comment}}</span></div>
+                </div>
+              </div>
+
+          </div>
+          {% if  el.tags %}
+          <div class="post-header__row-bottom">
+            <div class="post-header__block-icon"></div>
+              {% for tag in el.tags.all %}
+                 <span class="post-header__block-tab">{{ tag.name }}</span>
+              {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+     </div>
+            {% endfor %}
+        {% endif %}
 
     </div>
 {% endblock %}

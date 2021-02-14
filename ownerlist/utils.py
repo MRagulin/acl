@@ -7,8 +7,10 @@ import re
 import xlrd
 from django.conf import settings
 from django.db.utils import IntegrityError, DataError
+import datetime
+import time
 
-
+FUN_SPEED = 0
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -42,6 +44,40 @@ def upload_file_handler(request, functionhandler = None):
         #print("[E] Function handler not defined")
         #return result
 
+def count_perf(f):
+    """Декоратор для измерения скорости поиска"""
+    def wraper(*args, **kwargs):
+        global FUN_SPEED
+        time_init = datetime.datetime.now()
+        result = f(*args, **kwargs)
+        time_end = datetime.datetime.now()
+        total = time_end - time_init
+        FUN_SPEED = total
+        #print('Time: {}'.format(total))
+        return result
+    return wraper
+
+@count_perf
+def DeepSearch(string: str = ''):
+    result = ''
+    if re.match(r"^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$", string):
+        Iplist = apps.get_model('ownerlist', 'Iplist')
+        result = Iplist.objects.filter(ipv4=string)
+        if not result:
+            result = Iplist.objects.filter(ipv4__contains=string)[:5]
+        #result = Iplist.objects.filter(ipv4__contains=string)[:5]
+    #time.sleep(5)
+    return result
+
+def search_text(string: str = ''):
+    """ Функция для поиска данных в БД"""
+    global FUN_SPEED
+    context = {'SearchFor': string}
+    context['Data'] = DeepSearch(string)
+    context['TakeTime'] = FUN_SPEED
+    context['Info'] = ''
+    FUN_SPEED = 0
+    return context
 
 
 # def ExcelHandler(filename = ''):
@@ -96,6 +132,7 @@ def upload_file_handler(request, functionhandler = None):
 
 
 class ExtractDataXls():
+    """Основной класс для анализа xls файла"""
     def __init__(self, filename=''):
         self.ip_addr_idx = 1
         self.count_total: int = 0 #total records in db
