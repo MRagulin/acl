@@ -1,0 +1,78 @@
+{% extends 'base.html' %}
+
+{% block content %}
+{% load static %}
+<div class="main-feed">
+      <div class="post">
+          <h1 class="title-block">Создание <span>ACL</span></h1>
+        <ul class="descr-list">
+
+          <li class="descr-item">
+            <a class="descr-link--active" href="#">Обзор</a>
+          </li>
+          <li class="descr-item">
+            <a class="descr-link descr-link" href="#">Заполнение формы</a>
+          </li>
+          <li class="descr-item">
+            <a class="descr-link" href="#">Формирование Обращения</a>
+          </li>
+        </ul>
+      </div>
+
+      <div class="main">
+        <div class="post-sidebar d-none">
+          <span class="post-title">Статус</span>
+          <ul class="post-list">
+            <li class="post-list__item">
+              <a class="post-list__link" href="#">
+                <img class="post-link__circle--active" src="{% static 'img/check.svg' %}" alt="icon:check">
+              </a>
+            </li>
+            <li class="post-list__item">
+              <a class="post-list__link" href="#">
+                <img class="post-link__circle" src="{% static 'img/check.svg' %}" alt="icon:check">
+              </a>
+            </li>
+            <li class="post-list__item">
+              <a class="post-list__link" href="#">
+                <img class="post-link__circle" src="{% static 'img/check.svg' %}" alt="icon:check">
+
+              </a>
+            </li>
+            <li class="post-list__item">
+              <a class="post-list__link" href="#">
+                <img class="post-link__circle" src="{% static 'img/check.svg' %}" alt="icon:check">
+              </a>
+            </li>
+            <li class="post-list__item">
+              <a class="post-list__link" href="#">
+                 <img class="post-link__circle" src="{% static 'img/check.svg' %}" alt="icon:check">
+              </a>
+            </li>
+          </ul>
+        </div>
+        <div class="post-container">
+        <div class="row">
+            <div class="col-4">
+                <img class="img-fluid" src="{% static 'img/network.png' %}" style="height: 450px">
+            </div>
+            <div class="col-7 mt-5">
+                <div class="card text-center border-0">
+                      <div class="card-body">
+                        <h5 class="card-title">Создание ACL листа</h5>
+                        <p class="card-text">Списки доступа (access-lists) используются в целом ряде случаев и
+   являются общим механизмом задания условий, которые роутер проверяет
+   перед выполнением каких-либо действий.</p>
+                        <a href="{% url 'aclcreate_urls' %}" class="btn btn-danger btn-create-activity">Начать</a>
+                      </div>
+                </div>
+
+            </div>
+
+        </div>
+
+      </div>
+    </div>
+   </div>
+
+ {% endblock %}

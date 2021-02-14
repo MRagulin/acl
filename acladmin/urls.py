@@ -19,6 +19,8 @@ from django.conf.urls import include, url
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    #path('acl/<str:action>/', include('accesslist.urls')),
+    path('acl/', include('accesslist.urls')),
     path('', include('ownerlist.urls'))
 
 ]

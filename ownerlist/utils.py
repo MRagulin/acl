@@ -9,6 +9,7 @@ from django.conf import settings
 from django.db.utils import IntegrityError, DataError
 import datetime
 import time
+import asyncio
 
 FUN_SPEED = 0
 
@@ -69,14 +70,29 @@ def DeepSearch(string: str = ''):
     #time.sleep(5)
     return result
 
-def search_text(string: str = ''):
+
+
+def write_history(request, string, status) -> None:
+    """Сохранять историю поиска, для улучшения качества поиска"""
+    hc = apps.get_model('ownerlist', 'HistoryCall')
+    ip = apps.get_model('ownerlist', 'Iplist')
+
+    ip_object, obj = ip.objects.get_or_create(ipv4=request.META.get('REMOTE_ADDR'))
+    hc_object, obj = hc.objects.get_or_create(string=string,
+                                         ipv4=ip_object,
+                                         status=status)
+
+
+def search_text(request=None, string: str = '') -> dict:
     """ Функция для поиска данных в БД"""
     global FUN_SPEED
+    result = DeepSearch(string)
     context = {'SearchFor': string}
-    context['Data'] = DeepSearch(string)
+    context['Data'] = result
     context['TakeTime'] = FUN_SPEED
     context['Info'] = ''
     FUN_SPEED = 0
+    write_history(request, string, bool(result))
     return context
 
 

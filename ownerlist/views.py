@@ -25,7 +25,7 @@ class SearchView(View):
         if result == '':
                 return redirect('ipconfig_urls')
         if search is not None:
-            context = search_text(result)
+            context = search_text(request, result)
         return render(request, 'search.html', context=context)
 
 

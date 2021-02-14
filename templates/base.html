@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    {% load static %}
+  <link rel="stylesheet" href="{% static 'css/style.css' %}">
+  <link rel="stylesheet" href="{% static 'css/bootstrap.css' %}">
+  <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" ></script>
+  <script src="{% static 'js/main.js' %}"></script>
+  <title>
+      {% block title %}
+          ACL - форма
+      {% endblock %}
+  </title>
+</head>
+<body>
+  <header class="header">
+    <div class="center-block">
+      <div class="header-block col-lg-6 col-md-8 col-sm-12">
+        <form action="{%  url 'search' %}" method="GET" autocomplete="off" name="search-text" class="w-100" role="search" onsubmit="search_from_page(this);">
+            <input type="text" class="search-input" id="search-input-text" placeholder="Поиск IP или домена">
+        </form>
+      </div>
+   </div>
+<script type="text/javascript">
+    function search_from_page(form) {
+        form.action = window.location.origin+'/search/'+document.getElementById("search-input-text").value;
+    }
+</script>
+</header>
+
+<div class="wrapper">
+            <div class="menu-sidebar">
+                <div class="menu-sidebar-text">
+                  <nav class="nav-group">
+                    <a href="{% url 'aclcreate_urls' %}" class="nav-link">
+                      <span class="nav-text">
+                        Создание ACL
+                      </span>
+                    </a>
+                    <a href="#" class="nav-link">
+                      <span class="nav-text">
+                        Ресурсы VPN
+                      </span>
+                    </a>
+                    <a href="#" class="nav-link">
+                      <span class="nav-text">
+                        История обращений
+                      </span>
+                    </a>
+                    <a href="#" class="nav-link">
+                      <span class="nav-text">
+                        IP- адреса
+                      </span>
+                    </a>
+                  </nav>
+               </div>
+        </div>
+    <div class="content">
+             {% block content %}
+                Добро пожаловать
+            {% endblock %}
+    </div>
+</div>
+</body>
+</html>

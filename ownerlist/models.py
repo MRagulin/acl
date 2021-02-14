@@ -1,12 +1,12 @@
 from django.db import models
 from .utils import IP2Int
 
+
 class Tags(models.Model):
     name = models.CharField(blank=True, max_length=128, unique=True, verbose_name="Имя тега", default="default")
 
     def __str__(self):
         return "Тег: {}".format(self.name)
-
 
 class Vlans(models.Model):
     name = models.CharField(blank=True, max_length=64, verbose_name="Имя VLAN")
@@ -63,5 +63,10 @@ class Iplist(models.Model):
         super().save(*args, **kwargs)
 
 
-
+class HistoryCall(models.Model):
+    string = models.TextField(blank=True)
+    status = models.BooleanField(default=False, verbose_name="Is result")
+    ipv4 = models.ForeignKey(Iplist, null=True, on_delete=models.SET_NULL)
+    username = models.CharField(blank=True, max_length=64)
+    date = models.DateTimeField(auto_now_add=True, blank=True)
 
