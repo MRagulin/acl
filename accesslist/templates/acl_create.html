@@ -1,7 +1,107 @@
 {% extends 'acl_base.html' %}
-{% block title %}
-    Создание ACL
-{% endblock %}
-{% block content %}
+{% load static %}
 
+{% block row %}
+ <div class="col-12">
+
+<div class="p-5">
+              <div class="main-block">
+            <h4 class="main-title">1. Контактная информация <span class="badge badge-danger">Required</span></h4>
+          </div>
+          <div class="main-form">
+            <form class="contact-form" action="#">
+              <label class="contact-form__label">
+                <span class="contact-form__text">ФИО</span>
+                <input type="text" class="contact__input" placeholder="Иванов Иван" pattern="[А-Яа-яЁё\s]{3,32}" title="Username should only contain lowercase letters. e.g. john" autofocus>
+                <span class="validity"></span>
+
+              </label>
+              <label class="contact-form__label">
+                <span class="contact-form__text">Отдел/Управление</span>
+                <input type="text" class="contact__input" placeholder="УИБ" pattern="[А-Яа-яЁёA-Za-z\s]{2,32}">
+                <span class="validity"></span>
+              </label>
+
+              <label class="contact-form__label">
+                <span class="contact-form__text">Email</span>
+                <input type="email" name="Email" class="contact__input" placeholder="Norepl@Alfastrah.ru" pattern=".+@alfastrah.ru">
+                <span class="validity"></span>
+              </label>
+
+              <label class="contact-form__label">
+                <span class="contact-form__text">Проект/ИС</span>
+                <input type="text" class="contact__input" placeholder="Легкий Вход" pattern="[.+]{3,64}">
+                <span class="validity"></span>
+              </label>
+
+              <label class="contact-form__label">
+                <span class="contact-form__text">Телефон</span>
+                <input type="tel" name="Телефон" class="contact__input" placeholder="89096971821" pattern="[0-9]{4,}">
+                   <span class="validity"></span>
+              </label>
+            </form>
+
+
+          </div>
+          <div class="form-row__bottom">
+
+            <form class="contact-form__dates" action="#">
+
+              <label class="contact-form__label-checkbox">
+                <span class="contact-form__text">Дата ввода в эсплуатацию </span>
+                <input type="date" class="contact__input" id="contact__input__start" placeholder="21.01.2020" min="2020-01-01" max="2030-01-01">
+                <span class="validity"></span>
+              </label>
+
+              <label class="contact-form__label-checkbox">
+                <span class="contact-form__text">Дата вывода из эксплуатации</span>
+                <input type="date" class="contact__input" id="contact__input__term" placeholder="30.12.2030" min="2020-01-01" max="2030-01-01">
+                <span class="validity"></span>
+                <input type="checkbox" class="checkbox__real" id="checkbox__real__term">
+                <label for="checkbox__real__term">Бессрочно</label>
+{#                <span class="checkbox__title checkbox__title-active">Бессрочно</span>#}
+
+              </label>
+
+              <label class="contact-form__label-checkbox">
+                <span class="contact-form__text contact-form__text-active">Дата заполнения </span>
+                <input type="date" class="contact__input" id="contact__input__date" placeholder="01.01.2021" min="2020-01-01">
+            </label>
+            </form>
+           <!-- <form class="checkbox-form" action="#">
+              <label class="checkbox">
+                <input type="checkbox" class="checkbox__real" name="value-05">
+                <span class="checkbox__fake"></span>
+                <span class="checkbox__title">Без Срока</span>
+              </label>
+            </form>-->
+
+
+
+          </div>
+          <div class="form-row__footer">
+          <form class="contact-form__submit" action="#">
+          <label class="label-form__submit">
+          <input type="checkbox" class="checkbox__real-submit" name="value-05">
+          <span class="checkbox__fake"></span>
+          <span class="checkbox__title-footer">Сгенерировать Word Файл</span>
+          </label>
+         <label class="label-form__submit">
+          <input type="checkbox" class="checkbox__real-submit" name="value-05">
+          <span class="checkbox__fake"></span>
+          <span class="checkbox__title-footer">Отправить обращение в OmniTracker</span>
+          </label>
+
+          </form>
+           <button type="submit" class="form-btn form-btn--submit">Сохранить И Продолжить</button>
+          </div>
+
+
+</div>
+
+<script>
+    $(".post-sidebar").removeClass("d-none");
+    $("#contact__input__date, #contact__input__start").val(GetCurrentDate());
+</script>
+</div>
 {% endblock %}

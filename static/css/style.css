@@ -311,11 +311,12 @@ ul {
 }
 
 .post-sidebar {
-    height: 600px;
+    #height: 600px;
     width: 100px;
     border: 1px solid #e1e1e1;
     border-top: none;
     border-bottom: none;
+    border-left: none;
     padding: 20px 0;
 }
 
@@ -360,23 +361,10 @@ ul {
   font-weight: 500;
 }
 
-.post-sidebar {
-  height: 600px;
-  width: 100px;
-  border: 1px solid #e1e1e1;
-  border-top: none;
-  border-bottom: none;
-  padding: 20px 0;
-}
+/*.post-container {*/
+/*padding-top: 20px;*/
 
-.post-container {
-  width: 947px;
-  height: 450px;
-  border-top: none;
-  #margin-left: 70px;
-  #padding-top: 30px;
-  #padding-right: 70px;
-}
+/*}*/
 
 .post-title {
   display: block;
@@ -394,7 +382,7 @@ ul {
 .post-link__circle--active {
   width: 30px;
   height: 30px;
-  background-color: forestgreen;
+  background-color: #1e7e34;
   border-radius: 50%;
   border: none;
   padding: 3px;
@@ -441,17 +429,17 @@ ul {
   font-size: 16px;
 }
 
-.main-title span {
-  display: inline-block;
-  margin-left: 10px;
-  background-color: deeppink;
-  padding: 5px 12px;
-  color: #f1f1f1;
-  font-size: 14px;
-  line-height: 1.2;
-  font-weight: 300;
-  border-radius: 3px;
-}
+/*.main-title span {*/
+/*  display: inline-block;*/
+/*  margin-left: 10px;*/
+/*  background-color: deeppink;*/
+/*  padding: 5px 12px;*/
+/*  color: #f1f1f1;*/
+/*  font-size: 14px;*/
+/*  line-height: 1.2;*/
+/*  font-weight: 300;*/
+/*  border-radius: 3px;*/
+/*}*/
 
 .contact-form {
   display: grid;
@@ -473,7 +461,7 @@ ul {
 
 .contact-form__label-checkbox {
   display: grid;
-  grid-template-columns: 2fr 1fr 40px 90px;
+  grid-template-columns: 2fr 1fr 40px 190px;
   grid-template-rows: 1fr;
   align-items: center;
 }
@@ -495,7 +483,8 @@ ul {
   border: 1px solid lightgray;
   outline: #e0e0e0;
   padding: 4px 8px;
-  color: #d1d1d1;
+  color: #0d6a0d;
+  width: 250px;
 }
 
 ::-webkit-input-placeholder {
@@ -520,7 +509,7 @@ ul {
 }
 
 .checkbox__title-active {
-  color: green;
+  color: #212529;
   font-size: 18px;
 }
 
@@ -528,7 +517,6 @@ ul {
   margin-left: 5px;
   width: 27px;
   height: 27px;
-  background-color: green;
 }
 
 .form-row__footer {
@@ -587,7 +575,7 @@ ul {
 }
 
 .checkbox__real-submit:checked + .checkbox__fake {
-  background-color: red;
+  background-color: #1e7e34;
 }
 
 .checkbox__title-footer {
@@ -598,12 +586,12 @@ ul {
 
 .form-btn {
   height: 40px;
-  width: 30%;
+  width:220px;
   font-family: inherit;
-  background: #32a232;
+  background: #1e7e34;
   text-align: center;
-  border: 1px solid #d6d6d6;
-  border-radius: 4px;
+  border: none;
+  border-radius: 3px;
   cursor: pointer;
   font-size: 16px;
   color: #f2f2f2;
@@ -612,4 +600,22 @@ ul {
 
 .form-btn:hover {
   background-color: green;
+}
+
+input:not([type='checkbox']):invalid+span:after{
+  position: absolute;
+  content: '✖';
+  padding-left: 5px;
+  color: #bd2130d6;
+  font-weight: 700;
+  margin-top: -15px;
+}
+
+input:not([type='checkbox']):valid+span:after {
+    position: absolute;
+    content: '✓';
+    padding-left: 5px;
+    color: #0d6a0d;
+   font-weight: 700;
+   margin-top: -15px;
 }

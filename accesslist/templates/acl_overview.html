@@ -1,0 +1,19 @@
+{% extends 'acl_base.html' %}
+{% load static %}
+{% block row %}
+ <div class="col-2">
+            <img class="img-fluid" src="{% static 'img/network.png' %}" style="height: 450px">
+            </div>
+            <div class="col-7 mt-5">
+                <div class="card text-center border-0">
+                      <div class="card-body">
+                        <h5 class="card-title">Создание ACL листа</h5>
+                        <p class="card-text">Списки доступа (access-lists) используются в целом ряде случаев и
+   являются общим механизмом задания условий, которые роутер проверяет
+   перед выполнением каких-либо действий.</p>
+                        <a href="{% url 'aclcreate_urls' %}" class="btn btn-danger btn-create-activity">Начать</a>
+                      </div>
+                </div>
+
+            </div>
+{% endblock %}

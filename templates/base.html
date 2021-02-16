@@ -7,8 +7,8 @@
     {% load static %}
   <link rel="stylesheet" href="{% static 'css/style.css' %}">
   <link rel="stylesheet" href="{% static 'css/bootstrap.css' %}">
-  <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" ></script>
-  <script src="{% static 'js/main.js' %}"></script>
+  <script src="{% static 'js/jquery-3.4.1.js' %}"></script>
+  <script src="{% static 'js/main.js' %}" ></script>
   <title>
       {% block title %}
           ACL - форма
@@ -35,7 +35,7 @@
             <div class="menu-sidebar">
                 <div class="menu-sidebar-text">
                   <nav class="nav-group">
-                    <a href="{% url 'aclcreate_urls' %}" class="nav-link">
+                    <a href="{% url 'acloverview_urls' %}" class="nav-link">
                       <span class="nav-text">
                         Создание ACL
                       </span>
