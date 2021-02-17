@@ -175,7 +175,7 @@ body {
 
 .post {
   background: #fff;
-  box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
   border-radius: 4px;
   margin: 16px 0;
   padding: 16px;
@@ -311,13 +311,11 @@ ul {
 }
 
 .post-sidebar {
-    #height: 600px;
+    height: 100%;
     width: 100px;
-    border: 1px solid #e1e1e1;
-    border-top: none;
-    border-bottom: none;
-    border-left: none;
+    border-right: 1px solid #e1e1e1;
     padding: 20px 0;
+   margin-right: 15px;
 }
 
 .title-block {
@@ -361,10 +359,10 @@ ul {
   font-weight: 500;
 }
 
-/*.post-container {*/
-/*padding-top: 20px;*/
+.post-container {
+width: 100%;
 
-/*}*/
+}
 
 .post-title {
   display: block;
@@ -421,7 +419,7 @@ ul {
 }
 
 .main-block {
-  margin-bottom: 60px;
+  margin-bottom: 30px;
 }
 
 .main-title {
@@ -584,30 +582,34 @@ ul {
 
 
 
-.form-btn {
-  height: 40px;
-  width:220px;
-  font-family: inherit;
-  background: #1e7e34;
-  text-align: center;
-  border: none;
-  border-radius: 3px;
-  cursor: pointer;
-  font-size: 16px;
-  color: #f2f2f2;
-  transition: background-color 0.2s ease-in;
+/*.form-btn {*/
+/*  height: 40px;*/
+/*  width:220px;*/
+/*  font-family: inherit;*/
+/*  background: #1e7e34;*/
+/*  text-align: center;*/
+/*  border: none;*/
+/*  border-radius: 3px;*/
+/*  cursor: pointer;*/
+/*  font-size: 16px;*/
+/*  color: #f2f2f2;*/
+/*  transition: background-color 0.2s ease-in;*/
+/*}*/
+
+/*.form-btn:hover {*/
+/*  background-color: green;*/
+/*}*/
+
+input:not([type='checkbox']):invalid+span:after {
+    position: absolute;
+    content: 'X';
+    padding-left: 5px;
+    color: #ba1010;
+    font-weight: 700;
+
 }
 
-.form-btn:hover {
-  background-color: green;
-}
-
-input:not([type='checkbox']):invalid+span:after{
-  position: absolute;
-  content: '✖';
-  padding-left: 5px;
-  color: #bd2130d6;
-  font-weight: 700;
+.contact-form__label > input:not([type='checkbox']):invalid+span:after {
   margin-top: -15px;
 }
 
@@ -616,6 +618,31 @@ input:not([type='checkbox']):valid+span:after {
     content: '✓';
     padding-left: 5px;
     color: #0d6a0d;
-   font-weight: 700;
+    font-weight: 700;
+
+}
+
+.contact-form__label > input:not([type='checkbox']):valid+span:after {
    margin-top: -15px;
+}
+
+
+.btn-action {
+    font-size: 16px;
+    font-weight: bolder;
+    cursor: pointer;
+    /*margin: -5px 0px 0px 5px;*/
+    width: 30px;
+}
+
+.form-row {
+  min-width: 800px;
+}
+
+.table-ip-internal th{
+    text-align: center;
+}
+
+.table-ip-internal tr{
+    border-top: hidden;
 }

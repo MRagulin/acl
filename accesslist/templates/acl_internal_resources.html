@@ -1,0 +1,59 @@
+{% extends 'acl_base.html' %}
+{% load static %}
+
+{% block row %}
+
+<div class="p-4">
+    <div class="main-block">
+         <h4 class="main-title text-center mb-1">2. Описание доступа к ресурсам <span class="badge badge-danger">Required</span></h4>
+         <p class="main-description">2.1 Список внутренних ресурсов (СГ АльфаСтрахование)</p>
+    </div>
+
+    <table class="table table-ip-internal" style="display:inline-table;">
+        <thead>
+     <tr>
+         <th>IP-адрес источника</th>
+         <th>Префикс-сети</th>
+         <th>Описание</th>
+         <th>Активность</th>
+     </tr>
+
+      </thead>
+{#        <tbody>#}
+     <tr>
+                <td class="">
+                    <input type="text"  class="form-control" placeholder="172.16.45.75" id="input__ip" autofocus minlength="7" maxlength="15" size="15" pattern="^((\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.){3}(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])$">
+                    <span class="validity"></span>
+                </td>
+
+                <td class="">
+                        <input type="text" class="form-control" placeholder="/16" id="input__mask"  style="max-width: 110px;" pattern="^((\d{1,2}">
+                        <span class="validity"></span>
+                </td>
+                <td>
+                        <textarea class="form-control" placeholder="Внутренняя сеть АС" rows="1" id="input_descr" pattern=".{3,}"></textarea>
+                        <span class="validity"></span>
+                </td>
+                <td>
+                            <button class="btn btn-danger btn-sm btn-action btn-action-rm ml-3" type="button">-</button>
+                            <button class="btn btn-success btn-sm btn-action btn-action-add ml-1" type="button" onclick="AddRowTable();">+</button>
+                </td>
+     </tr>
+
+{#    </tbody>#}
+        </table>
+
+              <div class="form-row__footer">
+                  <div class="m-3">
+                      <a type="submit" class="btn btn-success" href="{% url 'acldmz_urls' %}">Сохранить И Продолжить</a>
+                  </div>
+              </div>
+    </div>
+
+<script>
+    $(".post-sidebar").removeClass("d-none");
+    $(".post-list > li:nth-child(2) >> img").removeClass("post-link__circle").addClass("post-link__circle--active");
+
+</script>
+</div>
+{% endblock %}

@@ -2,6 +2,10 @@ from django.shortcuts import render
 from django.views.generic import View
 
 
+class AclTest(View):
+    def get(self, request):
+        return render(request, 'acl_test.html')
+
 class AclOver(View):
     def get(self, request):
         return render(request, 'acl_overview.html')
@@ -18,3 +22,12 @@ class AclCreate(View):
 # class AclInfo(View):
 #     def get(self, request):
 #         return render(request, 'acl_create_info.html')
+
+
+class AclCreate_StageOne(View):
+    def get(self, request):
+        return render(request, 'acl_internal_resources.html')
+
+class AclCreate_StageTwo(View):
+    def get(self, request):
+        return render(request, 'acl_dmz_resources.html')
