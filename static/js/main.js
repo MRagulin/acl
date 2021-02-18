@@ -44,7 +44,7 @@ $(document).ready(function(){
 
     $(".table-ip-internal").delegate('.btn-action-add','click', function() {
     let tr    = $(this).closest('tr')[0];
-    $(tr).clone().insertAfter(tr).find('input:text').val('');
+    $(tr).clone().insertAfter(tr).find('.form-control').val('').attr('placeholder', '');
     });
 
 

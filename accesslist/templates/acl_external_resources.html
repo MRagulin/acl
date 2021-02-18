@@ -1,0 +1,80 @@
+{% extends 'acl_base.html' %}
+{% load static %}
+{% block row %}
+
+
+<div class="col-8 pt-3">
+        <div class="main-block">
+             <h4 class="main-title text-center mb-1">2. Описание доступа к ресурсам <span class="badge badge-danger">Required</span></h4>
+             <p class="main-description">2.3 Список внешних ресурсов (Internet)</p>
+        </div>
+
+<form class="form-inline">
+        <div class="form-row">
+            <table class="table table-md table-ip-internal" border="0">
+                <thead>
+                     <tr>
+                         <th>IP-адрес источника</th>
+                         <th>Префикс-сети</th>
+                         <th>Описание</th>
+                         <th></th>
+                     </tr>
+
+              </thead>
+                <tbody>
+                     <tr>
+                                <td class="">
+                                    <input type="text"  class="form-control" placeholder="173.194.222.0" id="input__ip" autofocus minlength="7" maxlength="15" size="15" pattern="^((\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.){3}(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])$">
+                                    <span class="validity"></span>
+                                </td>
+
+                                <td class="">
+                                        <input type="text" class="form-control" placeholder="/25" id="input__mask"  style="max-width: 110px;" pattern="^((\d{1,2}">
+                                        <span class="validity"></span>
+                                </td>
+                                <td>
+                                        <textarea class="form-control" placeholder="Сервисы google" rows="1" cols="40"  id="input_descr" pattern=".{3,}"></textarea>
+                                        <span class="validity"></span>
+                                </td>
+                                <td>
+                                            <button class="btn btn-danger btn-sm btn-action btn-action-rm ml-1" type="button">-</button>
+                                            <button class="btn btn-success btn-sm btn-action btn-action-add ml-1" type="button">+</button>
+                                </td>
+                     </tr>
+
+                                     <tr>
+                                <td class="">
+                                    <input type="text"  class="form-control" placeholder="api.yandex.net" id="input__ip" autofocus minlength="7" maxlength="15" size="15" pattern="^((\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.){3}(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])$">
+                                    <span class="validity"></span>
+                                </td>
+
+                                <td class="">
+                                        <input type="text" class="form-control" placeholder="" id="input__mask"  style="max-width: 110px;" pattern="^((\d{1,2}">
+                                        <span class="validity"></span>
+                                </td>
+                                <td>
+                                        <textarea class="form-control" placeholder="Доступ к  API yandex map" rows="1" cols="40"  id="input_descr" pattern=".{3,}"></textarea>
+                                        <span class="validity"></span>
+                                </td>
+                                <td>
+                                            <button class="btn btn-danger btn-sm btn-action btn-action-rm ml-1" type="button">-</button>
+                                            <button class="btn btn-success btn-sm btn-action btn-action-add ml-1" type="button">+</button>
+                                </td>
+                     </tr>
+                </tbody>
+            </table>
+        </div>
+</form>
+
+<div class="d-flex justify-content-end mt-5 pt-3 border-top bottom-form-save">
+        <a type="submit" class="btn btn-success" href="{% url 'acltraffic_urls' %}">Сохранить И Продолжить</a>
+</div>
+<script>
+    $(".post-sidebar").removeClass("d-none");
+    $(".post-list > li:nth-child(2) >> img").removeClass("post-link__circle").addClass("post-link__circle--active");
+    $(".post-list > li:nth-child(3) >> img").removeClass("post-link__circle").addClass("post-link__circle--active");
+    $(".post-list > li:nth-child(4) >> img").removeClass("post-link__circle").addClass("post-link__circle--active");
+
+</script>
+</div>
+{% endblock %}
