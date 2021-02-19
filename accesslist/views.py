@@ -4,51 +4,74 @@ from ownerlist.utils import make_doc
 from django.http import HttpResponseRedirect
 from django.urls import reverse
 from django.contrib import messages
+from django.http import HttpResponse
+import json
 
-data:dict = {}
+LOCAL_STORAGE:dict = {}
 act:dict = {}
 post_name_forms_key = [['name', 'email', 'tel', 'department', 'project', 'd_form', 'd_start', 'd_complete']]
 INFINITY = 'Нет'
 
-def request_handler(requests, namespace = ''):
+def append_global(namespace, list):
     global data
+    if namespace in data:
+        data[namespace].append(list)
+    else:
+        data[namespace] = [list, ]
+    return data
 
-    if namespace == 'contact':
-        con_list = []
-        for idx, post_key in enumerate(post_name_forms_key[0]):
-            if idx == 7: #post_key == 'd_complete'
-                if requests.POST.get(post_key) == 'on':
-                    con_list.append(INFINITY)
-            else:
-                if requests.POST.get(post_key) != '':
-                    con_list.append(requests.POST.get(post_key))
-                else:
-                    return False
-        data = {namespace: con_list}
 
-    elif namespace == 'internal':
-        con_list:list = []
-        data[namespace] = []
+def request_handler(requests, namespace=''):
+    global LOCAL_STORAGE
+    KEY = 0
+
+    if namespace == 'internal':
         for k, v in requests.POST.items():
             if 'input_' in str(k):
-                 if 'input__ip' in str(k):
-                    if len(con_list) > 0:
-                        if namespace in data:
-                            data[namespace].append(con_list)
-                            con_list.clear()
+                if 'input__ip' in str(k):
+                        if namespace in LOCAL_STORAGE:
+                                 LOCAL_STORAGE[namespace].append([v])
+                                 KEY += 1
                         else:
-                             data[namespace] = [con_list, ]
-                             con_list.clear()
-                 if v != '':
-                        con_list.append(v)
-                 else:
-                     return False
+                            LOCAL_STORAGE[namespace] = [[v]]
+                else:
+                        LOCAL_STORAGE[namespace][KEY].append(v)
 
-
-
-
-
-    return True
+    elif namespace == 'contact':
+            LOCAL_STORAGE[namespace] = []
+            for idx, post_key in enumerate(post_name_forms_key[0]):
+                if idx == 7: #post_key == 'd_complete'
+                    if requests.POST.get(post_key) == 'on':
+                        LOCAL_STORAGE[namespace].append(INFINITY)
+                else:
+                    if requests.POST.get(post_key) != '':
+                        LOCAL_STORAGE[namespace].append(requests.POST.get(post_key))
+                    else:
+                        return False
+    #
+    # elif namespace == 'internal':
+    #     con_list:list = []
+    #     for k, v in requests.POST.items():
+    #         if 'input_' in str(k):
+    #              if 'input__ip' in str(k):
+    #                 if len(con_list) > 0:
+    #                     if namespace in LOCAL_STORAGE:
+    #                         LOCAL_STORAGE[namespace].append(con_list)
+    #                         con_list.clear()
+    #                     else:
+    #                         LOCAL_STORAGE[namespace] = [con_list]
+    #                         con_list.clear()
+    #              if v != '':
+    #                     con_list.append(v)
+    #              else:
+    #                  return False
+    #     if len(con_list) > 0:
+    #         if namespace in LOCAL_STORAGE:
+    #             LOCAL_STORAGE[namespace].append(con_list)
+    #             con_list.clear()
+    #         else:
+    #             LOCAL_STORAGE[namespace] = [con_list]
+    return LOCAL_STORAGE
 
 class AclTest(View):
     def get(self, request):
@@ -99,11 +122,14 @@ class AclCreate_StageOne(View):
         return render(request, 'acl_internal_resources.html')
 
     def post(self, request):
+        global LOCAL_STORAGE
         if request.method == 'POST' and request.is_ajax and request_handler(request, 'internal'):
-            return HttpResponseRedirect(reverse('acldmz_urls'))  #acl_dmz_resources
-        else:
-            messages.warning(request, 'Не все поля заполнены')
-            return render(request, 'acl_internal_resources.html')
+            file_download = make_doc(LOCAL_STORAGE)
+            return HttpResponse(json.dumps(file_download), content_type="application/json")
+            #return HttpResponseRedirect(reverse('acldmz_urls'))  #acl_dmz_resources
+        # else:
+        #     messages.warning(request, 'Не все поля заполнены')
+        #     return render(request, 'acl_internal_resources.html')
 
 
 
