@@ -10,6 +10,9 @@ from django.db.utils import IntegrityError, DataError
 import datetime
 import time
 import asyncio
+from docx import Document
+from docx.shared import Pt
+import uuid
 
 FUN_SPEED = 0
 
@@ -620,3 +623,24 @@ class ExtractDataXls():
         if not DEBUG:
             return self.ExtractIPInfo(domain_idx=col_index['domain'], ip_idx=col_index['ip'], owner_idx=col_index['owner'],
                                   comment_idx=col_index['comment'], stop_recurse=True, HasTags=Tags)
+
+
+def make_doc(data_set={}):
+    TEMPLATE_FILE = os.path.join(BASE_DIR, 'templates\\ACL.docx')
+    APP_FILE = 'static\\docx\\Application_' + str(uuid.uuid4()) + '.docx'
+    doc = Document(TEMPLATE_FILE)
+    doc.styles['Normal'].font.name = 'Verdana'
+    doc.styles['Normal'].font.size = Pt(10)
+
+    for data_inx, data in enumerate(data_set):
+        table_tmp = doc.tables[data_inx]  # Берем таблицу
+        if data_inx == 0:  # Для таблицы контакты, меняем правила игры
+            for row_idx, row_data in enumerate(data_set[data]):
+                table_tmp.cell(row_idx, 1).text = row_data
+        else:
+            for key, value in enumerate(data_set[data], start=1):
+                for cell_idx, cell_val in enumerate(value):
+                    table_tmp.cell(key, cell_idx).text = cell_val
+
+    doc.save(os.path.join(BASE_DIR, APP_FILE))
+    return "..\\..\\" + APP_FILE

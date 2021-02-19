@@ -9,7 +9,8 @@
              <p class="main-description">2.1 Список внутренних ресурсов (СГ АльфаСтрахование)</p>
         </div>
 
-<form class="form-inline">
+<form class="form-inline" method="post" action="{% url 'aclinternal_urls' %}" name="acl-form-internal" enctype="multipart/form-data">
+    {% csrf_token %}
         <div class="form-row">
             <table class="table table-md table-ip-internal" border="0">
                 <thead>
@@ -24,16 +25,16 @@
                 <tbody>
                      <tr>
                                 <td class="">
-                                    <input type="text"  class="form-control" placeholder="172.16.45.75" id="input__ip" autofocus minlength="7" maxlength="15" size="15" pattern="^((\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.){3}(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])$">
+                                    <input type="text"  class="form-control" placeholder="172.16.45.75" name="input__ip" autofocus minlength="7" maxlength="15" size="15" pattern="^((\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.){3}(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])$">
                                     <span class="validity"></span>
                                 </td>
 
                                 <td class="">
-                                        <input type="text" class="form-control" placeholder="/16" id="input__mask"  style="max-width: 110px;" pattern="^([0-9]){1,2}$" min="1" max="32">
+                                        <input type="text" class="form-control" placeholder="/16" name="input__mask"  style="max-width: 110px;" pattern="^([0-9]){1,2}$" min="1" max="32">
                                         <span class="validity"></span>
                                 </td>
                                 <td>
-                                        <textarea class="form-control" placeholder="Внутренняя сеть АС" rows="1" cols="40"  id="input_descr" pattern=".{3,}"></textarea>
+                                        <textarea class="form-control" placeholder="Внутренняя сеть АС" rows="1" cols="40"  name="input_descr" pattern=".{3,}"></textarea>
                                         <span class="validity"></span>
                                 </td>
                                 <td>
@@ -44,15 +45,17 @@
                 </tbody>
             </table>
         </div>
-</form>
 
-<div class="d-flex justify-content-end mt-5 pt-3 border-top bottom-form-save">
-        <a type="submit" class="btn btn-success" href="{% url 'acldmz_urls' %}">Сохранить И Продолжить</a>
+
+<div class="d-flex justify-content-end mt-5 pt-3 border-top bottom-form-save" style="min-width: 80%!important;">
+       <input type="submit" value="Сохранить И Продолжить">
+{#    <a type="submit" class="btn btn-success" href="{% url 'acldmz_urls' %}">Сохранить И Продолжить</a>#}
 </div>
 <script>
     $(".post-sidebar").removeClass("d-none");
     $(".post-list > li:nth-child(2) >> img").removeClass("post-link__circle").addClass("post-link__circle--active");
 
 </script>
+    </form>
 </div>
 {% endblock %}

@@ -8,6 +8,11 @@ pattern='^((\\d{1,2}|1\\d\\d|2[0-4]\\d|25[0-5])\\.){3}(\\d{1,2}|1\\d\\d|2[0-4]\\
 </textarea><span class='validity'></span></td><td><button class='btn btn-danger btn-sm btn-action btn-action-rm ml-3' type='button'>-</button>
 <button class='btn btn-success btn-sm btn-action btn-action-add ml-1' type='button'>+</button></td>
 </tr>`;
+let el_id = 0;
+
+function hasNumber(myString) {
+  return /\d/.test(myString);
+}
 
 function GetCurrentDate()
 {
@@ -42,15 +47,45 @@ $(document).ready(function(){
 
     });
 
+    //.val('').attr('placeholder', '').attr('name', input_name)
     $(".table-ip-internal").delegate('.btn-action-add','click', function() {
+
     let tr    = $(this).closest('tr')[0];
-    $(tr).clone().insertAfter(tr).find('.form-control').val('').attr('placeholder', '');
+    let new_name = $('.table-ip-internal tr:first-child').find('.form-control');
+    let idx_input = 0;
+    //let input_name = $(tr).attr('name') +'_'+ Math.random().toString(36).substr(2, 5)
+    $(tr).clone().insertAfter(tr).find('.form-control').each(function() {
+        //let name1 = $(tr).find('input:text')[el_id].name;
+        try
+        {   console.log(new_name[idx_input].name);
+            $(this).val('').attr('placeholder', '').attr('name',  new_name[idx_input].name+'_'+el_id.toString());
+            idx_input++;
+            el_id++;
+        }catch (e){
+            console.log(e);
+        }
+
+    });
+
+
     });
 
 
     $(".table-ip-internal").delegate('.btn-action-rm','click', function() {
-    let tr = $(".table-ip-internal tr");
-    if ($(tr).length > 2) {
+    let all_tr = $(".table-ip-internal tr");
+    if ($(all_tr).length > 2) {
+        try
+        {
+            let mom  = $(this).closest('tr').find('.form-control')[0];
+            if (!hasNumber($(mom).attr('name'))) //.parentElement.parentElement.nodeName == 'TBODY'
+            {
+                return false;
+            }
+        } catch (e)
+        {
+            console.log('Parent el not find, row remove.');
+        }
+
         tr = $(this).closest('tr')[0];
         $(tr).remove();
     }
