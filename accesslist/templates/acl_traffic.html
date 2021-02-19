@@ -9,7 +9,8 @@
              <p class="main-description">2.4 Потоки трафика**</p>
         </div>
 
-<form class="form-inline">
+<form class="form-inline" method="post" action="{% url 'acltraffic_urls' %}" name="acl-form-internal">
+    {% csrf_token %}
         <div class="form-row">
             <table class="table table-md table-ip-internal" border="0">
                 <thead>
@@ -27,32 +28,32 @@
                 <tbody>
                      <tr>
                                 <td class="">
-                                    <input type="text"  class="form-control" placeholder="dpgw.alfastrah.ru" id="input__domain_source" autofocus minlength="7" maxlength="32" size="15">
+                                    <input type="text"  class="form-control" placeholder="dpgw.alfastrah.ru" name="input__domain_source" autofocus minlength="7" maxlength="32" size="15">
                                     <span class="validity"></span>
                                 </td>
 
                                 <td class="">
-                                        <input type="text"  class="form-control" placeholder="195.239.64.162" id="input__ip_source" autofocus minlength="7" maxlength="15" size="15" pattern="^((\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.){3}(\d{1,2}|1\d">
+                                        <input type="text"  class="form-control" placeholder="195.239.64.162" name="input__ip_source" autofocus minlength="7" maxlength="15" size="15" pattern="^((\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.){3}(\d{1,2}|1\d">
                                         <span class="validity"></span>
                                 </td>
 
                                 <td>
-                                        <input type="text"  class="form-control" placeholder="Z14-1709-gw.alfastrah.ru" id="input__domain_source" autofocus minlength="7" maxlength="32" size="15">
+                                        <input type="text"  class="form-control" placeholder="Z14-1709-gw.alfastrah.ru" name="input__domain_dest" autofocus minlength="7" maxlength="32" size="15">
                                         <span class="validity"></span>
                                 </td>
 
                                 <td class="">
-                                        <input type="text"  class="form-control" placeholder="195.239.64.79" id="input__ip_source" autofocus minlength="7" maxlength="15" size="15" pattern="^((\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.){3}(\d{1,2}|1\d">
+                                        <input type="text"  class="form-control" placeholder="195.239.64.79" name="input__host_source" autofocus minlength="7" maxlength="15" size="15" pattern="^((\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.){3}(\d{1,2}|1\d">
                                         <span class="validity"></span>
                                 </td>
 
                                 <td class="">
-                                        <input type="text"  class="form-control" placeholder="TCP:80,443,9000-9100" id="input__ip_source" autofocus minlength="7" maxlength="15" size="15" pattern="^((\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.){3}(\d{1,2}|1\d">
+                                        <input type="text"  class="form-control" placeholder="TCP:80,443,9000-9100" name="input__host_port" autofocus minlength="7" maxlength="15" size="15" pattern="^((\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.){3}(\d{1,2}|1\d">
                                         <span class="validity"></span>
                                 </td>
 
                                 <td>
-                                        <textarea class="form-control" placeholder="Управление, отладка, мониторинг" rows="1" cols="40"  id="input_descr" pattern=".{3,}"></textarea>
+                                        <textarea class="form-control" placeholder="Управление, отладка, мониторинг" rows="1" cols="40"  name="input_descr" pattern=".{3,}"></textarea>
                                         <span class="validity"></span>
                                 </td>
                                 <td>
@@ -65,11 +66,12 @@
                 </tbody>
             </table>
         </div>
-</form>
+
 
 <div class="d-flex justify-content-end mt-5 pt-3 border-top bottom-form-save" style="min-width: 95%!important;">
-        <a type="submit" class="btn btn-success" href="{% url 'acloverview_urls' %}">Сформировать обращение</a>
+         <input type="submit" value="Сохранить И Продолжить">
 </div>
+</form>
 
 <div class="col-12 pb-3" style="padding-top: 30px">
     <div class="card border-danger" style="max-width: 655px;">

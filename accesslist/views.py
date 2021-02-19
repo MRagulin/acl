@@ -25,19 +25,9 @@ def request_handler(requests, namespace=''):
     global LOCAL_STORAGE
     KEY = 0
 
-    if namespace == 'internal':
-        for k, v in requests.POST.items():
-            if 'input_' in str(k):
-                if 'input__ip' in str(k):
-                        if namespace in LOCAL_STORAGE:
-                                 LOCAL_STORAGE[namespace].append([v])
-                                 KEY += 1
-                        else:
-                            LOCAL_STORAGE[namespace] = [[v]]
-                else:
-                        LOCAL_STORAGE[namespace][KEY].append(v)
 
-    elif namespace == 'contact':
+
+    if namespace == 'contact':
             LOCAL_STORAGE[namespace] = []
             for idx, post_key in enumerate(post_name_forms_key[0]):
                 if idx == 7: #post_key == 'd_complete'
@@ -48,6 +38,29 @@ def request_handler(requests, namespace=''):
                         LOCAL_STORAGE[namespace].append(requests.POST.get(post_key))
                     else:
                         return False
+
+    else:
+        if namespace == 'traffic':
+            str_pattern = 'input__domain_source'
+        else:
+            str_pattern = 'input__ip'
+
+        for k, v in requests.POST.items():
+                if 'input_' in str(k):
+                        if str_pattern in str(k):
+                            if namespace in LOCAL_STORAGE:
+                                LOCAL_STORAGE[namespace].append([v])
+                                KEY += 1
+                            else:
+                                LOCAL_STORAGE[namespace] = [[v]]
+                        else:
+                            if v != '':
+                                LOCAL_STORAGE[namespace][KEY].append(v)
+                            else:
+                                return False
+
+
+
     #
     # elif namespace == 'internal':
     #     con_list:list = []
@@ -79,7 +92,7 @@ class AclTest(View):
 
 class AclOver(View):
     def get(self, request):
-        global data
+        global LOCAL_STORAGE
         # data['contact'] = ['Рагулин Михаил Пиздабольевич', 'ragulinma@alfastrah.ru', '8(909)6971821', 'УИБ', 'Портал',
         #                    '18.02.2021', '28.02.2021', 'Нет']
         #
@@ -98,8 +111,8 @@ class AclOver(View):
         #                     'gosuslugi.ru www.gosuslugi.ru esia.gosuslugi.ru esia-por-tal1.test.gosuslugi.ru esia-por',
         #                     '-', 'TCP: 443', 'Доступ к ГИС']]
 
-        file_download = make_doc(data)
-        data = {}
+        file_download = make_doc(LOCAL_STORAGE)
+        LOCAL_STORAGE = {}
         return render(request, 'acl_overview.html', context={'file_download': file_download})
 
 class AclCreate(View):
@@ -117,32 +130,50 @@ class AclCreate(View):
 #         return render(request, 'acl_create_info.html')
 
 
-class AclCreate_StageOne(View):
+class AclCreate_internal(View):
     def get(self, request):
         return render(request, 'acl_internal_resources.html')
 
     def post(self, request):
-        global LOCAL_STORAGE
         if request.method == 'POST' and request.is_ajax and request_handler(request, 'internal'):
-            file_download = make_doc(LOCAL_STORAGE)
-            return HttpResponse(json.dumps(file_download), content_type="application/json")
-            #return HttpResponseRedirect(reverse('acldmz_urls'))  #acl_dmz_resources
-        # else:
-        #     messages.warning(request, 'Не все поля заполнены')
-        #     return render(request, 'acl_internal_resources.html')
+            return HttpResponseRedirect(reverse('acldmz_urls'))  #acl_dmz_resources
+        else:
+            messages.warning(request, 'Не все поля заполнены')
+            return render(request, 'acl_internal_resources.html')
 
 
 
-class AclCreate_StageTwo(View):
+class AclCreate_dmz(View):
     def get(self, request):
         return render(request, 'acl_dmz_resources.html')
 
+    def post(self, request):
+        if request.method == 'POST' and request.is_ajax and request_handler(request, 'dmz'):
+            return HttpResponseRedirect(reverse('aclexternal_urls'))  #acl_dmz_resources
+        else:
+            messages.warning(request, 'Не все поля заполнены')
+            return render(request, 'acl_dmz_resources.html')
 
-class AclCreate_StageThree(View):
+
+class AclCreate_external(View):
     def get(self, request):
         return render(request, 'acl_external_resources.html')
 
+    def post(self, request):
+        if request.method == 'POST' and request.is_ajax and request_handler(request, 'external'):
+            return HttpResponseRedirect(reverse('acltraffic_urls'))  #acl_dmz_resources
+        else:
+            messages.warning(request, 'Не все поля заполнены')
+            return render(request, 'acl_external_resources.html')
 
-class AclCreate_StageFour(View):
+
+class AclCreate_traffic(View):
     def get(self, request):
         return render(request, 'acl_traffic.html')
+
+    def post(self, request):
+        if request.method == 'POST' and request.is_ajax and request_handler(request, 'traffic'):
+            return HttpResponseRedirect(reverse('acloverview_urls'))  #acl_dmz_resources
+        else:
+            messages.warning(request, 'Не все поля заполнены')
+            return render(request, 'acl_traffic.html')

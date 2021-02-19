@@ -9,7 +9,9 @@
              <p class="main-description">2.3 Список внешних ресурсов (Internet)</p>
         </div>
 
-<form class="form-inline">
+<form class="form-inline" method="post" action="{% url 'aclexternal_urls' %}" name="acl-form-internal">
+    {% csrf_token %}
+
         <div class="form-row">
             <table class="table table-md table-ip-internal" border="0">
                 <thead>
@@ -24,51 +26,31 @@
                 <tbody>
                      <tr>
                                 <td class="">
-                                    <input type="text"  class="form-control" placeholder="173.194.222.0" id="input__ip" autofocus minlength="7" maxlength="15" size="15" pattern="^((\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.){3}(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])$">
+                                    <input type="text"  class="form-control" placeholder="173.194.222.0" name="input__ip" autofocus minlength="7" maxlength="15" size="15" pattern="^((\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.){3}(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])$">
                                     <span class="validity"></span>
                                 </td>
 
                                 <td class="">
-                                        <input type="text" class="form-control" placeholder="/25" id="input__mask"  style="max-width: 110px;" pattern="^((\d{1,2}">
+                                        <input type="text" class="form-control" placeholder="/25" name="input__mask"  style="max-width: 110px;" pattern="^([0-9]){1,2}$">
                                         <span class="validity"></span>
                                 </td>
                                 <td>
-                                        <textarea class="form-control" placeholder="Сервисы google" rows="1" cols="40"  id="input_descr" pattern=".{3,}"></textarea>
+                                        <textarea class="form-control" placeholder="Сервисы google" rows="1" cols="40"  name="input_descr" pattern=".{3,}"></textarea>
                                         <span class="validity"></span>
                                 </td>
                                 <td>
                                             <button class="btn btn-danger btn-sm btn-action btn-action-rm ml-1" type="button">-</button>
                                             <button class="btn btn-success btn-sm btn-action btn-action-add ml-1" type="button">+</button>
                                 </td>
-                     </tr>
-
-                                     <tr>
-                                <td class="">
-                                    <input type="text"  class="form-control" placeholder="api.yandex.net" id="input__ip" autofocus minlength="7" maxlength="15" size="15" pattern="^((\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.){3}(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])$">
-                                    <span class="validity"></span>
-                                </td>
-
-                                <td class="">
-                                        <input type="text" class="form-control" placeholder="" id="input__mask"  style="max-width: 110px;" pattern="^((\d{1,2}">
-                                        <span class="validity"></span>
-                                </td>
-                                <td>
-                                        <textarea class="form-control" placeholder="Доступ к  API yandex map" rows="1" cols="40"  id="input_descr" pattern=".{3,}"></textarea>
-                                        <span class="validity"></span>
-                                </td>
-                                <td>
-                                            <button class="btn btn-danger btn-sm btn-action btn-action-rm ml-1" type="button">-</button>
-                                            <button class="btn btn-success btn-sm btn-action btn-action-add ml-1" type="button">+</button>
-                                </td>
-                     </tr>
                 </tbody>
             </table>
         </div>
-</form>
+
 
 <div class="d-flex justify-content-end mt-5 pt-3 border-top bottom-form-save">
-        <a type="submit" class="btn btn-success" href="{% url 'acltraffic_urls' %}">Сохранить И Продолжить</a>
+        <input type="submit" value="Сохранить И Продолжить">
 </div>
+</form>
 <script>
     $(".post-sidebar").removeClass("d-none");
     $(".post-list > li:nth-child(2) >> img").removeClass("post-link__circle").addClass("post-link__circle--active");
