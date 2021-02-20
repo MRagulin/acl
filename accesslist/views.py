@@ -10,6 +10,7 @@ import json
 LOCAL_STORAGE:dict = {}
 act:dict = {}
 post_name_forms_key = [['name', 'email', 'tel', 'department', 'project', 'd_form', 'd_start', 'd_complete']]
+FORM_APPLICATION_KEYS = ['contact', 'internal', 'dmz', 'external', 'traffic']
 INFINITY = 'Нет'
 
 def append_global(namespace, list):
@@ -93,6 +94,7 @@ class AclTest(View):
 class AclOver(View):
     def get(self, request):
         global LOCAL_STORAGE
+        file_download = None
         # data['contact'] = ['Рагулин Михаил Пиздабольевич', 'ragulinma@alfastrah.ru', '8(909)6971821', 'УИБ', 'Портал',
         #                    '18.02.2021', '28.02.2021', 'Нет']
         #
@@ -111,8 +113,9 @@ class AclOver(View):
         #                     'gosuslugi.ru www.gosuslugi.ru esia.gosuslugi.ru esia-por-tal1.test.gosuslugi.ru esia-por',
         #                     '-', 'TCP: 443', 'Доступ к ГИС']]
 
-        file_download = make_doc(LOCAL_STORAGE)
-        LOCAL_STORAGE = {}
+        if len(LOCAL_STORAGE) >= 4 and all(KEY in LOCAL_STORAGE for KEY in FORM_APPLICATION_KEYS):
+            file_download = make_doc(LOCAL_STORAGE)
+            LOCAL_STORAGE = {}
         return render(request, 'acl_overview.html', context={'file_download': file_download})
 
 class AclCreate(View):

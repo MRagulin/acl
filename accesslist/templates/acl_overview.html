@@ -8,9 +8,24 @@
                 <div class="card text-center border-0">
                       <div class="card-body">
                           <ul class="list-group list-group-flush">
+                          {% if  file_download %}
                             <li class="list-group-item"><h5 class="card-title">Обращение сформировано.</h5></li>
                             <li class="list-group-item"><p class="card-text">Скоро сотрудники ОТБ займутся вашим обращением. </p></li>
-                            <li class="list-group-item"> <a href="{{file_download}}" class="card-link">Скачать файл</a></li>
+                            <li class="list-group-item d-none"> <a href="{{file_download}}" class="card-link card-download-file">Скачать файл</a></li>
+                            <li class="list-group-item">
+                             <div class="d-flex justify-content-center">
+                                  <div class="spinner-border text-success" role="status">
+                                      <span class="sr-only">Loading...</span>
+                                    </div>
+                                </div>
+                            </li>
+                              {% else %}
+                                    <li class="list-group-item"><h5 class="card-title">Ошибка</h5></li>
+                                    <div class="alert alert-warning" role="alert">
+                                     Что-то пошло не так :( Вероятно, нехватает данных для формирования обращения.
+                                    </div>
+                               <li class="list-group-item"> <a href="{% url 'aclcreate_urls' %}" class="card-link">На главную</a></li>
+                              {% endif %}
                           </ul>
 
                       </div>
@@ -19,5 +34,15 @@
             </div>
 <script>
     $(".post-sidebar").addClass("d-none");
+    $(function(){
+        function animatedownload(){
+                $(".spinner-border").hide();
+                $(".card-download-file").parent().removeClass("d-none");
+
+        };
+        window.setTimeout(animatedownload, 3000);
+    });
+
+
 </script>
 {% endblock %}
