@@ -12,25 +12,15 @@ act:dict = {}
 post_name_forms_key = [['name', 'email', 'tel', 'department', 'project', 'd_form', 'd_start', 'd_complete']]
 INFINITY = 'Нет'
 
-def append_global(namespace, list):
-    global data
-    if namespace in data:
-        data[namespace].append(list)
-    else:
-        data[namespace] = [list, ]
-    return data
-
 
 def request_handler(requests, namespace=''):
+    """Функция для заполнения глобального массива LOCAL_STORAGE из POST параметров файлов acl*"""
     global LOCAL_STORAGE
     KEY = 0
-
-
-
     if namespace == 'contact':
             LOCAL_STORAGE[namespace] = []
             for idx, post_key in enumerate(post_name_forms_key[0]):
-                if idx == 7: #post_key == 'd_complete'
+                if idx == 7:
                     if requests.POST.get(post_key) == 'on':
                         LOCAL_STORAGE[namespace].append(INFINITY)
                 else:

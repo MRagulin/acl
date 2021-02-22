@@ -104,7 +104,7 @@ body {
   color:  #fff;
 }
 
-.nav-link:focus:hover {
+.nav-link:focus:hover, .nav-link--active {
   background-color: #CE253D;
   color:  #fff;
 }
@@ -354,7 +354,7 @@ ul {
   color: #bd2130d6;
   font-weight: 500;
 }
-.descr-link:focus, active{
+.descr-link:focus:active{
   color: #bd2130d6;
   font-weight: 500;
 }
