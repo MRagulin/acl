@@ -92,15 +92,12 @@ $(document).ready(function(){
     });
 
 
-  // $(".btn-create-activity").on("click", function (event){
-  //   event.preventDefault();
-  //   if (typeof window.STAGING !== 'undefined')
-  //   {
-  //     alert('Next');
-  //     // $('.main').load('/', function (){
-  //     //
-  //     // });
-  //   }
-  //   });
+$(function(){
+ function hide_alert(){
+   $('.alert').fadeOut();
+ };
+
+ window.setInterval(hide_alert, 3000);
+});
 
 });

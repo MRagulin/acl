@@ -39,7 +39,11 @@
             <div class="menu-sidebar">
                 <div class="menu-sidebar-text">
                   <nav class="nav-group">
-                    <a href="{% url 'aclcreate_urls' %}" class="nav-link {{ active }}">
+                    {% if 'acl' in request.path %}
+                        <a href="{% url 'aclcreate_urls' %}" class="nav-link nav-link--active">
+                    {% else %}
+                        <a href="{% url 'aclcreate_urls' %}" class="nav-link">
+                    {% endif %}
                       <span class="nav-text">
                         Создание ACL
                       </span>

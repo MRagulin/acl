@@ -312,7 +312,7 @@ ul {
 
 .post-sidebar {
     #height: 100%;
-    width: 100px;
+    min-width: 100px!important;
     border-right: 1px solid #e1e1e1;
     padding: 20px 0;
    margin-right: 15px;
