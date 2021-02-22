@@ -15,7 +15,8 @@ class TreeView(View):
     def get(self, request):
         return render(request, 'index.html')
     def post(self, request):
-        return render(request, 'index.html')
+        result = ExtractDataXls("/tmp/ip.xls")
+        return render(request, 'index.html', context=result)
 
 class SearchView(View):
     def get(self, request):
