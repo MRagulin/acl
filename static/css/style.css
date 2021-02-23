@@ -493,7 +493,7 @@ width: 100%;
   display: flex;
   align-items: center;
   padding-top: 100px;
-  padding-bottom: 40px;
+  padding-bottom: 10px;
   border-bottom: 1px solid lightgray;
 }
 
@@ -637,6 +637,7 @@ input:not([type='checkbox']):valid+span:after {
 
 .form-row {
   min-width: 800px;
+  border-bottom: 1px solid #dee2e6;
 }
 
 .table-ip-internal th{

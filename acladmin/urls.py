@@ -16,11 +16,12 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 from django.conf.urls import include, url
+from .views import login
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    #path('acl/<str:action>/', include('accesslist.urls')),
     path('acl/', include('accesslist.urls')),
+    path('login/', login.as_view(), name="login_urls"),
     path('', include('ownerlist.urls'))
 
 ]

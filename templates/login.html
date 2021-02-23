@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+    <div class="container">
+        <div class="justify-content-md-center">
+    <div class="col-8 mt-5" style="min-width: 635px;">
+     <div class="card mb-3">
+          <div class="row">
+            <div class="col-4">
+              <img src="{% static '/img/123123123.png' %}" alt="logo">
+            </div>
+            <div class="col-8">
+              <div class="card-body">
+                <h5 class="card-title pt-5">Авторизация</h5>
+                <form action="{% url 'login_urls' %}" method="post">
+                    {% csrf_token %}
+                      <div class="mb-3">
+                        <label for="InputEmail1" class="form-label">Имя пользователя</label>
+                        <input type="email" class="form-control" id="InputEmail1" aria-describedby="emailHelp" autofocus>
+                      </div>
+                      <div class="mb-3">
+                        <label for="InputPassword1" class="form-label">Пароль</label>
+                        <input type="password" class="form-control" id="InputPassword1">
+                      </div>
+                     <div class="d-flex justify-content-end">
+                      <button type="submit" class="btn btn-primary">Войти</button>
+                     </div>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+    </div>
+   </div>
+</div>
+{% endblock %}

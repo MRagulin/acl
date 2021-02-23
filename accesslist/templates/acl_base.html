@@ -7,14 +7,22 @@
           <h1 class="title-block">Создание <span>ACL</span></h1>
         <ul class="descr-list">
           <li class="descr-item">
-            <a class="descr-link--active" href="{% url 'aclcreate_urls' %}">Заполнение формы</a>
+              {% if '/acl/overview/' not in request.path %}
+                <a class="descr-link--active" href="{% url 'aclcreate_urls' %}">Заполнение формы</a>
+              {% else %}
+                  <a class="descr-link" href="{% url 'aclcreate_urls' %}">Заполнение формы</a>
+              {% endif %}
           </li>
           <li class="descr-item">
-            <a class="descr-link" href="#">Формирование Обращения</a>
+             {% if '/acl/overview/' in request.path %}
+                <a class="descr-link--active" href="{% url 'acloverview_urls' %}">Формирование Обращения</a>
+             {% else %}
+                 <a class="descr-link" href="{% url 'acloverview_urls' %}">Формирование Обращения</a>
+             {% endif %}
           </li>
 
            <li class="descr-item">
-            <a class="descr-link" href="{% url 'acloverview_urls' %}">Обзор</a>
+            <a class="descr-link" href="#">Обзор</a>
           </li>
         </ul>
       </div>

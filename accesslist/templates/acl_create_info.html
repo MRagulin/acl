@@ -6,7 +6,7 @@
     <form method="post" action="{% url 'aclcreate_urls' %}" name="acl-form-contacts">
     {% csrf_token %}
 
-<div class="p-5">
+<div class="pl-3 pr-3 pt-3">
            <div class="main-block">
             <h4 class="main-title">1. Контактная информация <span class="badge badge-danger">Required</span></h4>
           </div>
@@ -45,9 +45,8 @@
 
 
           </div>
-          <div class="form-row__bottom">
-
-            <div class="contact-form__dates">
+          <div class="form-row__bottom form-check-inline">
+ <div class="contact-form__dates">
 
               <label class="contact-form__label-checkbox">
                 <span class="contact-form__text">Дата ввода в эсплуатацию </span>
@@ -62,7 +61,6 @@
                 <input type="checkbox" class="checkbox__real" id="checkbox__real__term" name="d_complete" >
                 <label for="checkbox__real__term">Бессрочно</label>
 {#                <span class="checkbox__title checkbox__title-active">Бессрочно</span>#}
-
               </label>
 
               <label class="contact-form__label-checkbox">
@@ -70,14 +68,6 @@
                 <input type="date" class="contact__input" id="contact__input__date" name="d_form" placeholder="01.01.2021" min="2020-01-01">
             </label>
             </div>
-           <!-- <form class="checkbox-form" action="#">
-              <label class="checkbox">
-                <input type="checkbox" class="checkbox__real" name="value-05">
-                <span class="checkbox__fake"></span>
-                <span class="checkbox__title">Без Срока</span>
-              </label>
-            </form>-->
-
 
 
           </div>
@@ -94,8 +84,12 @@
           <span class="checkbox__title-footer">Отправить обращение в OmniTracker</span>
           </label>
 
+          <label class="label-form__submit">
+          <input type="checkbox" class="checkbox__real-submit" name="action_make_omni">
+          <span class="checkbox__fake"></span>
+          <span class="checkbox__title-footer">Создать обращение через Gitlab</span>
+          </label>
           </div>
-{#           <a type="submit" class="btn btn-success" href="{% url 'aclinternal_urls' %}">Сохранить И Продолжить</a>#}
               <input type="submit" class="btn btn-success" value="Сохранить И Продолжить">
           </div>
 
