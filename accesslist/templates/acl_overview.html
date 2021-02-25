@@ -22,9 +22,9 @@
                               {% else %}
                                     <li class="list-group-item"><h5 class="card-title">Ошибка 204</h5></li>
                                     <div class="alert alert-warning" role="alert">
-                                     Что-то пошло не так :( Вероятно, нехватает данных для формирования обращения.
+                                     Что-то пошло не так :( Вероятно, нехватает данных для формирования обращения. Вернитесь на шаг назад, и повторите операцию.
                                     </div>
-                               <li class="list-group-item"> <a href="{% url 'aclcreate_urls' %}" class="card-link">На главную</a></li>
+                               <li class="list-group-item"> <a href="{% url 'acltraffic_urls' %}" class="card-link">Назад</a></li>
                               {% endif %}
                           </ul>
 
