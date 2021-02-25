@@ -600,7 +600,7 @@ width: 100%;
 /*  background-color: green;*/
 /*}*/
 
-input:not([type='checkbox']):invalid+span:after {
+input:not([type='checkbox']):invalid+span:after, textarea:invalid+span:after {
     position: absolute;
     content: 'X';
     padding-left: 5px;
@@ -609,11 +609,11 @@ input:not([type='checkbox']):invalid+span:after {
 
 }
 
-.contact-form__label > input:not([type='checkbox']):invalid+span:after {
+.contact-form__label > input:not([type='checkbox']):invalid+span:after{
   margin-top: -15px;
 }
 
-input:not([type='checkbox']):valid+span:after {
+input:not([type='checkbox']):valid+span:after, textarea:valid+span:after {
     position: absolute;
     content: '✓';
     padding-left: 5px;
@@ -621,6 +621,15 @@ input:not([type='checkbox']):valid+span:after {
     font-weight: 700;
 
 }
+
+/*textarea:invalid+span:after {*/
+/*    position: absolute;*/
+/*    content: 'X';*/
+/*    padding-left: 5px;*/
+/*    color: #ba1010;*/
+/*    font-weight: 700;*/
+/*}*/
+
 
 .contact-form__label > input:not([type='checkbox']):valid+span:after {
    margin-top: -15px;
