@@ -1,13 +1,4 @@
 window.STAGING = 'A1'; //описание состояния заполнения формы
-let TableRow = `<tr><td class=''><input type='text'class='form-control' 
-placeholder='172.16.45.75' id='input__ip' autofocus minlength='7' maxlength='15' size='15' 
-pattern='^((\\d{1,2}|1\\d\\d|2[0-4]\\d|25[0-5])\\.){3}(\\d{1,2}|1\\d\\d|2[0-4]\\d|25[0-5])$'>
-<span class='validity'></span></td><td class=''>
-<input type='text' class='form-control' placeholder='/16' id='input__mask'style='max-width: 110px;' pattern='^((\\d{1,2}'>
-<span class='validity'></span></td><td><textarea class='form-control' placeholder='Внутренняя сеть АС' rows='1' id='input_descr' pattern='.{3,}'>
-</textarea><span class='validity'></span></td><td><button class='btn btn-danger btn-sm btn-action btn-action-rm ml-3' type='button'>-</button>
-<button class='btn btn-success btn-sm btn-action btn-action-add ml-1' type='button'>+</button></td>
-</tr>`;
 let el_id = 0;
 
 function hasNumber(myString) {

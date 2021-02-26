@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <div class="col-12 d-flex">
+  <div class="col-8">
+      Основа
+  </div>
+    <div class="col-4 border-left" style="height:90vh">
+     <div class="col-12 p-1">
+          <div class="card" style="width: 250px; height: 150px">
+              <p class="card-header text-center text-secondary " style="background-color: #fff;font-weight: 500;">
+                 <i class="far fa-plus-square"></i> Добавить данные
+              </p>
+              <div class="card-body">
+                  <div class="text-center p-3" style="border: 1px dashed #bd2130; cursor: pointer;">
+                      <form action="{%  url 'iptable_urls' %}" method="post" enctype="multipart/form-data" class="fs-2">
+                          <input type="file" id="input--file--upload" name="input--file--upload" value="">
+                          <label for="input--file--upload" class="input--file--label text-secondary">Из файла</label>
+                      </form>
+                  </div>
+
+              </div>
+          </div>
+     </div>
+
+
+
+  </div>
+  </div>
+{% endblock %}

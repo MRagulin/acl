@@ -7,12 +7,12 @@
     {% load static %}
   <link rel="stylesheet" href="{% static 'css/style.css' %}">
   <link rel="stylesheet" href="{% static 'css/bootstrap.css' %}">
-  <script src="{% static 'js/jquery-3.4.1.js' %}"></script>
-  <script src="{% static 'js/main.js' %}" ></script>
+  <script src="{% static 'fontawesome_free/js/all.min.js' %}"></script>
+  <link href="{% static 'fontawesome_free/css/all.min.css' %}" rel="stylesheet" type="text/css">
+<link href="{% static 'fontawesome_free/css/fontawesome.css' %}" rel="stylesheet" type="text/css">
+  <link href="{% static 'fontawesome_free/css/brands.css' %}" rel="stylesheet" type="text/css">
+  <link href="{% static 'fontawesome_free/css/solid.css' %}" rel="stylesheet" type="text/css">
 
-{#<script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>#}
-{#<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>#}
-{#<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>#}
   <title>
       {% block title %}
           ACL - форма
@@ -45,22 +45,26 @@
                         <a href="{% url 'aclcreate_urls' %}" class="nav-link">
                     {% endif %}
                       <span class="nav-text">
-                        Создание ACL
+                        <i class="fas fa-file-signature"></i> Создание ACL
                       </span>
                     </a>
                     <a href="#" class="nav-link">
                       <span class="nav-text">
-                        Ресурсы VPN
+                       <i class="fas fa-laptop-house"></i> Ресурсы VPN
                       </span>
                     </a>
                     <a href="#" class="nav-link">
                       <span class="nav-text">
-                        История обращений
+                        <i class="fas fa-clipboard-list"></i> История обращений
                       </span>
                     </a>
-                    <a href="#" class="nav-link">
+                    {% if 'iptable' in request.path %}
+                    <a href="{% url 'iptable_urls' %}" class="nav-link nav-link--active">
+                    {% else %}
+                        <a href="{% url 'iptable_urls' %}" class="nav-link">
+                    {% endif %}
                       <span class="nav-text">
-                        IP- адреса
+                       <i class="fas fa-list-ul"></i> IP-адреса
                       </span>
                     </a>
                   </nav>
@@ -72,5 +76,7 @@
             {% endblock %}
     </div>
 </div>
+  <script src="{% static 'js/jquery-3.4.1.js' %}"></script>
+  <script src="{% static 'js/main.js' %}" ></script>
 </body>
 </html>
