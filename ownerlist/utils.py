@@ -2,6 +2,7 @@ import os
 from pathlib import Path
 from django.core.files.storage import FileSystemStorage
 from django.apps import apps
+from django.contrib import messages
 import socket
 import re
 import xlrd
@@ -62,12 +63,14 @@ def count_perf(f):
     return wraper
 
 @count_perf
-def DeepSearch(string: str = ''):
+def DeepSearch(request, string: str = ''):
     result = ''
     if re.match(r"^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$", string):
         Iplist = apps.get_model('ownerlist', 'Iplist')
         result = Iplist.objects.filter(ipv4=string)
         if not result:
+            messages.add_message(request, messages.INFO,
+                                 'По запросу {} ничего не найдено, но мы нашли похожую информацию.'.format(string))
             result = Iplist.objects.filter(ipv4__contains=string)[:5]
         #result = Iplist.objects.filter(ipv4__contains=string)[:5]
     #time.sleep(5)
@@ -89,7 +92,7 @@ def write_history(request, string, status) -> None:
 def search_text(request=None, string: str = '') -> dict:
     """ Функция для поиска данных в БД"""
     global FUN_SPEED
-    result = DeepSearch(string)
+    result = DeepSearch(request, string)
     context = {'SearchFor': string}
     context['Data'] = result
     context['TakeTime'] = FUN_SPEED

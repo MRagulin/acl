@@ -17,6 +17,11 @@
         </div>
 
         {% else %}
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-light mt-1">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
             {% for el in Data %}
           <div class="post text-wrap" style="overflow-wrap: break-word;  word-break: break-word">
           <div class="post-header">

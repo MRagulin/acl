@@ -97,7 +97,7 @@ $(function(){
    $('.alert').fadeOut();
  };
 
- window.setInterval(hide_alert, 3000);
+ window.setInterval(hide_alert, 5000);
 });
 
 });
