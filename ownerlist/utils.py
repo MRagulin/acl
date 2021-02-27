@@ -43,8 +43,9 @@ def upload_file_handler(request, functionhandler = None):
         return {'ok': functionhandler(uploaded_file_url)}
     else:
         result = ExtractDataXls(request, uploaded_file_url).execute_file_parsing()
-        time.sleep(3)
-        #os.remove(uploaded_file_url)
+        # race condition
+        time.sleep(1)
+        os.remove(uploaded_file_url)
         if result > 0:
             return {'ok': 'Добавлено новых значений: {}'.format(result)}
         return {'error': 'Данных для добавления - нету'}
