@@ -30,6 +30,7 @@ def upload_file_handler(request, functionhandler = None):
         UPLOAD_PATH = os.path.join(BASE_DIR, 'upload')
         myfile = request.FILES['input--file--upload']
         fs = FileSystemStorage(location=UPLOAD_PATH)
+        fs.save(myfile.name, myfile)
         uploaded_file_url = os.path.join(UPLOAD_PATH, myfile.name) #bug with persone encode
         print('Upload file to: {}'.format(uploaded_file_url))
     else:
@@ -42,8 +43,8 @@ def upload_file_handler(request, functionhandler = None):
         return {'ok': functionhandler(uploaded_file_url)}
     else:
         result = ExtractDataXls(request, uploaded_file_url).execute_file_parsing()
-        os.remove(uploaded_file_url)
-
+        time.sleep(3)
+        #os.remove(uploaded_file_url)
         if result > 0:
             return {'ok': 'Добавлено новых значений: {}'.format(result)}
         return {'error': 'Данных для добавления - нету'}
