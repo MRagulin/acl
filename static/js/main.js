@@ -24,25 +24,11 @@ function IsJsonString(str) {
   }
 }
 
-
-function AddRowTable()
-{
-       //$(".btn-action-add").click(function(){
-       $(".table-ip-internal > tbody:last-child").append(TableRow);
-       //$(document).on('click','.btn-action-add',AddRowTable());
- // });
-}
 $(document).ready(function(){
 
     $("#upload_file_form").submit(function (event){
                event.preventDefault();
                let ActionUrl = event.currentTarget.action;
-               // let result = $.post(ActionUrl, $("#upload_file_form").serialize()).done(function(result){
-
-               //
-               // }).fail(function(xhr, status, error){
-               //     alert('Error: '+ status);
-               // });
                $.ajax({
                  url:ActionUrl,
                  type:'post',
@@ -96,16 +82,12 @@ $(document).ready(function(){
         }
 
     });
-
-    //.val('').attr('placeholder', '').attr('name', input_name)
     $(".table-ip-internal").delegate('.btn-action-add','click', function() {
 
     let tr    = $(this).closest('tr')[0];
     let new_name = $('.table-ip-internal tr:first-child').find('.form-control');
     let idx_input = 0;
-    //let input_name = $(tr).attr('name') +'_'+ Math.random().toString(36).substr(2, 5)
     $(tr).clone().insertAfter(tr).find('.form-control').each(function() {
-        //let name1 = $(tr).find('input:text')[el_id].name;
         try
         {   console.log(new_name[idx_input].name);
             $(this).val('').attr('placeholder', '').attr('name',  new_name[idx_input].name+'_'+el_id.toString());
@@ -141,12 +123,11 @@ $(document).ready(function(){
     }
     });
 
-
+//Скрывать все элементы с классом alert после x времени
 $(function(){
  function hide_alert(){
    $('.alert').fadeOut();
  };
-
  window.setInterval(hide_alert, 7000);
 });
 

@@ -30,8 +30,14 @@
                                 </td>
 
                                 <td class="">
-                                        <input type="text" class="form-control" placeholder="/30" name="input__mask"  style="max-width: 110px;" pattern="^([0-9]){1,2}$" min="1" max="32" required>
+                                      <div class="input-group mb-2">
+                                            <div class="input-group-prepend">
+                                                <div class="input-group-text">/</div>
+                                            </div>
+                                        <input type="text" class="form-control" placeholder="30" name="input__mask"  style="max-width: 110px;" pattern="^([0-9]){1,2}$" min="1" max="32" required>
                                         <span class="validity"></span>
+                                      </div>
+
                                 </td>
                                 <td>
                                         <textarea class="form-control" placeholder="Доступ до z14-1709-gw.alfastrah.ru" rows="1" cols="40"  name="input_descr" pattern=".{3,}" required></textarea>
@@ -64,10 +70,10 @@
                         <th>Описание</th>
                   </thead>
                   <tbody>
-                        <tr><td>195.239.64.0</td><td>255.255.255.128</td><td>PUBLIC</td></tr>
-                        <tr><td>195.239.64.192</td><td>255.255.255.248</td><td>SAP</td></tr>
-                        <tr><td>195.239.64.200</td><td>255.255.255.248</td><td>MAILFILE</td></tr>
-                        <tr><td>195.239.64.224</td><td>255.255.255.240</td><td>PARTNERS</td></tr>
+                        <tr><td>195.239.64.0</td><td>255.255.255.128/25</td><td>PUBLIC</td></tr>
+                        <tr><td>195.239.64.192</td><td>255.255.255.248/29</td><td>SAP</td></tr>
+                        <tr><td>195.239.64.200</td><td>255.255.255.248/29</td><td>MAILFILE</td></tr>
+                        <tr><td>195.239.64.224</td><td>255.255.255.240/28</td><td>PARTNERS</td></tr>
                   </tbody>
               </table>
           </div>
