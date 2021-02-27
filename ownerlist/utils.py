@@ -26,26 +26,28 @@ def IP2Int(ip):
 def upload_file_handler(request, functionhandler = None):
     """Функция обработки загрузки файлов и вызова функции для парсинга xls"""
     result = {}
-    if 'FileInput' in request.FILES:
+    if 'input--file--upload' in request.FILES:
         UPLOAD_PATH = os.path.join(BASE_DIR, 'upload')
-        myfile = request.FILES['FileInput']
+        myfile = request.FILES['input--file--upload']
         fs = FileSystemStorage(location=UPLOAD_PATH)
-        filename = fs.save(myfile.name, myfile)
         uploaded_file_url = os.path.join(UPLOAD_PATH, myfile.name) #bug with persone encode
-       # uploaded_file_url = '{}{}'.format(UPLOAD_PATH, fs.url(filename))
-
-        result['ok'] = "File start processing..."
         print('Upload file to: {}'.format(uploaded_file_url))
     else:
         result['error'] = "There is error upload file"
+        return result
+    if uploaded_file_url == '':
+       return {'error': 'There is error upload file'}
 
     if functionhandler is not None:
-        return functionhandler(uploaded_file_url)
+        return {'ok': functionhandler(uploaded_file_url)}
     else:
-        vlan_fun = ExtractDataXls(request, uploaded_file_url)
-        return vlan_fun.ExtractVlanInfo()
-        #print("[E] Function handler not defined")
-        #return result
+        result = ExtractDataXls(request, uploaded_file_url).execute_file_parsing()
+        os.remove(uploaded_file_url)
+
+        if result > 0:
+            return {'ok': 'Добавлено новых значений: {}'.format(result)}
+        return {'error': 'Данных для добавления - нету'}
+
 
 def count_perf(f):
     """Декоратор для измерения скорости поиска"""

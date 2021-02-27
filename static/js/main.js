@@ -15,6 +15,14 @@ function GetCurrentDate()
     //return new Date().toLocaleDateString();
 }
 
+function IsJsonString(str) {
+  try {
+    var json = JSON.parse(str);
+    return (typeof json === 'object');
+  } catch (e) {
+    return false;
+  }
+}
 
 
 function AddRowTable()
@@ -26,10 +34,56 @@ function AddRowTable()
 }
 $(document).ready(function(){
 
+    $("#upload_file_form").submit(function (event){
+               event.preventDefault();
+               let ActionUrl = event.currentTarget.action;
+               // let result = $.post(ActionUrl, $("#upload_file_form").serialize()).done(function(result){
+
+               //
+               // }).fail(function(xhr, status, error){
+               //     alert('Error: '+ status);
+               // });
+               $.ajax({
+                 url:ActionUrl,
+                 type:'post',
+                 enctype: 'multipart/form-data',
+                 data: new FormData($('#upload_file_form')[0]),
+                 cache: false,
+                 contentType: false,
+                 processData: false,
+                 beforeSend:function(){
+                     $(".input--file--label").hide();
+                     $("#upload_file_form").append("<div class='spinner-border text-danger' role='status'><span class='sr-only'>Loading...</span></div>");
+                 } ,
+                 success : function(result){
+                   if (typeof result!= 'undefined' && result !== null && result.length > 0)
+                   {
+                      if (IsJsonString(result))
+                      {
+                          result = JSON.parse(result);
+                          let MessageType = result.hasOwnProperty('ok') ? 'success' : 'warning';
+                          $(".content > div>div:nth-child(1)").append("<div class='alert alert-"+MessageType + "'>" + Object.values(result)[0] +  "</div>");
+                      }
+                   }
+                 } ,
+                 error:function(data){
+                     $(".content > div>div:nth-child(1)").append("<div class='alert alert-danger>При отправке файла произошла ошибка, напишите нам об этом.</div>");
+                     },
+                 complete:function(){
+                     $(".spinner-border").hide();
+                     $(".input--file--label").show();
+                     $("#upload_file_form").each(function(){
+                        this.reset();
+                     });
+                 } ,
+                });
+            });
+
+
     $("#input--file--upload").on('change', function (e){
         if( this.files && this.files.length > 0 )
         {
-            alert(123);
+            $("#upload_file_form").submit();
         }
     });
     $("#checkbox__real__term").on("click", function(){
@@ -93,7 +147,7 @@ $(function(){
    $('.alert').fadeOut();
  };
 
- window.setInterval(hide_alert, 5000);
+ window.setInterval(hide_alert, 7000);
 });
 
 });

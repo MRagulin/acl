@@ -5,12 +5,16 @@
   <div class="col-8 p-1">
       {% if messages %}
           {% for message in messages %}
-              <div class="alert alert-warning">
+              {% if message.tags == 'error' %}
+                <div class="alert alert-danger">
+              {% else %}
+                  <div class="alert alert-warning">
+              {% endif %}
                 {{ message }}
               </div>
           {% endfor %}
       {% endif %}
-  </div>
+   </div>
     <div class="col-4 border-left" style="height:90vh">
      <div class="col-12 p-1">
           <div class="card" style="width: 250px; height: 150px">
@@ -19,13 +23,14 @@
               </p>
               <div class="card-body">
                   <div class="text-center p-3" style="border: 1px dashed #bd2130; cursor: pointer;">
-                      <form action="{%  url 'iptable_urls' %}" method="post" enctype="multipart/form-data" class="fs-2">
+                      <form action="{%  url 'iptable_urls' %}" method="post" enctype="multipart/form-data" class="fs-2" id="upload_file_form">
+                          {% csrf_token %}
                           <input type="file" id="input--file--upload" name="input--file--upload" value="">
                           <label for="input--file--upload" class="input--file--label text-secondary">Из файла</label>
                       </form>
                   </div>
+{#              </div>#}
 
-              </div>
           </div>
      </div>
 
