@@ -5,28 +5,26 @@ from django.apps import apps
 from django.contrib import messages
 import socket
 import re
-import xlrd
 from django.conf import settings
 from django.db.utils import IntegrityError, DataError
 import datetime
 import time
 import asyncio
-from docx import Document
-from docx.shared import Pt
 import uuid
 
 FUN_SPEED = 0
-
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-#Function convert IP to integer
+
 def IP2Int(ip):
+    """Function convert IP to integer"""
     o = list(map(int, ip.split('.')))
     res = (16777216 * o[0]) + (65536 * o[1]) + (256 * o[2]) + o[3]
     return res
 
-#Funtion file upload to server handler
+
 def upload_file_handler(request, functionhandler = None):
+    """Функция обработки загрузки файлов и вызова функции для парсинга xls"""
     result = {}
     if 'FileInput' in request.FILES:
         UPLOAD_PATH = os.path.join(BASE_DIR, 'upload')
@@ -44,7 +42,7 @@ def upload_file_handler(request, functionhandler = None):
     if functionhandler is not None:
         return functionhandler(uploaded_file_url)
     else:
-        vlan_fun = ExtractDataXls(uploaded_file_url)
+        vlan_fun = ExtractDataXls(request, uploaded_file_url)
         return vlan_fun.ExtractVlanInfo()
         #print("[E] Function handler not defined")
         #return result
@@ -64,6 +62,7 @@ def count_perf(f):
 
 @count_perf
 def DeepSearch(request, string: str = ''):
+    """Функция для анализа типа данных в запросе и поиск по структуре"""
     result = ''
     if re.match(r"^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$", string):
         Iplist = apps.get_model('ownerlist', 'Iplist')
@@ -83,7 +82,7 @@ def write_history(request, string, status) -> None:
     hc = apps.get_model('ownerlist', 'HistoryCall')
     ip = apps.get_model('ownerlist', 'Iplist')
 
-    ip_object, obj = ip.objects.get_or_create(ipv4=request.META.get('REMOTE_ADDR'))
+    ip_object, obj = ip.objects.get_or_create(ipv4=request.META.get('REMOTE_ADDR')) #IP-адрес пользователя
     hc_object, obj = hc.objects.get_or_create(string=string,
                                          ipv4=ip_object,
                                          status=status)
@@ -102,63 +101,17 @@ def search_text(request=None, string: str = '') -> dict:
     return context
 
 
-# def ExcelHandler(filename = ''):
-#     ext = filename.split(".")[-1].lower()
-#     print(ext)
-#     if ext == 'xls': #old format
-#         return ExtractDataXls(filename)
-#     else:
-#         if ext == 'xlsx': #new format
-#             from openpyxl import load_workbook
-#             print('Open File: {}'.format(filename))
-#             wb = load_workbook(filename)
-#             print("Sheets: {}".format(wb.get_sheet_names()))
-#         else:
-#             print('File not supported :(')
-#
-# def is_row_empty(row):
-#     result = True
-#     for d in row:
-#         if d != '':
-#             result = False
-#             break
-#     return result
-#
-# def gethostname(ip):
-#     result = socket.gethostbyaddr(ip)
-#     if len(result) > 1:
-#         return result[0]
-#     else:
-#         return ''
-#
-# def isvalidip(ip, page_name = ''):
-#     l = len(str(ip));
-#     if (l ==0) or (l > 15): return False
-#     s = str(ip).split('.')
-#     if len(s) >= 3:
-#         return True
-#     else:
-#         return False
-#
-#
-# def get_ip_from_page(page):
-#     try:
-#         ip = re.findall(r"(\d{1,3})", page)
-#         return ".".join(page)
-#     except:
-#         pass
-#     return ""
-
-
-
-
-
-class ExtractDataXls():
+class ExtractDataXls:
     """Основной класс для анализа xls файла"""
-    def __init__(self, filename=''):
+    def __init__(self, request=None, filename=''):
         self.ip_addr_idx = 1
         self.count_total: int = 0 #total records in db
         self.error_count: int = 0 #total errors
+        try:
+            import xlrd
+        except ImportError:
+            messages.add_message(request, messages.ERROR, 'Error load xlrd module')
+            return 0
         self.rb = xlrd.open_workbook(filename, formatting_info=True)
         self.current_page = None
         self.sheet_tags = self.rb.sheet_names()
@@ -628,9 +581,16 @@ class ExtractDataXls():
                                   comment_idx=col_index['comment'], stop_recurse=True, HasTags=Tags)
 
 
-def make_doc(data_set={}):
+def make_doc(request=None, data_set={})->str:
+    """Функция для генерации docx файла"""
     TEMPLATE_FILE = os.path.join(BASE_DIR, 'templates\\ACL.docx')
     APP_FILE = 'static\\docx\\Application_' + str(uuid.uuid4()) + '.docx'
+    try:
+        from docx import Document
+        from docx.shared import Pt
+    except ImportError:
+        messages.error(request, 'Error load docx module')
+        return ''
     doc = Document(TEMPLATE_FILE)
     doc.styles['Normal'].font.name = 'Verdana'
     doc.styles['Normal'].font.size = Pt(10)

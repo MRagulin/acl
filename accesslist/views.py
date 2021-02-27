@@ -63,7 +63,8 @@ class AclOver(View):
         global LOCAL_STORAGE
         file_download = None
         if len(LOCAL_STORAGE) >= 4 and all(KEY in LOCAL_STORAGE for KEY in FORM_APPLICATION_KEYS):
-            file_download = make_doc(LOCAL_STORAGE)
+            file_download = make_doc(request, LOCAL_STORAGE)
+            # Очищаем глобальный массив с данными для заполнения docx
             LOCAL_STORAGE = {}
         return render(request, 'acl_overview.html', context={'file_download': file_download})
 
@@ -71,6 +72,7 @@ class AclOver(View):
 class AclCreate(View):
     def get(self, request):
         return render(request, 'acl_create_info.html')
+
     def post(self, request):
         if request.method == 'POST' and request.is_ajax and request_handler(request, 'contact'):
             return HttpResponseRedirect(reverse('aclinternal_urls'))

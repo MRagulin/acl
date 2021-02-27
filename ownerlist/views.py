@@ -14,12 +14,16 @@ class IpTable(View):
     def get(self, request):
         return render(request, 'iptable.html')
 
+    def post(self, request):
+        result = upload_file_handler(request)
+        return render(request, 'iptable.html', context=result)
+
 class TreeView(View):
     def get(self, request):
         return render(request, 'index.html')
-    def post(self, request):
-        result = ExtractDataXls("/tmp/ip.xls")
-        return render(request, 'index.html', context=result)
+    # def post(self, request):
+    #     result = ExtractDataXls(request, "/tmp/ip.xls")
+    #     return render(request, 'index.html', context=result)
 
 class SearchView(View):
     def get(self, request):

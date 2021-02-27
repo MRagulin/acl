@@ -26,7 +26,12 @@ function AddRowTable()
 }
 $(document).ready(function(){
 
-
+    $("#input--file--upload").on('change', function (e){
+        if( this.files && this.files.length > 0 )
+        {
+            alert(123);
+        }
+    });
     $("#checkbox__real__term").on("click", function(){
         if (this.checked)
         {
