@@ -21,6 +21,9 @@ class Vlans(models.Model):
 
 class Owners(models.Model):
     username = models.CharField(blank=True, max_length=256, verbose_name="Имя владельца")
+    email = models.EmailField(blank=True)
+    phone = models.CharField(blank=True, max_length=256, verbose_name="Телефон")
+    active = models.BooleanField(null=True, default=True)
 
     @classmethod
     def get_default_owner(cls):

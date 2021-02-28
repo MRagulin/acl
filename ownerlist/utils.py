@@ -67,18 +67,18 @@ def count_perf(f):
 @count_perf
 def DeepSearch(request, string: str = ''):
     """Функция для анализа типа данных в запросе и поиск по структуре"""
-    result = ''
+    result, tmp = '', string
     Iplist = apps.get_model('ownerlist', 'Iplist')
-    if re.match(r"^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$", string):
-        result = Iplist.objects.filter(ipv4=string)
+    if re.match(r"^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$", tmp):
+        result = Iplist.objects.filter(ipv4=tmp)
 
     if not result:
-            if re.match(r"^\d{1,3}\,\d{1,3}\,\d{1,3}\,\d{1,3}$", string):
+            if re.match(r"^\d{1,3}\,\d{1,3}\,\d{1,3}\,\d{1,3}$", tmp):
                 tmp = string.replace(',', '.')
             if tmp:
                 result = Iplist.objects.filter(ipv4__contains=tmp)[:5]
-            else:
-                result = Iplist.objects.filter(ipv4__contains=string)[:5]
+            # else:
+            #     result = Iplist.objects.filter(ipv4__contains=string)[:5]
             if result:
                 messages.add_message(request, messages.INFO,
                                      'По запросу {} ничего не найдено, но мы нашли похожую информацию:'.format(string))

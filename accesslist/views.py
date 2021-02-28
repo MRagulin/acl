@@ -1,11 +1,13 @@
 from django.shortcuts import render
 from django.views.generic import View
 from ownerlist.utils import make_doc
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, HttpResponseForbidden
 from django.urls import reverse
 from django.contrib import messages
 from django.http import HttpResponse
+from .models import ACL
 import json
+import uuid
 
 LOCAL_STORAGE:dict = {}  # Хранение данных для заполнения docx
 LOCAL_ACTION:dict = {}  # Хранение данных для активностей: docx, git, omni
@@ -68,16 +70,28 @@ class AclOver(View):
         if len(LOCAL_STORAGE) >= 4 and all(KEY in LOCAL_STORAGE for KEY in FORM_APPLICATION_KEYS):
             file_download = make_doc(request, LOCAL_STORAGE)
             # Очищаем глобальный массив с данными для заполнения docx
-            LOCAL_STORAGE = {}
+            #LOCAL_STORAGE = {}
+        test = json.dumps(LOCAL_STORAGE)
+        return HttpResponse(test)
         return render(request, 'acl_overview.html', context={'file_download': file_download})
 
 
 class AclCreate(View):
-    def get(self, request):
-        return render(request, 'acl_create_info.html')
+    def get(self, request, acl_id=None):
+        if acl_id is None:
+            if 'HTTP_REFERER' in request.META.keys():
+                if '/acl/demo/' in request.META.get('HTTP_REFERER'):
+                    return HttpResponseRedirect(reverse('aclcreate_uuid_urls', kwargs={'acl_id': str(uuid.uuid4())}))
+        else:
+            return render(request, 'acl_create_info.html')
+        return HttpResponseRedirect(reverse('acldemo_urls'))
 
-    def post(self, request):
-        if request.method == 'POST' and request.is_ajax and request_handler(request, 'contact'):
+
+    def post(self, request, acl_id=None):
+        if request.method == 'POST' and request.is_ajax and acl_id is not None and request_handler(request, 'contact'):
+            id, obj = ACL.objects.get_or_create(id=acl_id)
+            if obj:
+                print('ok')
             return HttpResponseRedirect(reverse('aclinternal_urls'))
         else:
             messages.warning(request, 'Не все поля заполнены')

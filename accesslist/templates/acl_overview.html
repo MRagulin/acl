@@ -8,10 +8,10 @@
                 <div class="card text-center border-0">
                       <div class="card-body">
                           <ul class="list-group list-group-flush">
-                          {% if  file_download %}
+                          {% if file_download %}
                             <li class="list-group-item"><h5 class="card-title">Обращение сформировано.</h5></li>
                             <li class="list-group-item"><p class="card-text">Скоро сотрудники ОТБ займутся вашим обращением. </p></li>
-                            <li class="list-group-item d-none"> <a href="{{file_download}}" class="card-link card-download-file">Скачать файл</a></li>
+                            <li class="list-group-item d-none text-primary"><a href="{{file_download}}" class="card-link card-download-file"><i class="fas fa-file-word"></i> Скачать файл</a></li>
                             <li class="list-group-item">
                              <div class="d-flex justify-content-center">
                                   <div class="spinner-border text-success" role="status">
