@@ -57,6 +57,9 @@ class AclTest(View):
     def get(self, request):
         return render(request, 'acl_test.html')
 
+class AclDemo(View):
+    def get(self, request):
+        return render(request, 'acl_demo.html')
 
 class AclOver(View):
     def get(self, request):

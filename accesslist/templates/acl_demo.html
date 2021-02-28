@@ -1,0 +1,43 @@
+{% extends 'acl_base.html' %}
+{% load static %}
+{% block row %}
+ <div class="col-2 d-none d-md-block d-lg-block" style="min-width: 370px;">
+            <img class="img-fluid" src="{% static 'img/demo.png' %}" style="min-height: 550px">
+            </div>
+            <div class="col-7 mt-3">
+                <div class="card text-center border-0">
+                      <div class="card-body">
+                          <h5 class="card-title">Инициатива по оптимизации внутренних процессов</h5>
+                          <p class="text-secondary">Наша задача – улучшить и облегчить бизнес-процессы в нашей компании, связанные с безопасностью. Для обеспечения гибкости взаимодействия, мы запустили данный портал,
+                              основная цель которого – систематизация, верификация и механизмы отчетности.
+                              Главным образом мы хотели, чтобы процесс управления сетевым доступом (ACL) был более удобнее.</p>
+                        <div class="align-self-start">
+                            <p class="text-primary">Обращения по созданию сетевого доступа (ACL) должны учитывать несколько важных принципов:</p>
+                            <div class="list-group text-left">
+                                <ul class="form-group">
+                                 <li class="text-secondary" style="padding: 0.75rem 1.25rem;"><i class="fas fa-bug mr-2"></i>Перед публикацией проекта во внешней сети интернет – проект должен пройти аудит защищённости, проводимый командой Отдела технической безопасности.</li>
+                                 <li class="text-secondary" style="padding: 0.75rem 1.25rem;"><i class="fas fa-dungeon mr-2"></i>Ресурс - который имеет доступ из сети интернет и имеет прямое взаимодействие с другими системами, должен располагаться в DMZ – сети.</li>
+                                 <li class="text-secondary" style="padding: 0.75rem 1.25rem;"><i class="fas fa-undo mr-2"></i>Прямой проброс порта для веб-приложений крайне не рекомендуется, за исключением связи backend-to-backend, и для этих целей лучше использовать реверс-прокси выставленный в сеть интернет, который будет принимать запросы из внешней сети.</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                    <a href="{% url 'aclcreate_urls' %}" class="btn btn-success btn-lg">Начать</a>
+                      </div>
+                </div>
+
+            </div>
+<script>
+    $(".post-sidebar").addClass("d-none");
+    $(function(){
+        function animatedownload(){
+                $(".spinner-border").hide();
+                $(".card-download-file").parent().removeClass("d-none");
+
+        };
+        window.setTimeout(animatedownload, 3000);
+    });
+
+
+</script>
+{% endblock %}

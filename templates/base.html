@@ -41,9 +41,9 @@
                 <div class="menu-sidebar-text">
                   <nav class="nav-group">
                     {% if 'acl' in request.path %}
-                        <a href="{% url 'aclcreate_urls' %}" class="nav-link nav-link--active">
+                        <a href="{% url 'acldemo_urls' %}" class="nav-link nav-link--active">
                     {% else %}
-                        <a href="{% url 'aclcreate_urls' %}" class="nav-link">
+                        <a href="{% url 'acldemo_urls' %}" class="nav-link">
                     {% endif %}
                       <span class="nav-text">
                         <i class="fas fa-file-signature"></i> Создание ACL
