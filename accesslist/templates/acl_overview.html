@@ -7,6 +7,17 @@
             <div class="col-7 mt-5">
                 <div class="card text-center border-0">
                       <div class="card-body">
+                       {% if messages %}
+                          {% for message in messages %}
+                              {% if message.tags == 'error' %}
+                                <div class="alert alert-danger">
+                              {% else %}
+                                  <div class="alert alert-warning">
+                              {% endif %}
+                                {{ message }}
+                              </div>
+                          {% endfor %}
+                      {% endif %}
                           <ul class="list-group list-group-flush">
                           {% if file_download %}
                             <li class="list-group-item"><h5 class="card-title">Обращение сформировано.</h5></li>

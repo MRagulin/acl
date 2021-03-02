@@ -71,16 +71,31 @@ class AclDemo(View):
         return render(request, 'acl_demo.html')
 
 class AclOver(View):
-    def get(self, request):
+    def get(self, request, acl_id=None):
+        global LOCAL_UID
+        if acl_id is None:
+            if LOCAL_UID is not None:
+                return redirect(reverse('acloverview_urls', kwargs={'acl_id': LOCAL_UID}))
+            else:
+                return HttpResponseRedirect(reverse('acldemo_urls'))
+
         global LOCAL_STORAGE
+
+
         file_download = None
         if len(LOCAL_STORAGE) >= 4 and all(KEY in LOCAL_STORAGE for KEY in FORM_APPLICATION_KEYS):
-            file_download = make_doc(request, LOCAL_STORAGE)
+            try:
+                file_download = make_doc(request, LOCAL_STORAGE, str(acl_id))
+            except PermissionError:
+                messages.error(request, 'К сожалению, мы не смогли создать файл, так как нехватает прав.')
+            except:
+                messages.error(request, 'К сожалению, при создании файла, что-то пошло не так. '
+                                        'Мы уже занимаемся устранением.')
             # Очищаем глобальный массив с данными для заполнения docx
-            #LOCAL_STORAGE = {}
-            #LOCAL_UID = None
+            LOCAL_STORAGE = {}
+            LOCAL_UID = None
         test = json.dumps(LOCAL_STORAGE)
-        return HttpResponse("{} {}".format(test, LOCAL_STORAGE))
+        #return HttpResponse("{} {}".format(test, LOCAL_STORAGE))
         return render(request, 'acl_overview.html', context={'file_download': file_download})
 
 
@@ -182,7 +197,7 @@ class AclCreate_traffic(View):
 
     def post(self, request, acl_id=None):
         if request.method == 'POST' and request.is_ajax and acl_id is not None and request_handler(request, 'acl_traffic.html'):
-            return HttpResponseRedirect(reverse('acloverview_urls'))  #acl_dmz_resources
+            return HttpResponseRedirect(reverse('acloverview_urls', kwargs={'acl_id': acl_id}))  #acl_dmz_resources
         else:
             messages.warning(request, 'Не все поля заполнены')
             return render(request, 'acl_traffic.html')

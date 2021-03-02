@@ -19,7 +19,7 @@ LOCAL_ACTION:dict = {}  # Хранение данных для активнос�
 LOCAL_UID = None
 
 FORM_APPLICATION_KEYS = ['acl_create_info.html', 'acl_internal_resources.html', 'acl_dmz_resources.html', 'acl_external_resources.html', 'acl_traffic.html']
-POST_FORM_KEYS = ['name', 'email', 'tel', 'department', 'project', 'd_form', 'd_start', 'd_complete']
+POST_FORM_KEYS = ['name', 'email', 'tel', 'department', 'project', 'd_form', 'd_start', 'd_complate']
 
 
 def request_handler(requests, namespace=''):
@@ -33,11 +33,12 @@ def request_handler(requests, namespace=''):
                 if idx == 7:
                     if requests.POST.get(post_key) == 'on':
                         LOCAL_STORAGE[namespace].append(INFINITY)
+                        continue
+
+                if requests.POST.get(post_key) != '':
+                     LOCAL_STORAGE[namespace].append(requests.POST.get(post_key))
                 else:
-                    if requests.POST.get(post_key) != '':
-                        LOCAL_STORAGE[namespace].append(requests.POST.get(post_key))
-                    else:
-                        return False
+                    return False
 
     else:
         if namespace == FORM_APPLICATION_KEYS[-1]: #last
@@ -637,10 +638,12 @@ class ExtractDataXls:
                                   comment_idx=col_index['comment'], stop_recurse=True, HasTags=Tags)
 
 
-def make_doc(request=None, data_set={})->str:
+def make_doc(request=None, data_set={}, fileuuid='')->str:
     """Функция для генерации docx файла"""
     TEMPLATE_FILE = os.path.join(BASE_DIR, 'templates\\ACL.docx')
-    APP_FILE = 'static\\docx\\Application_' + str(uuid.uuid4()) + '.docx'
+    if fileuuid == '':
+        fileuuid = str(uuid.uuid4())
+    APP_FILE = 'static\\docx\\Application_' + fileuuid + '.docx'
     try:
         from docx import Document
         from docx.shared import Pt
@@ -650,16 +653,27 @@ def make_doc(request=None, data_set={})->str:
     doc = Document(TEMPLATE_FILE)
     doc.styles['Normal'].font.name = 'Verdana'
     doc.styles['Normal'].font.size = Pt(10)
-
     for data_inx, data in enumerate(data_set):
-        table_tmp = doc.tables[data_inx]  # Берем таблицу
+        row_cnt = 1
+        table_tmp = doc.tables[data_inx]  # Берем таблицу по номеру
+        table_rows = len(table_tmp.rows) - 1  #Берем все строки из таблицы
         if data_inx == 0:  # Для таблицы контакты, меняем правила игры
             for row_idx, row_data in enumerate(data_set[data]):
+                if row_idx >= table_rows:
+                    table_tmp.add_row()
                 table_tmp.cell(row_idx, 1).text = row_data
+
         else:
+            row_cnt = 0
             for key, value in enumerate(data_set[data], start=1):
+                if row_cnt >= table_rows:
+                        table_tmp.add_row()
                 for cell_idx, cell_val in enumerate(value):
                     table_tmp.cell(key, cell_idx).text = cell_val
 
+                row_cnt += 1
+
+
+
     doc.save(os.path.join(BASE_DIR, APP_FILE))
-    return "..\\..\\" + APP_FILE
+    return "..\\..\\..\\" + APP_FILE
