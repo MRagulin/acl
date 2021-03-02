@@ -81,19 +81,27 @@ class AclOver(View):
 
         global LOCAL_STORAGE
 
-
         file_download = None
         if len(LOCAL_STORAGE) >= 4 and all(KEY in LOCAL_STORAGE for KEY in FORM_APPLICATION_KEYS):
             try:
                 file_download = make_doc(request, LOCAL_STORAGE, str(acl_id))
             except PermissionError:
                 messages.error(request, 'К сожалению, мы не смогли создать файл, так как нехватает прав.')
-            except:
+            except Exception as e:
                 messages.error(request, 'К сожалению, при создании файла, что-то пошло не так. '
-                                        'Мы уже занимаемся устранением.')
+                                        'Мы уже занимаемся устранением. {}'.format(e))
+
+            try:
+                obj, created = ACL.objects.get_or_create(id=str(acl_id),
+                                                         acltext=json.dumps(LOCAL_STORAGE),
+                                                         is_executed=True)
+            except Exception as e:
+                messages.error(request, 'Ошибка, мы не смогли записать данные в БД. {}'.format(e))
+
+
             # Очищаем глобальный массив с данными для заполнения docx
-            LOCAL_STORAGE = {}
-            LOCAL_UID = None
+            #LOCAL_STORAGE = {}
+            #LOCAL_UID = None
         test = json.dumps(LOCAL_STORAGE)
         #return HttpResponse("{} {}".format(test, LOCAL_STORAGE))
         return render(request, 'acl_overview.html', context={'file_download': file_download})

@@ -7,22 +7,11 @@
             <div class="col-7 mt-5">
                 <div class="card text-center border-0">
                       <div class="card-body">
-                       {% if messages %}
-                          {% for message in messages %}
-                              {% if message.tags == 'error' %}
-                                <div class="alert alert-danger">
-                              {% else %}
-                                  <div class="alert alert-warning">
-                              {% endif %}
-                                {{ message }}
-                              </div>
-                          {% endfor %}
-                      {% endif %}
-                          <ul class="list-group list-group-flush">
+                          <ul class="list-group list-group-flush border-0">
                           {% if file_download %}
                             <li class="list-group-item"><h5 class="card-title">Обращение сформировано.</h5></li>
-                            <li class="list-group-item"><p class="card-text">Скоро сотрудники ОТБ займутся вашим обращением. </p></li>
-                            <li class="list-group-item d-none text-primary"><a href="{{file_download}}" class="card-link card-download-file"><i class="fas fa-file-word"></i> Скачать файл</a></li>
+                            <li class="list-group-item border-0"><p class="card-text">Скоро сотрудники ОТБ займутся вашим обращением. </p></li>
+                            <li class="list-group-item d-none text-success border-0"><a href="{{file_download}}" class="card-link card-download-file"><i class="fas fa-file-word pr-1"></i> Скачать файл</a></li>
                             <li class="list-group-item">
                              <div class="d-flex justify-content-center">
                                   <div class="spinner-border text-success" role="status">
@@ -31,12 +20,28 @@
                                 </div>
                             </li>
                               {% else %}
-                                    <li class="list-group-item"><h5 class="card-title">Ошибка 204</h5></li>
-                                    <div class="alert alert-warning" role="alert">
-                                     Что-то пошло не так :( Вероятно, не хватает данных для формирования обращения. Вернитесь на шаг назад, и повторите операцию.
+                                    <li class="list-group-item border-0"><h5 class="card-title">Ошибка 204</h5></li>
+                                    <li class="list-group-item border-0"><div class="alert alert-warning" role="alert">
+                                     Что-то пошло не так :( Вероятно, не хватает данных для формирования обращения.
+                                        Вернитесь на шаг назад, убедитесь в правильности заполнения формы и повторите операцию.
                                     </div>
-                               <li class="list-group-item"> <a href="{% url 'acltraffic_urls' %}" class="card-link">Назад</a></li>
+                                    </li>
+                                    <li class="list-group-item border-0"> <a class="btn btn-danger btn-lg" href="{% url 'acltraffic_urls' %}" class="card-link">Вернутся к ACL</a></li>
                               {% endif %}
+
+                          {% if messages %}
+                          {% for message in messages %}
+                              {% if message.tags == 'error' %}
+                               <li class="list-group-item border-0">
+                                  <div class="alert alert-danger">
+                              {% else %}
+                                  <div class="alert alert-warning">
+                              {% endif %}
+                                {{ message }}
+                              </div></li>
+                          {% endfor %}
+                      {% endif %}
+                            <li class="list-group-item"><a href="{% url 'acldemo_urls' %}" class="card-link"><i class="fas fa-home pr-1"></i>На главную</a></li>
                           </ul>
 
                       </div>
