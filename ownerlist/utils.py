@@ -14,6 +14,51 @@ import uuid
 
 FUN_SPEED = 0
 BASE_DIR = Path(__file__).resolve().parent.parent
+LOCAL_STORAGE:dict = {}  # Хранение данных для заполнения docx
+LOCAL_ACTION:dict = {}  # Хранение данных для активностей: docx, git, omni
+LOCAL_UID = None
+
+FORM_APPLICATION_KEYS = ['acl_create_info.html', 'acl_internal_resources.html', 'acl_dmz_resources.html', 'acl_external_resources.html', 'acl_traffic.html']
+POST_FORM_KEYS = ['name', 'email', 'tel', 'department', 'project', 'd_form', 'd_start', 'd_complete']
+
+
+def request_handler(requests, namespace=''):
+    """Функция для заполнения глобального массива LOCAL_STORAGE из POST параметров файлов acl*"""
+    INFINITY = 'Нет'
+    global LOCAL_STORAGE
+    cnt_key = 0
+    if namespace == FORM_APPLICATION_KEYS[0]: #first
+            LOCAL_STORAGE[namespace] = []
+            for idx, post_key in enumerate(POST_FORM_KEYS):
+                if idx == 7:
+                    if requests.POST.get(post_key) == 'on':
+                        LOCAL_STORAGE[namespace].append(INFINITY)
+                else:
+                    if requests.POST.get(post_key) != '':
+                        LOCAL_STORAGE[namespace].append(requests.POST.get(post_key))
+                    else:
+                        return False
+
+    else:
+        if namespace == FORM_APPLICATION_KEYS[-1]: #last
+            str_pattern = 'input__domain_source'
+        else:
+            str_pattern = 'input__ip'
+
+        for k, v in requests.POST.items():
+                if 'input_' in str(k):
+                        if str_pattern in str(k):
+                            if namespace in LOCAL_STORAGE:
+                                LOCAL_STORAGE[namespace].append([v])
+                                cnt_key += 1
+                            else:
+                                LOCAL_STORAGE[namespace] = [[v]]
+                        else:
+                            if v != '':
+                                LOCAL_STORAGE[namespace][cnt_key].append(v)
+                            else:
+                                return False
+    return LOCAL_STORAGE
 
 
 def IP2Int(ip):

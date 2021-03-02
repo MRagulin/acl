@@ -9,7 +9,7 @@
              <p class="main-description">2.1 Список внутренних ресурсов (СГ АльфаСтрахование)</p>
         </div>
 
-<form class="form-inline" method="post" action="{% url 'aclinternal_urls' %}" name="acl-form-internal">
+<form class="form-inline" method="post" action="{% url 'aclinternal_urls' %}{{ acl_id }}/" name="acl-form-internal">
     {% csrf_token %}
         <div class="form-row">
             <table class="table table-md table-ip-internal" border="0">

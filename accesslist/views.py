@@ -1,58 +1,65 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect, get_object_or_404
 from django.views.generic import View
-from ownerlist.utils import make_doc
 from django.http import HttpResponseRedirect, HttpResponseForbidden
 from django.urls import reverse
 from django.contrib import messages
 from django.http import HttpResponse
 from .models import ACL
+
+from ownerlist.utils import make_doc, request_handler
+from ownerlist.utils import LOCAL_STORAGE, LOCAL_ACTION, FORM_APPLICATION_KEYS, POST_FORM_KEYS, LOCAL_UID
+
 import json
 import uuid
 
-LOCAL_STORAGE:dict = {}  # Хранение данных для заполнения docx
-LOCAL_ACTION:dict = {}  # Хранение данных для активностей: docx, git, omni
-
-FORM_APPLICATION_KEYS = ['contact', 'internal', 'dmz', 'external', 'traffic']
-POST_FORM_KEYS = ['name', 'email', 'tel', 'department', 'project', 'd_form', 'd_start', 'd_complete']
-
-
-def request_handler(requests, namespace=''):
-    """Функция для заполнения глобального массива LOCAL_STORAGE из POST параметров файлов acl*"""
-    INFINITY = 'Нет'
-    global LOCAL_STORAGE
-    cnt_key = 0
-    if namespace == 'contact':
-            LOCAL_STORAGE[namespace] = []
-            for idx, post_key in enumerate(POST_FORM_KEYS):
-                if idx == 7:
-                    if requests.POST.get(post_key) == 'on':
-                        LOCAL_STORAGE[namespace].append(INFINITY)
-                else:
-                    if requests.POST.get(post_key) != '':
-                        LOCAL_STORAGE[namespace].append(requests.POST.get(post_key))
-                    else:
-                        return False
-
-    else:
-        if namespace == 'traffic':
-            str_pattern = 'input__domain_source'
-        else:
-            str_pattern = 'input__ip'
-
-        for k, v in requests.POST.items():
-                if 'input_' in str(k):
-                        if str_pattern in str(k):
-                            if namespace in LOCAL_STORAGE:
-                                LOCAL_STORAGE[namespace].append([v])
-                                cnt_key += 1
-                            else:
-                                LOCAL_STORAGE[namespace] = [[v]]
-                        else:
-                            if v != '':
-                                LOCAL_STORAGE[namespace][cnt_key].append(v)
-                            else:
-                                return False
-    return LOCAL_STORAGE
+#
+# class ObjectMixin:
+#     model = None
+#     template = None
+#     next_step = None
+#     obj = None
+#     context = {}
+#
+#     def get(self, request, acl_id=None):
+#         global LOCAL_UID
+#         if acl_id is None:
+#             if 'HTTP_REFERER' in request.META.keys():
+#                 if reverse('acldemo_urls') in request.META.get('HTTP_REFERER'):
+#                     LOCAL_UID = str(uuid.uuid4())
+#                     return HttpResponseRedirect(reverse('aclcreate_uuid_urls', kwargs={'acl_id': LOCAL_UID}))
+#         else:
+#             #if reverse('aclcreate_urls') not in request.path:
+#                 #self.obj = get_object_or_404(self.model, id=acl_id)
+#             if acl_id == LOCAL_UID:
+#                 self.context['acl_id'] = LOCAL_UID
+#                 self.context[self.model.__name__.lower()] = self.obj
+#                 return render(request, self.template, context=self.context)
+#
+#         return HttpResponseRedirect(reverse('acldemo_urls'))
+#
+#     def post(self, request, acl_id=None):
+#         if request.is_ajax and acl_id is not None and (acl_id == LOCAL_UID) and request_handler(request, self.template):
+#             return redirect(reverse(self.next_step, kwargs={'acl_id': acl_id}))
+#         else:
+#              messages.warning(request, 'Не все поля заполнены')
+#              return render(request, self.template)
+#
+#
+# class AclCreate(ObjectMixin, View):
+#     model = ACL
+#     template = 'acl_create_info.html'
+#     next_step = 'aclinternal_urls'
+#
+# class AclCreate_internal(ObjectMixin, View):
+#     model = ACL
+#     template = 'acl_internal_resources.html'
+#     next_step = 'acldmz_urls'
+#
+#
+# class AclCreate_dmz(ObjectMixin, View):
+#     model = ACL
+#     template = 'acl_dmz_resources.html'
+#     next_step = 'aclexternal_urls'
 
 
 class AclTest(View):
@@ -71,28 +78,30 @@ class AclOver(View):
             file_download = make_doc(request, LOCAL_STORAGE)
             # Очищаем глобальный массив с данными для заполнения docx
             #LOCAL_STORAGE = {}
+            #LOCAL_UID = None
         test = json.dumps(LOCAL_STORAGE)
-        return HttpResponse(test)
+        return HttpResponse("{} {}".format(test, LOCAL_STORAGE))
         return render(request, 'acl_overview.html', context={'file_download': file_download})
 
 
 class AclCreate(View):
     def get(self, request, acl_id=None):
+        global LOCAL_UID
         if acl_id is None:
             if 'HTTP_REFERER' in request.META.keys():
-                if '/acl/demo/' in request.META.get('HTTP_REFERER'):
-                    return HttpResponseRedirect(reverse('aclcreate_uuid_urls', kwargs={'acl_id': str(uuid.uuid4())}))
+                if reverse('acldemo_urls') in request.META.get('HTTP_REFERER'):
+                    LOCAL_UID = str(uuid.uuid4())
+            if LOCAL_UID is not None:
+                return HttpResponseRedirect(reverse('aclcreate_urls', kwargs={'acl_id': LOCAL_UID}))
         else:
-            return render(request, 'acl_create_info.html')
+            return render(request, 'acl_create_info.html', context={'acl_id': acl_id})
         return HttpResponseRedirect(reverse('acldemo_urls'))
 
 
     def post(self, request, acl_id=None):
-        if request.method == 'POST' and request.is_ajax and acl_id is not None and request_handler(request, 'contact'):
-            id, obj = ACL.objects.get_or_create(id=acl_id)
-            if obj:
-                print('ok')
-            return HttpResponseRedirect(reverse('aclinternal_urls'))
+        if request.method == 'POST' and request.is_ajax and acl_id is not None and request_handler(request, 'acl_create_info.html'):
+            return redirect(reverse('aclinternal_urls', kwargs={'acl_id': acl_id}))
+            #return redirect('AclCreate_internal', acl_id=acl_id)
         else:
             messages.warning(request, 'Не все поля заполнены')
             return render(request, 'acl_create_info.html')
@@ -102,13 +111,23 @@ class AclCreate(View):
 #         return render(request, 'acl_create_info.html')
 
 
-class AclCreate_internal(View):
-    def get(self, request):
-        return render(request, 'acl_internal_resources.html')
+def ACldefault(request):
+    return HttpResponseRedirect(reverse('acldemo_urls'))
 
-    def post(self, request):
-        if request.method == 'POST' and request.is_ajax and request_handler(request, 'internal'):
-            return HttpResponseRedirect(reverse('acldmz_urls'))  #acl_dmz_resources
+
+class AclCreate_internal(View):
+    def get(self, request, acl_id=None):
+        global LOCAL_UID
+        if acl_id is None:
+           if LOCAL_UID is not None:
+               return redirect(reverse('aclinternal_urls', kwargs={'acl_id': LOCAL_UID}))
+           else:
+               return HttpResponseRedirect(reverse('acldemo_urls'))
+        return render(request, 'acl_internal_resources.html', context={'acl_id': acl_id})
+
+    def post(self, request, acl_id=None):
+        if request.method == 'POST' and request.is_ajax and acl_id is not None and request_handler(request, 'acl_internal_resources.html'):
+            return HttpResponseRedirect(reverse('acldmz_urls', kwargs={'acl_id': acl_id}))  #acl_dmz_resources
         else:
             messages.warning(request, 'Не все поля заполнены')
             return render(request, 'acl_internal_resources.html')
@@ -116,35 +135,53 @@ class AclCreate_internal(View):
 
 
 class AclCreate_dmz(View):
-    def get(self, request):
-        return render(request, 'acl_dmz_resources.html')
+    def get(self, request, acl_id=None):
+        global LOCAL_UID
+        if acl_id is None:
+            if LOCAL_UID is not None:
+                return redirect(reverse('acldmz_urls', kwargs={'acl_id': LOCAL_UID}))
+            else:
+                return HttpResponseRedirect(reverse('acldemo_urls'))
+        return render(request, 'acl_dmz_resources.html', context={'acl_id': acl_id})
 
-    def post(self, request):
-        if request.method == 'POST' and request.is_ajax and request_handler(request, 'dmz'):
-            return HttpResponseRedirect(reverse('aclexternal_urls'))  #acl_dmz_resources
+    def post(self, request, acl_id=None):
+        if request.method == 'POST' and request.is_ajax and acl_id is not None and request_handler(request, 'acl_dmz_resources.html'):
+            return HttpResponseRedirect(reverse('aclexternal_urls', kwargs={'acl_id': acl_id}))  #acl_dmz_resources
         else:
             messages.warning(request, 'Не все поля заполнены')
             return render(request, 'acl_dmz_resources.html')
 
 
 class AclCreate_external(View):
-    def get(self, request):
-        return render(request, 'acl_external_resources.html')
+    def get(self, request, acl_id=None):
+        global LOCAL_UID
+        if acl_id is None:
+            if LOCAL_UID is not None:
+                return redirect(reverse('aclexternal_urls', kwargs={'acl_id': LOCAL_UID}))
+            else:
+                return HttpResponseRedirect(reverse('acldemo_urls'))
+        return render(request, 'acl_external_resources.html', context={'acl_id': acl_id})
 
-    def post(self, request):
-        if request.method == 'POST' and request.is_ajax and request_handler(request, 'external'):
-            return HttpResponseRedirect(reverse('acltraffic_urls'))  #acl_dmz_resources
+    def post(self, request, acl_id=None):
+        if request.method == 'POST' and request.is_ajax and acl_id is not None and request_handler(request, 'acl_external_resources.html'):
+            return HttpResponseRedirect(reverse('acltraffic_urls', kwargs={'acl_id': acl_id}))  #acl_dmz_resources
         else:
             messages.warning(request, 'Не все поля заполнены')
             return render(request, 'acl_external_resources.html')
 
 
 class AclCreate_traffic(View):
-    def get(self, request):
-        return render(request, 'acl_traffic.html')
+    def get(self, request, acl_id=None):
+        global LOCAL_UID
+        if acl_id is None:
+            if LOCAL_UID is not None:
+                return redirect(reverse('acltraffic_urls', kwargs={'acl_id': LOCAL_UID}))
+            else:
+                return HttpResponseRedirect(reverse('acldemo_urls'))
+        return render(request, 'acl_traffic.html', context={'acl_id': acl_id})
 
-    def post(self, request):
-        if request.method == 'POST' and request.is_ajax and request_handler(request, 'traffic'):
+    def post(self, request, acl_id=None):
+        if request.method == 'POST' and request.is_ajax and acl_id is not None and request_handler(request, 'acl_traffic.html'):
             return HttpResponseRedirect(reverse('acloverview_urls'))  #acl_dmz_resources
         else:
             messages.warning(request, 'Не все поля заполнены')

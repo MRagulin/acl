@@ -3,10 +3,11 @@
 
 {% block row %}
  <div class="col-12">
-    <form method="post" action="{% url 'aclcreate_urls' %}" name="acl-form-contacts">
+    <form method="post" action="{% url 'aclcreate_urls' %}{{ acl_id }}/" name="acl-form-contacts">
     {% csrf_token %}
 
 <div class="pl-3 pr-3 pt-3">
+            <!--#{% url 'aclcreate_urls' %}-->
            <div class="main-block">
             <h4 class="main-title">1. Контактная информация <span class="badge badge-danger">Required</span></h4>
           </div>
@@ -103,6 +104,6 @@
     $(".post-sidebar").removeClass("d-none");
     $("#contact__input__date, #contact__input__start").val(GetCurrentDate());
 </script>
-        </form>
+</form>
 </div>
 {% endblock %}

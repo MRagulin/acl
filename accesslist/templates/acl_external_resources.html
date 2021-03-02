@@ -9,7 +9,7 @@
              <p class="main-description">2.3 Список внешних ресурсов (Internet)</p>
         </div>
 
-<form class="form-inline" method="post" action="{% url 'aclexternal_urls' %}" name="acl-form-internal">
+<form class="form-inline" method="post" action="{% url 'aclexternal_urls' %}{{ acl_id }}/" name="acl-form-internal">
     {% csrf_token %}
 
         <div class="form-row">
