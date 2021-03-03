@@ -95,6 +95,8 @@ class AclOver(View):
                 obj, created = ACL.objects.get_or_create(id=str(acl_id),
                                                          acltext=json.dumps(LOCAL_STORAGE),
                                                          is_executed=True)
+
+
             except Exception as e:
                 messages.error(request, 'Ошибка, мы не смогли записать данные в БД. {}'.format(e))
 

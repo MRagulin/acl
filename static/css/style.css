@@ -698,3 +698,7 @@ input:not([type='checkbox']):valid+span:after, textarea:valid+span:after {
     cursor: pointer;
     padding-top: 3px;
 }
+
+.card-download-file{
+  font-size: 24px;
+}
