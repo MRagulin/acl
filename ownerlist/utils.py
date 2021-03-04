@@ -19,6 +19,7 @@ LOCAL_ACTION:dict = {}  # Хранение данных для активнос�
 LOCAL_UID = None
 
 FORM_APPLICATION_KEYS = ['acl_create_info.html', 'acl_internal_resources.html', 'acl_dmz_resources.html', 'acl_external_resources.html', 'acl_traffic.html']
+FORM_URLS = ["acldemo_urls", "aclcreate_urls", "aclinternal_urls", "aclexternal_urls", "acldmz_urls", "acltraffic_urls", "acloverview_urls"]
 POST_FORM_KEYS = ['name', 'email', 'tel', 'department', 'project', 'd_form', 'd_start', 'd_complate']
 
 
@@ -30,8 +31,8 @@ def request_handler(requests, namespace=''):
     if namespace == FORM_APPLICATION_KEYS[0]: #first
             LOCAL_STORAGE[namespace] = []
             for idx, post_key in enumerate(POST_FORM_KEYS):
-                if idx == 7:
-                    if requests.POST.get(post_key) == 'on':
+                if idx == len(POST_FORM_KEYS) - 1:
+                    if requests.POST.get(post_key) == 'on' or requests.POST.get(post_key) is None:
                         LOCAL_STORAGE[namespace].append(INFINITY)
                         continue
 

@@ -128,7 +128,7 @@ $(function(){
  function hide_alert(){
    $('.alert').fadeOut();
  };
- window.setInterval(hide_alert, 7000);
+ window.setInterval(hide_alert, 70000);
 });
 
 });
