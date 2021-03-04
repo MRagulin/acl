@@ -21,6 +21,7 @@ LOCAL_UID = None
 FORM_APPLICATION_KEYS = ['acl_create_info.html', 'acl_internal_resources.html', 'acl_dmz_resources.html', 'acl_external_resources.html', 'acl_traffic.html']
 FORM_URLS = ["acldemo_urls", "aclcreate_urls", "aclinternal_urls", "aclexternal_urls", "acldmz_urls", "acltraffic_urls", "acloverview_urls"]
 POST_FORM_KEYS = ['name', 'email', 'tel', 'department', 'project', 'd_form', 'd_start', 'd_complate']
+POST_FORM_EMPTY = ['on', '', None]
 
 
 def request_handler(requests, namespace=''):
@@ -32,14 +33,15 @@ def request_handler(requests, namespace=''):
             LOCAL_STORAGE[namespace] = []
             for idx, post_key in enumerate(POST_FORM_KEYS):
                 if idx == len(POST_FORM_KEYS) - 1:
-                    if requests.POST.get(post_key) == 'on' or requests.POST.get(post_key) is None:
+                    if requests.POST.get(post_key) in POST_FORM_EMPTY:
                         LOCAL_STORAGE[namespace].append(INFINITY)
                         continue
 
-                if requests.POST.get(post_key) != '':
+                if requests.POST.get(post_key) not in POST_FORM_EMPTY:
                      LOCAL_STORAGE[namespace].append(requests.POST.get(post_key))
                 else:
-                    return False
+                    LOCAL_STORAGE[namespace].append(INFINITY)
+                   # return False
 
     else:
         if namespace == FORM_APPLICATION_KEYS[-1]: #last
@@ -59,7 +61,8 @@ def request_handler(requests, namespace=''):
                             if v != '':
                                 LOCAL_STORAGE[namespace][cnt_key].append(v)
                             else:
-                                return False
+                                LOCAL_STORAGE[namespace][cnt_key].append(INFINITY)
+                                #return False
     return LOCAL_STORAGE
 
 

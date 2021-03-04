@@ -16,8 +16,6 @@ import uuid
 class ObjectMixin:
     template = None
     url = None
-    obj = None
-    context = {}
 
     def get(self, request, acl_id=None):
         global LOCAL_UID
@@ -76,10 +74,10 @@ class AclTest(View):
 
 
 class AclDemo(View):
-    global LOCAL_UID
-    global LOCAL_STORAGE
-
     def get(self, request):
+        global LOCAL_UID
+        global LOCAL_STORAGE
+
         LOCAL_UID = None
         LOCAL_STORAGE = {}
         return render(request, 'acl_demo.html')
