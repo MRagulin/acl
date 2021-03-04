@@ -102,9 +102,9 @@ class AclOver(View):
 
 
             # Очищаем глобальный массив с данными для заполнения docx
-            #LOCAL_STORAGE = {}
-            #LOCAL_UID = None
-        test = json.dumps(LOCAL_STORAGE)
+            LOCAL_STORAGE = {}
+            LOCAL_UID = None
+        #test = json.dumps(LOCAL_STORAGE)
         #return HttpResponse("{} {}".format(test, LOCAL_STORAGE))
         return render(request, 'acl_overview.html', context={'file_download': file_download})
 
@@ -119,6 +119,15 @@ class AclCreate(View):
             if LOCAL_UID is not None:
                 return HttpResponseRedirect(reverse('aclcreate_urls', kwargs={'acl_id': LOCAL_UID}))
         else:
+            #if 'HTTP_REFERER' in request.META.keys():
+            #if LOCAL_UID is None or LOCAL_UID != acl_id: #reverse('acldemo_urls') in request.META.get('HTTP_REFERER') and
+                    # obj = ACL.objects.get(id=str(acl_id)) #get_object_or_404(ACL, id=str(acl_id))
+                    #if obj:
+                     #   LOCAL_STORAGE = json.loads(obj.acltext)
+                      #  if 'acl_create_info.html' in LOCAL_STORAGE:
+                       #     return render(request, 'acl_create_info.html',
+                        #                  context={'acl_id': acl_id, 'LOCAL_STORAGE': LOCAL_STORAGE['acl_create_info.html']})
+
             return render(request, 'acl_create_info.html', context={'acl_id': acl_id})
         return HttpResponseRedirect(reverse('acldemo_urls'))
 

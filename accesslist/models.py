@@ -9,4 +9,4 @@ class ACL(models.Model):
     acltext = models.JSONField(blank=True)
     is_executed = models.BooleanField(null=True, default=False)
     owner = models.CharField(max_length=64, blank=True, default='admin')
-    created = models.DateTimeField(blank=True, auto_now_add=True)
+    created = models.DateField(blank=True, auto_now_add=True)

@@ -15,31 +15,31 @@
             <div class="contact-form">
               <label class="contact-form__label">
                 <span class="contact-form__text">ФИО</span>
-                <input type="text" class="contact__input" placeholder="Иванов Иван" name="name" pattern="[А-Яа-яЁё\s]{3,32}" title="Username should only contain lowercase letters. e.g. john" autofocus required>
+                <input type="text" class="contact__input" value="{% if LOCAL_STORAGE %}{{ LOCAL_STORAGE.0 }}{% endif %}" placeholder="Иванов Иван" name="name" pattern="[А-Яа-яЁё\s]{3,32}" title="Username should only contain lowercase letters. e.g. john" autofocus required>
                 <span class="validity"></span>
 
               </label>
               <label class="contact-form__label">
                 <span class="contact-form__text">Отдел/Управление</span>
-                <input type="text" name="department" class="contact__input" placeholder="УИБ" pattern="[А-Яа-яЁёA-Za-z\s]{2,32}" required>
+                <input type="text" name="department" value="{% if LOCAL_STORAGE %}{{ LOCAL_STORAGE.3 }}{% endif %}" class="contact__input" placeholder="УИБ" pattern="[А-Яа-яЁёA-Za-z\s]{2,32}" required>
                 <span class="validity"></span>
               </label>
 
               <label class="contact-form__label">
                 <span class="contact-form__text">Email</span>
-                <input type="email" name="email" class="contact__input" placeholder="Norepl@Alfastrah.ru" pattern=".+@alfastrah.ru" required>
+                <input type="email" name="email" value="{% if LOCAL_STORAGE %}{{ LOCAL_STORAGE.1 }}{% endif %}" class="contact__input" placeholder="Norepl@Alfastrah.ru" pattern=".+@alfastrah.ru" required>
                 <span class="validity"></span>
               </label>
 
               <label class="contact-form__label">
                 <span class="contact-form__text">Проект/ИС</span>
-                <input type="text" name="project" class="contact__input" placeholder="Легкий Вход" pattern=".{3,}" required>
+                <input type="text" name="project" value="{% if LOCAL_STORAGE %}{{ LOCAL_STORAGE.4 }}{% endif %}" class="contact__input" placeholder="Легкий Вход" pattern=".{3,}" required>
                 <span class="validity"></span>
               </label>
 
               <label class="contact-form__label">
                 <span class="contact-form__text">Телефон</span>
-                <input type="tel" name="tel" class="contact__input" placeholder="89096971821" pattern="[0-9]{4,}">
+                <input type="tel" name="tel"value="{% if LOCAL_STORAGE %}{{ LOCAL_STORAGE.2 }}{% endif %}"  class="contact__input" placeholder="89096971821" pattern="[0-9]{4,}">
                    <span class="validity"></span>
               </label>
             </div>
@@ -51,13 +51,15 @@
 
               <label class="contact-form__label-checkbox">
                 <span class="contact-form__text">Дата ввода в эсплуатацию </span>
-                <input type="date" class="contact__input" name="d_start" id="contact__input__start" placeholder="21.01.2020" min="2020-01-01" max="2030-01-01" required>
+{#                <input type="date" class="contact__input" name="d_start" id="contact__input__start" placeholder="21.01.2020" value="2023-12-01" min="2020-01-01" max="2030-01-01" required>#}
+                 <input type="date" class="contact__input" name="d_start" id="date" min="2020-01-01" placeholder="21.01.2020" value="{{LOCAL_STORAGE.7}}" required>
+
                 <span class="validity"></span>
               </label>
 
               <label class="contact-form__label-checkbox">
                 <span class="contact-form__text">Дата вывода из эксплуатации</span>
-                <input type="date" class="contact__input" id="contact__input__term" name="d_complate" placeholder="30.12.2030" min="2020-01-01" max="2030-01-01" required>
+                <input type="date" class="contact__input" id="contact__input__term" value="{% if LOCAL_STORAGE %}{{ LOCAL_STORAGE.6}}{% endif %}" name="d_complate" placeholder="30.12.2030" min="2020-01-01" max="2030-01-01" required>
                 <span class="validity"></span>
                 <div style="white-space:nowrap;padding-top:5px;">
                     <input type="checkbox" class="checkbox__real" id="checkbox__real__term" name="d_complete" >
@@ -68,7 +70,7 @@
 
               <label class="contact-form__label-checkbox">
                 <span class="contact-form__text contact-form__text-active">Дата заполнения </span>
-                <input type="date" class="contact__input" id="contact__input__date" name="d_form" placeholder="01.01.2021" min="2020-01-01" required>
+                <input type="date" class="contact__input" id="contact__input__date" value="{% if LOCAL_STORAGE %}{{ LOCAL_STORAGE.7}}{% endif %}" name="d_form" placeholder="01.01.2021" min="2020-01-01" required>
                 <span class="validity"></span>
             </label>
             </div>
