@@ -30,17 +30,40 @@ class ObjectMixin:
                     LOCAL_UID = str(uuid.uuid4())
                     return HttpResponseRedirect(reverse(FORM_URLS[1], kwargs={'acl_id': LOCAL_UID}))
         else:
-             return render(request, self.template, context={'acl_id': acl_id})
+            if LOCAL_UID is None:
+                LOCAL_UID = acl_id
+            try:
+                tmp = ACL.objects.get(id=str(acl_id))
+                LOCAL_STORAGE = json.loads(tmp.acltext)
+            except ACL.DoesNotExist:
+                pass
+
+            if self.template not in LOCAL_STORAGE:
+                return render(request, self.template, context={'acl_id': acl_id})
+            else:
+                return render(request, self.template, context={'acl_id': acl_id, 'LOCAL_STORAGE': LOCAL_STORAGE[self.template]})
         return HttpResponseRedirect(reverse(FORM_URLS[0]))
 
     def post(self, request, acl_id=None):
-        if request.method == 'POST' and request.is_ajax and acl_id is not None and request_handler(request,
-                                                                                                 self.template):
+        global LOCAL_STORAGE
+        #request.method == 'POST' and request.is_ajax
+        if acl_id is not None:
+            tmp = request_handler(request, self.template)
+            if tmp:
+                if self.template in LOCAL_STORAGE:  #[self.template] : tmp[self.template]
+                    LOCAL_STORAGE.update({self.template : tmp[self.template]})
+                else:
+                    LOCAL_STORAGE[self.template] = tmp[self.template]
+                obj, created = ACL.objects.get_or_create(id=str(acl_id))
+                obj.acltext = json.dumps(LOCAL_STORAGE)
+                obj.save()
+
+                #if created:
             current_page = FORM_URLS.index(self.url)
             return redirect(reverse(FORM_URLS[current_page + 1], kwargs={'acl_id': acl_id}))
-        else:
-             messages.warning(request, 'Не все поля заполнены')
-             return render(request, self.template)
+
+        messages.warning(request, 'Не все поля заполнены')
+        return render(request, self.template)
 
 
 class AclCreate(ObjectMixin, View):
