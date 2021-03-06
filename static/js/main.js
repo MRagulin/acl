@@ -131,4 +131,15 @@ $(function(){
  window.setInterval(hide_alert, 70000);
 });
 
+$("#flexAgreementCheck").click(function(){
+        if ($("#flexAgreementCheck:checked").length > 0) {
+            $(".btn-start").removeClass('not-active');
+
+        } else
+        {
+            $(".btn-start").addClass('not-active');
+        }
+});
+
+
 });

@@ -141,9 +141,7 @@ class AclOver(View):
             except Exception as e:
                 messages.error(request, 'Ошибка, мы не смогли записать данные в БД. {}'.format(e))
 
-
             # Очищаем глобальный массив с данными для заполнения docx
-
             #LOCAL_STORAGE = {}
             #LOCAL_UID = None
         #test = json.dumps(LOCAL_STORAGE)

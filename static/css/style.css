@@ -698,3 +698,9 @@ input:not([type='checkbox']):valid+span:after, textarea:valid+span:after {
 .form-control, .contact__input{
   font-size: 1.1rem!important;
 }
+
+.not-active {
+  pointer-events: none;
+  cursor: default;
+  text-decoration: none;
+}
