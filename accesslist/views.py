@@ -130,9 +130,11 @@ class AclOver(View):
                                         'Мы уже занимаемся устранением. {}'.format(e))
 
             try:
-                obj, created = ACL.objects.get_or_create(id=str(acl_id),
-                                                         acltext=json.dumps(LOCAL_STORAGE),
-                                                         is_executed=True)
+                obj, created = ACL.objects.get_or_create(id=str(acl_id))
+                if obj:
+                    obj.acltext = json.dumps(LOCAL_STORAGE)
+                    obj.is_executed = True
+                    obj.save()
 
 
             except Exception as e:

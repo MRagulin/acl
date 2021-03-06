@@ -1,5 +1,6 @@
 {% extends 'acl_base.html' %}
 {% load static %}
+{% load random_numbers %}
 {% block row %}
 
 
@@ -26,6 +27,45 @@
 
               </thead>
                 <tbody>
+                 {% if LOCAL_STORAGE|length > 0 %}
+                    {% for item in LOCAL_STORAGE %}
+                     <tr>
+                                <td class="">
+                                    <input type="text" value="{{ item.0}}" class="form-control" name="input__domain_source_{% random_int 0 100 %}" autofocus minlength="7" maxlength="32" size="15" required>
+                                    <span class="validity"></span>
+                                </td>
+
+                                <td class="">
+                                        <input type="text" value="{{ item.1}}" class="form-control" name="input__ip_source_{% random_int 0 100 %}" autofocus minlength="7" maxlength="15" size="15" pattern="^((\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.){3}(\d{1,2}|1\d" required>
+                                        <span class="validity"></span>
+                                </td>
+
+                                <td>
+                                        <input type="text" value="{{ item.2}}" class="form-control" name="input__domain_dest_{% random_int 0 100 %}" autofocus minlength="7" maxlength="32" size="15" required>
+                                        <span class="validity"></span>
+                                </td>
+
+                                <td class="">
+                                        <input type="text" value="{{ item.3}}" class="form-control" placeholder="195.239.64.79" name="input__host_source_{% random_int 0 100 %}" autofocus minlength="7" maxlength="15" size="15" pattern="^((\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.){3}(\d{1,2}|1\d" required>
+                                        <span class="validity"></span>
+                                </td>
+
+                                <td class="">
+                                        <input type="text" value="{{ item.4}}" class="form-control" name="input__host_port_{% random_int 0 100 %}" autofocus minlength="6" maxlength="15" size="15" pattern="^((\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.){3}(\d{1,2}|1\d" required>
+                                        <span class="validity"></span>
+                                </td>
+
+                                <td>
+                                        <textarea class="form-control" rows="1" cols="40"  name="input_descr_{% random_int 0 100 %}" pattern=".{3,}" required>{{item.5}}</textarea>
+                                        <span class="validity"></span>
+                                </td>
+                                <td>
+                                            <button class="btn btn-danger btn-sm btn-action btn-action-rm ml-1" type="button">-</button>
+                                            <button class="btn btn-success btn-sm btn-action btn-action-add ml-1" type="button">+</button>
+                                </td>
+                     </tr>
+                 {% endfor %}
+                    {% else %}
                      <tr>
                                 <td class="">
                                     <input type="text"  class="form-control" placeholder="dpgw.alfastrah.ru" name="input__domain_source" autofocus minlength="7" maxlength="32" size="15" required>
@@ -63,6 +103,7 @@
 
 
                      </tr>
+                  {% endif %}
                 </tbody>
             </table>
         </div>

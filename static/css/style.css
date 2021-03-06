@@ -461,7 +461,7 @@ width: 100%;
   display: grid;
   grid-template-columns: 2fr 1fr 40px 190px;
   grid-template-rows: 1fr;
-  align-items: center;
+  #align-items: center;
 }
 
 .contact-form__label:last-child {
@@ -481,8 +481,8 @@ width: 100%;
   border: 1px solid lightgray;
   outline: #e0e0e0;
   padding: 4px 8px;
-  color: #0d6a0d;
-  width: 250px;
+  color: #495057;
+  width: 295px;
 }
 
 ::-webkit-input-placeholder {
@@ -615,20 +615,12 @@ input:not([type='checkbox']):invalid+span:after, textarea:invalid+span:after {
 
 input:not([type='checkbox']):valid+span:after, textarea:valid+span:after {
     position: absolute;
-    content: '✓';
-    padding-left: 5px;
+    content: '\2714';
+    padding-left: 2px;
     color: #0d6a0d;
     font-weight: 700;
 
 }
-
-/*textarea:invalid+span:after {*/
-/*    position: absolute;*/
-/*    content: 'X';*/
-/*    padding-left: 5px;*/
-/*    color: #ba1010;*/
-/*    font-weight: 700;*/
-/*}*/
 
 
 .contact-form__label > input:not([type='checkbox']):valid+span:after {
@@ -701,4 +693,8 @@ input:not([type='checkbox']):valid+span:after, textarea:valid+span:after {
 
 .card-download-file{
   font-size: 24px;
+}
+
+.form-control, .contact__input{
+  font-size: 1.1rem!important;
 }

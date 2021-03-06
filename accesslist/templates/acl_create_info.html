@@ -52,17 +52,17 @@
               <label class="contact-form__label-checkbox">
                 <span class="contact-form__text">Дата ввода в эсплуатацию </span>
 {#                <input type="date" class="contact__input" name="d_start" id="contact__input__start" placeholder="21.01.2020" value="2023-12-01" min="2020-01-01" max="2030-01-01" required>#}
-                 <input type="date" class="contact__input" name="d_start" id="date" min="2020-01-01" placeholder="21.01.2020" value="{{LOCAL_STORAGE.7}}" required>
+                 <input type="date" class="contact__input" name="d_start" id="date" min="2020-01-01" placeholder="21.01.2020" value="{{LOCAL_STORAGE.6}}" required>
 
                 <span class="validity"></span>
               </label>
 
               <label class="contact-form__label-checkbox">
                 <span class="contact-form__text">Дата вывода из эксплуатации</span>
-                <input type="date" class="contact__input" id="contact__input__term" value="{% if LOCAL_STORAGE %}{{ LOCAL_STORAGE.6}}{% endif %}" name="d_complate" placeholder="30.12.2030" min="2020-01-01" max="2030-01-01" required>
+                <input type="date" class="contact__input" id="contact__input__term" value="{% if LOCAL_STORAGE %}{% if LOCAL_STORAGE.7 != 'Нет' %}{{ LOCAL_STORAGE.7}}{% endif %}{% endif %}" name="d_complate" placeholder="30.12.2030" min="2020-01-01" max="2030-01-01" required>
                 <span class="validity"></span>
                 <div style="white-space:nowrap;padding-top:5px;">
-                    <input type="checkbox" class="checkbox__real" id="checkbox__real__term" name="d_complete" >
+                    <input type="checkbox" class="checkbox__real" id="checkbox__real__term" name="d_complete">
                     <label for="checkbox__real__term" style="vertical-align: bottom;">Бессрочно</label>
                 </div>
 {#                <span class="checkbox__title checkbox__title-active">Бессрочно</span>#}
@@ -70,11 +70,18 @@
 
               <label class="contact-form__label-checkbox">
                 <span class="contact-form__text contact-form__text-active">Дата заполнения </span>
-                <input type="date" class="contact__input" id="contact__input__date" value="{% if LOCAL_STORAGE %}{{ LOCAL_STORAGE.7}}{% endif %}" name="d_form" placeholder="01.01.2021" min="2020-01-01" required>
+                <input type="date" class="contact__input" value="{% if LOCAL_STORAGE %}{{ LOCAL_STORAGE.5}}{% endif %}" name="d_form" id="date" placeholder="21.01.2020" required>
                 <span class="validity"></span>
             </label>
             </div>
-
+              {% if LOCAL_STORAGE %}
+                <script>
+                {% if LOCAL_STORAGE.7 == 'Нет' %}
+                    $("#checkbox__real__term").attr('checked', true);
+                    $("#contact__input__term").attr('disabled', true);
+                {% endif %}
+                </script>
+              {% endif %}
 
           </div>
           <div class="form-row__footer">

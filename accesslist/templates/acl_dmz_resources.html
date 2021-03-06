@@ -1,5 +1,6 @@
 {% extends 'acl_base.html' %}
 {% load static %}
+{% load random_numbers %}
 {% block row %}
 
 
@@ -23,7 +24,36 @@
 
               </thead>
                 <tbody>
-                     <tr>
+                {% if LOCAL_STORAGE|length > 0 %}
+                    {% for item in LOCAL_STORAGE %}
+                         <tr>
+                                    <td class="">
+                                       <input type="text"  class="form-control" value="{{ item.0}}" placeholder="195.239.64.79" name="input__ip_{% random_int 0 100 %}" autofocus minlength="7" maxlength="15" size="15" pattern="^((\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.){3}(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])$" required>
+                                        <span class="validity"></span>
+                                    </td>
+
+                                    <td class="">
+                                          <div class="input-group mb-2">
+                                                <div class="input-group-prepend">
+                                                    <div class="input-group-text">/</div>
+                                                </div>
+                                            <input type="number" value="{{ item.1}}" class="form-control" placeholder="30" name="input__mask_{% random_int 0 100 %}"  style="max-width: 110px;" pattern="^([0-9]){1,2}$" min="1" max="32" required>
+                                            <span class="validity"></span>
+                                          </div>
+
+                                    </td>
+                                    <td>
+                                            <textarea class="form-control" placeholder="Доступ до z14-1709-gw.alfastrah.ru" rows="1" cols="40"  name="input_descr_{% random_int 0 100 %}" pattern=".{3,}" required>{{item.2}}</textarea>
+                                            <span class="validity"></span>
+                                    </td>
+                                    <td>
+                                                <button class="btn btn-danger btn-sm btn-action btn-action-rm ml-3" type="button">-</button>
+                                                <button class="btn btn-success btn-sm btn-action btn-action-add ml-1" type="button">+</button>
+                                    </td>
+                         </tr>
+                    {% endfor %}
+                {% else %}
+                                     <tr>
                                 <td class="">
                                    <input type="text"  class="form-control" placeholder="195.239.64.79" name="input__ip" autofocus minlength="7" maxlength="15" size="15" pattern="^((\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.){3}(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])$" required>
                                     <span class="validity"></span>
@@ -48,6 +78,7 @@
                                             <button class="btn btn-success btn-sm btn-action btn-action-add ml-1" type="button">+</button>
                                 </td>
                      </tr>
+                {% endif %}
                 </tbody>
             </table>
         </div>
