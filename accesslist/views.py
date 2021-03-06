@@ -133,7 +133,8 @@ class AclOver(View):
                 obj, created = ACL.objects.get_or_create(id=str(acl_id))
                 if obj:
                     obj.acltext = json.dumps(LOCAL_STORAGE)
-                    obj.is_executed = True
+                    obj.is_executed = False
+                    obj.status = 'FL'
                     obj.save()
 
 

@@ -10,3 +10,11 @@ class ACL(models.Model):
     is_executed = models.BooleanField(null=True, default=False)
     owner = models.CharField(max_length=64, blank=True, default='admin')
     created = models.DateField(blank=True, auto_now_add=True)
+    APL_STATUS = [
+        ('NOTFL', 'Не заполнено'),
+        ('FL','Заполнено'),
+        ('CMP','Выполнено'),
+        ('WTE','Ожидает рассмотрения'),
+        ('CNL','Отклонено')
+    ]
+    status = models.CharField(choices=APL_STATUS, default='NOTFL', blank=True, max_length=20)
