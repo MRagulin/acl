@@ -66,6 +66,12 @@ class ObjectMixin:
         return render(request, self.template)
 
 
+class Aclhistory(View):
+    def get(self, request):
+        acllist = ACL.objects.order_by("-created")[:10]
+        return render(request, 'acl_history.html', context={"acllists": acllist})
+
+
 class AclCreate(ObjectMixin, View):
     template = 'acl_create_info.html'
     url = 'aclcreate_urls'
@@ -105,8 +111,10 @@ class AclDemo(View):
         LOCAL_STORAGE = {}
         return render(request, 'acl_demo.html')
 
+
 def ACldefault(request):
     return HttpResponseRedirect(reverse('acldemo_urls'))
+
 
 class AclOver(View):
     def get(self, request, acl_id=None):
@@ -147,3 +155,6 @@ class AclOver(View):
         #test = json.dumps(LOCAL_STORAGE)
         #return HttpResponse("{} {}".format(test, LOCAL_STORAGE))
         return render(request, 'acl_overview.html', context={'file_download': file_download})
+
+
+

@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% block content %}
+{#    <script>#}
+{#        $('body').css({'background-color': '#f4f7fa'});#}
+{#    </script>#}
+
+    <div class="p-1 w-80" style="margin-top: 50px" >
+        <table class="table table-hover table-bordered table-sm">
+          <thead style="background:#efefef;">
+            <tr>
+              <th>#</th>
+              <th></th>
+              <th scope="col">Проект</th>
+              <th scope="col">Статус</th>
+              <th scope="col">Пользователь</th>
+              <th scope="col">Дата создания</th>
+              <th scope="col">UUID</th>
+            </tr>
+          </thead>
+          <tbody style="cursor: pointer">
+          {% if acllists %}
+              {% for acllist in acllists %}
+            <tr>
+                <td class="bs">
+                        <a class="detail-icon" href="#"><i class="fa fa-plus"></i></a>
+                </td>
+                 <td class="bs">
+                     <label>
+                        <input data-index="0" name="btSelectItem" type="checkbox" value="0">
+                        <span></span>
+                     </label>
+                 </td>
+              <td>{{ acllist.owner }}</td>
+              <td>
+                  <p class="badge
+                  {% if acllist.status == 'FL' %}badge-info
+                  {% elif acllist.status == 'WTE'%}badge-warning
+                  {% elif acllist.status == 'NOTFL'%}badge-light
+                  {% elif acllist.status == 'CMP'%}badge-success
+                  {% elif acllist.status == 'CNL'%}badge-secondary
+                  {% endif %}
+                    ">
+                      {{ acllist.get_status_display }}
+                  </p>
+              </td>
+              <td>
+                  <div class="font-weight-bold">
+                      {{ acllist.owner}}
+                  </div>
+                  <div class="font-weight-light text-secondary">
+                      УИБ
+                  </div>
+              </td>
+              <td>{{ acllist.created}}</td>
+              <td class="text-primary">{{ acllist.id}}</td>
+            </tr>
+            {% endfor %}
+          {% endif %}
+          </tbody>
+        </table>
+
+    </div>
+{% endblock %}

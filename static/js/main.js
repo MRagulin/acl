@@ -131,6 +131,15 @@ $(function(){
  window.setInterval(hide_alert, 70000);
 });
 
+
+$(".btn-start").click(function(){
+        if ($("#flexAgreementCheck:checked").length == 0)
+        {
+            $("label.form-check-label").css({"border-bottom":" 2px solid red"});
+            return false;
+        }
+});
+
 $("#flexAgreementCheck").click(function(){
         if ($("#flexAgreementCheck:checked").length > 0) {
             $(".btn-start").removeClass('not-active');
