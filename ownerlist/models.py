@@ -33,12 +33,8 @@ class Owners(models.Model):
     def __str__(self):
         return "Владелец: {}".format(self.username)
 
-# class IpTags(models.Model):
-#     tagname = models.CharField(blank=True, max_length=64, unique=True)
-
-
 class Iplist(models.Model):
-    ipv4 = models.GenericIPAddressField(protocol='IPv4', unique=True, verbose_name="IP адресс")
+    ipv4 = models.GenericIPAddressField(protocol='IPv4', unique=True, verbose_name="IP адресс", db_index=True)
     ipv4_int = models.BigIntegerField(default=0, db_index=True)
     ipv4_str = models.CharField(blank=True, max_length=15)
     hostname = models.CharField(blank=True, max_length=64)

@@ -68,8 +68,11 @@ class ObjectMixin:
 
 
 class Aclhistory(View):
-    def get(self, request):
-        acllist = ACL.objects.order_by("-created")[:10]
+    def get(self, request, acl_id=None):
+        if acl_id is not None:
+            acllist= ACL.objects.filter(id__exact=acl_id)
+        else:
+            acllist = ACL.objects.order_by("-created")[:10]
         return render(request, 'acl_history.html', context={"acllists": acllist})
 
 

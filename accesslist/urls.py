@@ -22,6 +22,7 @@ urlpatterns = [
     path("traffic/", AclCreate_traffic.as_view(), name="acltraffic_urls"),
     path("dmz/", AclCreate_dmz.as_view(), name="acldmz_urls"),
     path("history/", Aclhistory.as_view(), name="aclhistory_urls"),
+    path("history/<uuid:acl_id>/", Aclhistory.as_view(), name="aclhistory_uuid_urls"),
 
     path("checkip/<str:ip>/", CheckIp, name='check_ip_urls'),
     #url(r"^create/(?P<acl_id>[a-f0-9]{8}-?[a-f0-9]{4}-?4[a-f0-9]{3}-?[89ab][a-f0-9]{3}-?[a-f0-9]{12})/$", AclCreate.as_view(), name="aclcreate_uuid_urls"),

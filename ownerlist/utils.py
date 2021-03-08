@@ -10,7 +10,8 @@ import datetime
 import time
 import uuid
 import ipaddress
-
+from django.shortcuts import redirect
+from django.urls import reverse
 
 FUN_SPEED = 0
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -33,6 +34,18 @@ def ip_status(ip=None)->dict:
     except ValueError:
         return data
     data['ip'] = True
+
+    if ip.is_reserved:
+        data['type'] = 3
+        return data
+
+    if ip.is_loopback:
+        data['type'] = 4
+        return data
+    if ip.is_multicast:
+        data['type'] = 5
+        return data
+
     if ip.is_global:
         data['type'] = 1
     elif ip.is_private:
@@ -137,6 +150,7 @@ def DeepSearch(request, string: str = ''):
     """Функция для анализа типа данных в запросе и поиск по структуре"""
     result, tmp = '', string
     Iplist = apps.get_model('ownerlist', 'Iplist')
+
     if re.match(r"^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$", tmp):
         result = Iplist.objects.filter(ipv4=tmp)
 

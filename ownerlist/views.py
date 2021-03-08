@@ -6,7 +6,9 @@ from .forms import UploadFileForm
 from .utils import upload_file_handler, ExtractDataXls, search_text
 from django.contrib import messages
 import json
-
+from django.shortcuts import redirect
+from django.urls import reverse
+import re
 # Create your views here.
 #vlan_fun = ExtractDataXls('D:\\Project\\acladmin-20210206T113742Z-001\\IP_LIST\\таблица ip адресов.xls') # ip\\172.18.0.Х Avaya.xls таблица ip адресов.xls ip\\195.239.64.хх.xls
 #result = vlan_fun.execute_file_parsing() or 0
@@ -39,11 +41,14 @@ class TreeView(View):
 class SearchView(View):
     def get(self, request):
         context = {}
+
         search = request.path.split('/')
         result = search[2].strip().lower()
         if result == '':
                 return redirect('ipconfig_urls')
         if search is not None:
+            if re.match(r"[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}", result):
+                return redirect(reverse('aclhistory_uuid_urls', kwargs={'acl_id': result}))
             context = search_text(request, result)
         return render(request, 'search.html', context=context)
 

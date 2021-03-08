@@ -32,7 +32,11 @@ function ValidateIPaddress(ipaddress) {
 }
 function ShowNotify(idx)
 {
-    let message =  ['Неправильный IP-адресс','Обратите внимание, возможно указан неправильный IP-адрес, либо он не является внутреннем.', 'Обратите внимание, возможно указан неправильный IP-адрес, либо он не является внешним.'];
+    let message =  ['Неправильный IP-адресс',
+        'Обратите внимание, возможно указан неправильный IP-адрес, либо он не является внутреннем.',
+        'Обратите внимание, возможно указан неправильный IP-адрес, либо он не является внешним.',
+        'Это зарезервированный IP-адрес, использовать его нежелательно.'
+    ];
     if($("#successMessage").length < 1)
     {
         $("body").append("<div id='notifyMessage' class='alert alert-warning' style='text-align:center;vertical-align:middle;width:400px;position:absolute;top:190px;right:30px;margin:20px;display:none;border:1px solid #fd7e14;opacity: 0.8;'><i class='fas fa-radiation mr-3'></i>" + message[idx] + "</i></div>");
@@ -55,7 +59,7 @@ $(document).ready(function(){
                    let status = JSON.parse(JSON.stringify(data));
                    if (status.ip != true || status.type != 2)
                    {
-                           ShowNotify(1) ;
+                            [3, 4, 5].includes(status.type) ? ShowNotify(3) : ShowNotify(1);
                    }
                 }
                 catch(e) {  console.error(e);
@@ -74,7 +78,7 @@ $(document).ready(function(){
                    let status = JSON.parse(JSON.stringify(data));
                    if (status.ip != true || status.type != 1)
                    {
-                           ShowNotify(2) ;
+                           [3, 4, 5].includes(status.type) ? ShowNotify(3) : ShowNotify(2);
                    }
                 }
                 catch(e) {  console.error(e);
