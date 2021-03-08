@@ -24,7 +24,66 @@ function IsJsonString(str) {
   }
 }
 
+function ValidateIPaddress(ipaddress) {
+  if (/^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/.test(ipaddress)) {
+    return (true)
+  }
+  return (false)
+}
+function ShowNotify(idx)
+{
+    let message =  ['Неправильный IP-адресс','Обратите внимание, возможно указан неправильный IP-адрес, либо он не является внутреннем.', 'Обратите внимание, возможно указан неправильный IP-адрес, либо он не является внешним.'];
+    if($("#successMessage").length < 1)
+    {
+        $("body").append("<div id='notifyMessage' class='alert alert-warning' style='text-align:center;vertical-align:middle;width:400px;position:absolute;top:190px;right:30px;margin:20px;display:none;border:1px solid #fd7e14;opacity: 0.8;'><i class='fas fa-radiation mr-3'></i>" + message[idx] + "</i></div>");
+    }
+    else
+    {
+        $("#successMessage").html(message[idx]);
+    }
+    $("#notifyMessage").show('slow');
+    setTimeout('$("#notifyMessage").hide("slow")',10000);
+}
+
 $(document).ready(function(){
+
+    $(".input__ip__internal").change(function(el){
+        if (ValidateIPaddress(this.value) == true) {
+            $.getJSON("/acl/checkip/" + this.value + '/',).done(function (data) {
+                try
+                {
+                   let status = JSON.parse(JSON.stringify(data));
+                   if (status.ip != true || status.type != 2)
+                   {
+                           ShowNotify(1) ;
+                   }
+                }
+                catch(e) {  console.error(e);
+                };
+
+
+            })
+        }
+    });
+
+        $(".input__ip__external").change(function(el){
+        if (ValidateIPaddress(this.value) == true) {
+            $.getJSON("/acl/checkip/" + this.value + '/',).done(function (data) {
+                try
+                {
+                   let status = JSON.parse(JSON.stringify(data));
+                   if (status.ip != true || status.type != 1)
+                   {
+                           ShowNotify(2) ;
+                   }
+                }
+                catch(e) {  console.error(e);
+                };
+
+
+            })
+        }
+    });
 
     $("#upload_file_form").submit(function (event){
                event.preventDefault();

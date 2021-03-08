@@ -29,7 +29,7 @@
                 {% for item in LOCAL_STORAGE %}
                      <tr>
                                 <td class="">
-                                    <input type="text" value="{{item.0}}" class="form-control" name="input__ip_{% random_int 0 100 %}" autofocus minlength="7" maxlength="15" size="15" pattern="^((\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.){3}(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])$" required>
+                                    <input type="text" value="{{item.0}}" class="form-control input__ip__external" name="input__ip_{% random_int 0 100 %}" autofocus minlength="7" maxlength="15" size="15" pattern="^((\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.){3}(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])$" required>
                                     <span class="validity"></span>
                                 </td>
 
@@ -54,7 +54,7 @@
                 {% endfor %}
                 {% else %}
                      <tr> <td class="">
-                                    <input type="text" class="form-control" placeholder="173.194.222.0" name="input__ip" autofocus minlength="7" maxlength="15" size="15" pattern="^((\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.){3}(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])$" required>
+                                    <input type="text" class="form-control input__ip__external" placeholder="173.194.222.0" name="input__ip" autofocus minlength="7" maxlength="15" size="15" pattern="^((\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.){3}(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])$" required>
                                     <span class="validity"></span>
                                 </td>
 
@@ -63,7 +63,7 @@
                                             <div class="input-group-prepend">
                                                 <div class="input-group-text">/</div>
                                             </div>
-                                       <input type="number" value="{{item.1}}" class="form-control" placeholder="25" name="input__mask"  style="max-width: 110px;" pattern="^([0-9]){1,2}$" required>
+                                       <input type="number" value="{{item.1}}" class="form-control input__ip__external" placeholder="25" name="input__mask"  style="max-width: 110px;" pattern="^([0-9]){1,2}$" required>
                                         <span class="validity"></span>
                                       </div>
                                 </td>

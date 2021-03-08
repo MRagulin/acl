@@ -7,12 +7,13 @@ from django.http import HttpResponse
 from .models import ACL
 
 from ownerlist.utils import make_doc, request_handler
-from ownerlist.utils import LOCAL_ACTION, FORM_APPLICATION_KEYS, POST_FORM_KEYS,  FORM_URLS, LOCAL_UID, LOCAL_STORAGE
+from ownerlist.utils import LOCAL_ACTION, FORM_APPLICATION_KEYS, POST_FORM_KEYS,  FORM_URLS, LOCAL_UID, LOCAL_STORAGE, \
+    ip_status
 
 import json
 import uuid
 
-
+import ipaddress
 class ObjectMixin:
     template = None
     url = None
@@ -158,3 +159,5 @@ class AclOver(View):
 
 
 
+def CheckIp(request, ip=None):
+    return HttpResponse(json.dumps(ip_status(ip)), content_type="application/json")

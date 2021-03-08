@@ -29,7 +29,7 @@
                 {% for item in LOCAL_STORAGE %}
                     <tr>
                                 <td class="">
-                                    <input type="text" value="{{item.0}}" class="form-control"  name="input__ip_{% random_int 0 100 %}" autofocus minlength="7" maxlength="15" size="15" pattern="^((\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.){3}(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])$" required>
+                                    <input type="text" value="{{item.0}}" class="form-control input__ip__internal"  name="input__ip_{% random_int 0 100 %}" autofocus minlength="7" maxlength="15" size="15" pattern="^((\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.){3}(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])$" required>
                                     <span class="validity"></span>
                                 </td>
 
@@ -55,7 +55,7 @@
                 {% else %}
                                 <tr>
                                 <td class="">
-                                    <input type="text" class="form-control" placeholder="172.16.45.75" name="input__ip" autofocus minlength="7" maxlength="15" size="15" pattern="^((\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.){3}(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])$" required>
+                                    <input type="text" class="form-control input__ip__internal" placeholder="172.16.45.75" name="input__ip" autofocus minlength="7" maxlength="15" size="15" pattern="^((\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.){3}(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])$" required>
                                     <span class="validity"></span>
                                 </td>
 

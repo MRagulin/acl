@@ -3,14 +3,14 @@ from pathlib import Path
 from django.core.files.storage import FileSystemStorage
 from django.apps import apps
 from django.contrib import messages
-import socket
 import re
 from django.conf import settings
 from django.db.utils import IntegrityError, DataError
 import datetime
 import time
-import asyncio
 import uuid
+import ipaddress
+
 
 FUN_SPEED = 0
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -22,6 +22,24 @@ FORM_APPLICATION_KEYS = ['acl_create_info.html', 'acl_internal_resources.html', 
 FORM_URLS = ["acldemo_urls", "aclcreate_urls", "aclinternal_urls", "aclexternal_urls", "acldmz_urls", "acltraffic_urls", "acloverview_urls"]
 POST_FORM_KEYS = ['name', 'email', 'tel', 'department', 'project', 'd_form', 'd_start', 'd_complate']
 POST_FORM_EMPTY = ['on', '', None]
+
+
+def ip_status(ip=None)->dict:
+    """Проверка типа IP адресса"""
+    data = {}
+    data['ip'] = False
+    try:
+        ip = ipaddress.ip_address(ip)
+    except ValueError:
+        return data
+    data['ip'] = True
+    if ip.is_global:
+        data['type'] = 1
+    elif ip.is_private:
+        data['type'] = 2
+    else:
+        data['type'] = 0
+    return data
 
 
 def request_handler(requests, namespace=''):
@@ -180,8 +198,8 @@ class ExtractDataXls:
         self.Tags = apps.get_model('ownerlist', 'Tags')
         self.Iplist = apps.get_model('ownerlist', 'Iplist')
         self.Owners = apps.get_model('ownerlist', 'Owners')
-        self.page_headers = ['ответственный', 'комменты', 'ip address', 'Имя сервера','отвеcтвенный', 'nat inside']
-        self.fio_exclude_list = ['гусев','оксенюк','северцев','егоров','совинский','огнивцев','допиро','мюлекер','уволен','иренов','казаков','куслеев']
+        self.page_headers = ['ответственный', 'комменты', 'ip address', 'Имя сервера', 'отвеcтвенный', 'nat inside']
+        self.fio_exclude_list = ['гусев', 'оксенюк', 'северцев', 'егоров', 'совинский', 'огнивцев', 'допиро', 'мюлекер', 'уволен', 'иренов', 'казаков', 'куслеев']
 
 
 

@@ -1,18 +1,14 @@
 {% extends "base.html" %}
 {% block content %}
-{#    <script>#}
-{#        $('body').css({'background-color': '#f4f7fa'});#}
-{#    </script>#}
-
     <div class="p-1 w-80" style="margin-top: 50px" >
-        <table class="table table-hover table-bordered table-sm">
+        <table class="table table-hover table-borderles table-sm" style="border: 1px solid #dee2e6">
           <thead style="background:#efefef;">
             <tr>
               <th>#</th>
               <th></th>
               <th scope="col">Проект</th>
               <th scope="col">Статус</th>
-              <th scope="col">Пользователь</th>
+              <th scope="col" class="text-center">Пользователь</th>
               <th scope="col">Дата создания</th>
               <th scope="col">UUID</th>
             </tr>
@@ -20,7 +16,7 @@
           <tbody style="cursor: pointer">
           {% if acllists %}
               {% for acllist in acllists %}
-            <tr>
+            <tr data="{{acllist.id}}">
                 <td class="bs">
                         <a class="detail-icon" href="#"><i class="fa fa-plus"></i></a>
                 </td>
@@ -31,7 +27,7 @@
                      </label>
                  </td>
               <td>{{ acllist.owner }}</td>
-              <td>
+              <td style="max-width: 100px;!important;">
                   <p class="badge
                   {% if acllist.status == 'FL' %}badge-info
                   {% elif acllist.status == 'WTE'%}badge-warning
@@ -44,20 +40,19 @@
                   </p>
               </td>
               <td>
-                  <div class="font-weight-bold">
+                  <div class="font-weight-bold text-secondary text-center">
                       {{ acllist.owner}}
                   </div>
-                  <div class="font-weight-light text-secondary">
+                  <div class="font-weight-light text-secondary text-center">
                       УИБ
                   </div>
               </td>
               <td>{{ acllist.created}}</td>
-              <td class="text-primary">{{ acllist.id}}</td>
+              <td class="text-secondary">{{ acllist.id}}</td>
             </tr>
             {% endfor %}
           {% endif %}
           </tbody>
         </table>
-
     </div>
 {% endblock %}
