@@ -26,7 +26,7 @@
     <div class="center-block">
       <div class="header-block col-lg-6 col-md-8 col-sm-12">
         <form action="{%  url 'search' %}" method="GET" autocomplete="off" name="search-text" class="w-100" role="search" onsubmit="search_from_page(this);">
-            <input type="text" class="search-input" id="search-input-text" placeholder="Поиск IP или домена">
+            <input type="text" class="search-input" id="search-input-text" placeholder="Поиск IP, домена, uuid обращения">
         </form>
       </div>
    </div>
@@ -41,7 +41,7 @@
             <div class="menu-sidebar">
                 <div class="menu-sidebar-text">
                   <nav class="nav-group">
-                    {% if 'welcome' in request.path %}
+                    {% if 'acl' in request.path and 'history' not in request.path %}
                         <a href="{% url 'acldemo_urls' %}" class="nav-link nav-link--active">
                     {% else %}
                         <a href="{% url 'acldemo_urls' %}" class="nav-link">
@@ -50,7 +50,11 @@
                         <i class="fas fa-file-signature pr-1"></i> Создание ACL
                       </span>
                     </a>
-                    <a href="#" class="nav-link">
+                   {% if 'vpn' in request.path %}
+                    <a href="{% url 'vpn' %}" class="nav-link nav-link--active">
+                   {% else %}
+                       <a href="{% url 'vpn' %}" class="nav-link">
+                   {% endif %}
                       <span class="nav-text">
                        <i class="fas fa-laptop-house pr-1"></i> Ресурсы VPN
                       </span>

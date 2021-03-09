@@ -50,7 +50,10 @@ function ShowNotify(idx)
 }
 
 $(document).ready(function(){
+    $('.table-history input:checkbox').click(function(){
+         ($(this).prop('checked')) ? $(".btn-danger").attr('disabled', false) : $(".btn-danger").attr('disabled', true);
 
+    });
     $(".input__ip__internal").change(function(el){
         if (ValidateIPaddress(this.value) == true) {
             $.getJSON("/acl/checkip/" + this.value + '/',).done(function (data) {

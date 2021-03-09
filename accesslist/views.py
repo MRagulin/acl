@@ -53,8 +53,8 @@ class ObjectMixin:
         if acl_id is not None:
             tmp = request_handler(request, self.template)
             if tmp:
-                if self.template in LOCAL_STORAGE:  #[self.template] : tmp[self.template]
-                    LOCAL_STORAGE.update({self.template : tmp[self.template]})
+                if self.template in LOCAL_STORAGE:
+                    LOCAL_STORAGE.update({self.template: tmp[self.template]})
                 else:
                     LOCAL_STORAGE[self.template] = tmp[self.template]
                 obj, created = ACL.objects.get_or_create(id=str(acl_id))
@@ -144,19 +144,22 @@ class AclOver(View):
                                         'Мы уже занимаемся устранением. {}'.format(e))
             owner_form = LOCAL_STORAGE[FORM_APPLICATION_KEYS[0]]
 
-            try:
-                user, created = Owners.objects.get_or_create(username=owner_form[0],
-                                                                 email=owner_form[1],
-                                                                 phone=owner_form[2],
-                                                                 active=True,
-                                                                 department=owner_form[3]
-                                                                 )
-            except IntegrityError:
-                user = Owners.objects.get(email=owner_form[1])
-                user.username = owner_form[0]
-                user.phone = owner_form[2]
-                user.department = owner_form[3]
-                user.save()
+            #try:
+            user, created = Owners.objects.get_or_create(email=owner_form[1])
+            if created:
+                    user.username = owner_form[0],
+                    user.phone = owner_form[2],
+                    user.active = True,
+                    user.department = owner_form[3]
+                    user.save()
+            # except:
+            #     pass
+            #except IntegrityError:
+                # user = Owners.objects.get(email=owner_form[1])
+                # user.username = owner_form[0]
+                # user.phone = owner_form[2]
+                # user.department = owner_form[3]
+                # user.save()
                # pass
             try:
                 obj, created = ACL.objects.get_or_create(id=str(acl_id))
@@ -173,8 +176,8 @@ class AclOver(View):
                 messages.error(request, 'Ошибка, мы не смогли записать данные в БД. {}'.format(e))
 
             # Очищаем глобальный массив с данными для заполнения docx
-            #LOCAL_STORAGE = {}
-            #LOCAL_UID = None
+            LOCAL_STORAGE = {}
+            LOCAL_UID = None
         #test = json.dumps(LOCAL_STORAGE)
         #return HttpResponse("{} {}".format(test, LOCAL_STORAGE))
         return render(request, 'acl_overview.html', context={'file_download': file_download})

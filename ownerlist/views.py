@@ -53,3 +53,6 @@ class SearchView(View):
         return render(request, 'search.html', context=context)
 
 
+class Vpn(View):
+    def get(self, request):
+        return render(request, 'vpn.html')
