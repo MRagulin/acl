@@ -15,7 +15,6 @@ from ownerlist.utils import LOCAL_ACTION, FORM_APPLICATION_KEYS, POST_FORM_KEYS,
 import json
 import uuid
 
-import ipaddress
 class ObjectMixin:
     template = None
     url = None
@@ -119,6 +118,7 @@ class AclDemo(View):
 
 
 def ACldefault(request):
+    request.session.set_expiry(0)
     return HttpResponseRedirect(reverse('acldemo_urls'))
 
 
@@ -135,21 +135,24 @@ class AclOver(View):
 
         file_download = None
         if len(LOCAL_STORAGE) >= 4 and all(KEY in LOCAL_STORAGE for KEY in FORM_APPLICATION_KEYS):
-            try:
-                file_download = make_doc(request, LOCAL_STORAGE, str(acl_id))
-            except PermissionError:
-                messages.error(request, 'К сожалению, мы не смогли создать файл, так как нехватает прав.')
-            except Exception as e:
-                messages.error(request, 'К сожалению, при создании файла, что-то пошло не так. '
-                                        'Мы уже занимаемся устранением. {}'.format(e))
+            if 'action_make_docx' in request.session:
+                try:
+                    file_download = make_doc(request, LOCAL_STORAGE, str(acl_id))
+                except PermissionError:
+                    messages.error(request, 'К сожалению, мы не смогли создать файл, так как нехватает прав.')
+                except Exception as e:
+                    messages.error(request, 'К сожалению, при создании файла, что-то пошло не так. '
+                                            'Мы уже занимаемся устранением. {}'.format(e))
+                    file_download = 'None'
+                del request.session['action_make_docx']
             owner_form = LOCAL_STORAGE[FORM_APPLICATION_KEYS[0]]
 
             #try:
             user, created = Owners.objects.get_or_create(email=owner_form[1])
             if created:
-                    user.username = owner_form[0],
-                    user.phone = owner_form[2],
-                    user.active = True,
+                    user.username = owner_form[0]
+                    user.phone = owner_form[2]
+                    user.active = True
                     user.department = owner_form[3]
                     user.save()
             # except:
@@ -180,7 +183,11 @@ class AclOver(View):
             LOCAL_UID = None
         #test = json.dumps(LOCAL_STORAGE)
         #return HttpResponse("{} {}".format(test, LOCAL_STORAGE))
+
+
         return render(request, 'acl_overview.html', context={'file_download': file_download})
+
+
 
 
 

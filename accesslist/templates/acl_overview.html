@@ -8,18 +8,19 @@
                 <div class="card text-center border-0">
                       <div class="card-body">
                           <ul class="list-group list-group-flush border-0">
-                          {% if file_download %}
+
                             <li class="list-group-item"><h5 class="card-title">Обращение сформировано.</h5></li>
                             <li class="list-group-item border-0"><p class="card-text">Скоро сотрудники ОТБ займутся вашим обращением. </p></li>
-                            <li class="list-group-item d-none border-0"><a href="{{file_download}}" class="card-link card-download-file text-success"><i class="fas fa-file-word pr-1"></i> Скачать файл</a></li>
-                            <li class="list-group-item border-0">
-                             <div class="d-flex justify-content-center">
-                                  <div class="spinner-border text-success" role="status">
-                                      <span class="sr-only">Loading...</span>
+                            {% if file_download and file_download != 'None' %}
+                                <li class="list-group-item d-none border-0"><a href="{{file_download}}" class="card-link card-download-file text-success"><i class="fas fa-file-word pr-1"></i> Скачать файл</a></li>
+                                <li class="list-group-item border-0">
+                                 <div class="d-flex justify-content-center">
+                                      <div class="spinner-border text-success" role="status">
+                                          <span class="sr-only">Loading...</span>
+                                        </div>
                                     </div>
-                                </div>
-                            </li>
-                              {% else %}
+                                </li>
+                              {% elif file_download == 'None' %}
                                     <li class="list-group-item border-0"><h5 class="card-title">Ошибка 204</h5></li>
                                     <li class="list-group-item border-0"><div class="alert alert-warning" role="alert">
                                      Что-то пошло не так :( Вероятно, не хватает данных для формирования обращения.

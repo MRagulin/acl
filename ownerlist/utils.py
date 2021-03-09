@@ -73,6 +73,8 @@ def request_handler(requests, namespace=''):
                 else:
                     LOCAL_STORAGE[namespace].append(INFINITY)
                    # return False
+            if requests.POST.get('action_make_docx') == 'on':
+                requests.session['action_make_docx'] = True
 
     else:
         if namespace == FORM_APPLICATION_KEYS[-1]: #last
@@ -689,7 +691,7 @@ def make_doc(request=None, data_set={}, fileuuid='')->str:
     doc = Document(TEMPLATE_FILE)
     doc.styles['Normal'].font.name = 'Verdana'
     doc.styles['Normal'].font.size = Pt(10)
-    for data_inx, data in enumerate(data_set):
+    for data_inx, data in enumerate(FORM_APPLICATION_KEYS):
         row_cnt = 1
         table_tmp = doc.tables[data_inx]  # Берем таблицу по номеру
         table_rows = len(table_tmp.rows) - 1  #Берем все строки из таблицы
