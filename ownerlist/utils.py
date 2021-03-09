@@ -477,7 +477,7 @@ class ExtractDataXls:
                             #owner_info = self.Owners.get_default_owner()
 
                     try:
-                        ip_info, created  = self.Iplist.objects.get_or_create(
+                        ip_info, created = self.Iplist.objects.get_or_create(
                             ipv4 = ip_addr,
                             hostname = domain,
                             owner = owner_info,

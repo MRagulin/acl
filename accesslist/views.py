@@ -5,6 +5,8 @@ from django.urls import reverse
 from django.contrib import messages
 from django.http import HttpResponse
 from .models import ACL
+from ownerlist.models import Owners
+from django.db.utils import IntegrityError
 
 from ownerlist.utils import make_doc, request_handler
 from ownerlist.utils import LOCAL_ACTION, FORM_APPLICATION_KEYS, POST_FORM_KEYS,  FORM_URLS, LOCAL_UID, LOCAL_STORAGE, \
@@ -140,13 +142,30 @@ class AclOver(View):
             except Exception as e:
                 messages.error(request, 'К сожалению, при создании файла, что-то пошло не так. '
                                         'Мы уже занимаемся устранением. {}'.format(e))
+            owner_form = LOCAL_STORAGE[FORM_APPLICATION_KEYS[0]]
 
+            try:
+                user, created = Owners.objects.get_or_create(username=owner_form[0],
+                                                                 email=owner_form[1],
+                                                                 phone=owner_form[2],
+                                                                 active=True,
+                                                                 department=owner_form[3]
+                                                                 )
+            except IntegrityError:
+                user = Owners.objects.get(email=owner_form[1])
+                user.username = owner_form[0]
+                user.phone = owner_form[2]
+                user.department = owner_form[3]
+                user.save()
+               # pass
             try:
                 obj, created = ACL.objects.get_or_create(id=str(acl_id))
                 if obj:
                     obj.acltext = json.dumps(LOCAL_STORAGE)
                     obj.is_executed = False
                     obj.status = 'FL'
+                    obj.owner = user
+                    obj.project = owner_form[4]
                     obj.save()
 
 

@@ -1,6 +1,11 @@
 {% extends "base.html" %}
 {% block content %}
+ {% if acllists %}
     <div class="p-1 w-80" style="margin-top: 50px" >
+        <div class="p-1">
+            <button class="btn btn-danger" disabled>Удалить</button>
+        </div>
+
         <table class="table table-hover table-borderles table-sm" style="border: 1px solid #dee2e6">
           <thead style="background:#efefef;">
             <tr>
@@ -11,10 +16,10 @@
               <th scope="col" class="text-center">Пользователь</th>
               <th scope="col">Дата создания</th>
               <th scope="col">UUID</th>
+              <th scope="col"></th>
             </tr>
           </thead>
           <tbody style="cursor: pointer">
-          {% if acllists %}
               {% for acllist in acllists %}
             <tr data="{{acllist.id}}">
                 <td class="bs">
@@ -26,7 +31,7 @@
                         <span></span>
                      </label>
                  </td>
-              <td>{{ acllist.owner }}</td>
+              <td>{{ acllist.project }}</td>
               <td style="max-width: 100px;!important;">
                   <p class="badge
                   {% if acllist.status == 'FL' %}badge-info
@@ -41,18 +46,25 @@
               </td>
               <td>
                   <div class="font-weight-bold text-secondary text-center">
-                      {{ acllist.owner}}
+                      {{ acllist.owner.username}}
                   </div>
                   <div class="font-weight-light text-secondary text-center">
-                      УИБ
+                      {{ acllist.owner.department}}
                   </div>
               </td>
               <td>{{ acllist.created}}</td>
               <td class="text-secondary">{{ acllist.id}}</td>
+                <td class="text-secondary"><a href="{% url 'aclcreate_urls' %}{{ acllist.id}}/"><i class="far fa-file-alt">Подробнее</i></a></td>
             </tr>
             {% endfor %}
-          {% endif %}
           </tbody>
         </table>
-    </div>
+     </div>
+      {% else %}
+            <div class="post">
+                        <div class="post-header">
+                            <p>Ничего не найдено</p>
+                        </div>
+                    </div>
+    {% endif %}
 {% endblock %}

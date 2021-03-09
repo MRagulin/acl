@@ -41,32 +41,38 @@
             <div class="menu-sidebar">
                 <div class="menu-sidebar-text">
                   <nav class="nav-group">
-                    {% if 'acl' in request.path %}
+                    {% if 'welcome' in request.path %}
                         <a href="{% url 'acldemo_urls' %}" class="nav-link nav-link--active">
                     {% else %}
                         <a href="{% url 'acldemo_urls' %}" class="nav-link">
                     {% endif %}
                       <span class="nav-text">
-                        <i class="fas fa-file-signature"></i> Создание ACL
+                        <i class="fas fa-file-signature pr-1"></i> Создание ACL
                       </span>
                     </a>
                     <a href="#" class="nav-link">
                       <span class="nav-text">
-                       <i class="fas fa-laptop-house"></i> Ресурсы VPN
+                       <i class="fas fa-laptop-house pr-1"></i> Ресурсы VPN
                       </span>
                     </a>
-                    <a href="{% url 'aclhistory_urls' %}" class="nav-link">
+                  {% if 'history' in request.path %}
+                        <a href="{% url 'aclhistory_urls' %}" class="nav-link nav-link--active">
+                    {% else %}
+                        <a href="{% url 'aclhistory_urls' %}" class="nav-link">
+                    {% endif %}
+
                       <span class="nav-text">
-                        <i class="fas fa-clipboard-list"></i> История обращений
+                        <i class="fas fa-clipboard-list pr-1"></i> История обращений
                       </span>
                     </a>
+
                     {% if 'iptable' in request.path %}
                     <a href="{% url 'iptable_urls' %}" class="nav-link nav-link--active">
                     {% else %}
                         <a href="{% url 'iptable_urls' %}" class="nav-link">
                     {% endif %}
                       <span class="nav-text">
-                       <i class="fas fa-list-ul"></i> IP-адреса
+                       <i class="fas fa-list-ul pr-1"></i> IP-адреса
                       </span>
                     </a>
                   </nav>
