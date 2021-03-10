@@ -30,15 +30,21 @@ class ObjectMixin:
             if 'HTTP_REFERER' in request.META.keys():
                 if reverse(FORM_URLS[0]) in request.META.get('HTTP_REFERER'):
                     LOCAL_UID = str(uuid.uuid4())
+                    request.session['uuid'] = LOCAL_UID
                     return HttpResponseRedirect(reverse(FORM_URLS[1], kwargs={'acl_id': LOCAL_UID}))
         else:
             if LOCAL_UID is None:
                 LOCAL_UID = acl_id
-            try:
-                tmp = ACL.objects.get(id=str(acl_id))
+
+            if 'uuid' in request.session and str(acl_id) == request.session['uuid']:
+                try:
+                    tmp = ACL.objects.get(id=str(acl_id))
+                    LOCAL_STORAGE = json.loads(tmp.acltext)
+                except ACL.DoesNotExist:
+                    pass
+            else:
+                tmp = get_object_or_404(ACL, id=str(acl_id))
                 LOCAL_STORAGE = json.loads(tmp.acltext)
-            except ACL.DoesNotExist:
-                pass
 
             if self.template not in LOCAL_STORAGE:
                 return render(request, self.template, context={'acl_id': acl_id})
