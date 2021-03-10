@@ -169,7 +169,7 @@ class AclOver(View):
                 # user.phone = owner_form[2]
                 # user.department = owner_form[3]
                 # user.save()
-               # pass
+               # passZ
             try:
                 obj, created = ACL.objects.get_or_create(id=str(acl_id))
                 if obj:
@@ -185,6 +185,8 @@ class AclOver(View):
                 messages.error(request, 'Ошибка, мы не смогли записать данные в БД. {}'.format(e))
 
             # Очищаем глобальный массив с данными для заполнения docx
+            if 'uuid' in request.session:
+                del request.session['uuid']
             LOCAL_STORAGE = {}
             LOCAL_UID = None
         #test = json.dumps(LOCAL_STORAGE)
