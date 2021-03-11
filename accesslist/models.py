@@ -1,6 +1,6 @@
 from django.db import models
 from ownerlist.models import Owners
-
+from django.shortcuts import reverse
 
 class ACL(models.Model):
     pkid = models.BigAutoField(primary_key=True, editable=False)
@@ -18,3 +18,4 @@ class ACL(models.Model):
         ('CNL', 'Отклонено')
     ]
     status = models.CharField(choices=APL_STATUS, default='NOTFL', blank=True, max_length=20)
+

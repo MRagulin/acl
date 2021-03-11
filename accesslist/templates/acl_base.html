@@ -13,11 +13,12 @@
                   <a class="descr-link" href="{% url 'aclcreate_urls' %}">Заполнение формы</a>
               {% endif %}
           </li>
+
           <li class="descr-item">
              {% if '/acl/overview/' in request.path %}
-                <a class="descr-link--active" href="{% url 'acloverview_urls' %}">Формирование Обращения</a>
+                <a class="descr-link--active not-active" href="{% url 'acloverview_urls' %}">Формирование Обращения</a>
              {% else %}
-                 <a class="descr-link" href="{% url 'acloverview_urls' %}">Формирование Обращения</a>
+                 <a class="descr-link not-active" href="{% url 'acloverview_urls' %}">Формирование Обращения</a>
              {% endif %}
           </li>
         </ul>
@@ -29,7 +30,7 @@
           <ul class="post-list">
             <li class="post-list__item">
               <a class="post-list__link" href="{% url 'aclcreate_urls' %}">
-                <img class="post-link__circle--active" src="{% static 'img/check.svg' %}" alt="icon:check">
+                <img class="post-link__circle" src="{% static 'img/check.svg' %}" alt="icon:check"> <!----active-->
               </a>
             </li>
             <li class="post-list__item">
@@ -62,9 +63,16 @@
         </div>
       </div>
     </div>
-{#<script>#}
-{#    $(".alert")#}
-{#</script>#}
-   </div>
+<script>
+    {% for KEY in FORM_APPLICATION_KEYS %}
+        {% if KEY in FULL_STORAGE %}
+            $(".post-list > li:nth-child({{forloop.counter}}) >> img").removeClass("post-link__circle").addClass("post-link__circle--active");
+        {% endif %}
+    {% endfor %}
 
+    {% if FULL_STORAGE|length >= 4 %}
+        $(".descr-list a").last().removeClass('not-active');
+    {% endif %}
+</script>
+</div>
  {% endblock %}

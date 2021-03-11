@@ -10,7 +10,7 @@
              <p class="main-description">2.2 Список DMZ ресурсов (СГ АльфаСтрахование)</p>
         </div>
 
-    <form method="post" class="form-inline" action="{% url 'acldmz_urls' %}{{ acl_id }}/" name="acl-form-contacts">
+    <form method="post" class="form-inline" action="{% url 'acldmz_urls' acl_id=acl_id %}" name="acl-form-contacts">
     {% csrf_token %}
         <div class="form-row">
             <table class="table table-md table-ip-internal" border="0">

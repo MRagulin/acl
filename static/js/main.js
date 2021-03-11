@@ -37,19 +37,29 @@ function ShowNotify(idx)
         'Обратите внимание, возможно указан неправильный IP-адрес, либо он не является внешним.',
         'Это зарезервированный IP-адрес, использовать его нежелательно.'
     ];
-    if($("#successMessage").length < 1)
+    if($("#notifyMessage").length < 1)
     {
-        $("body").append("<div id='notifyMessage' class='alert alert-warning' style='text-align:center;vertical-align:middle;width:400px;position:absolute;top:190px;right:30px;margin:20px;display:none;border:1px solid #fd7e14;opacity: 0.8;'><i class='fas fa-radiation mr-3'></i>" + message[idx] + "</i></div>");
+        $("body").append("<div id='notifyMessage' class='alert alert-warning shadow rounded' style='text-align:center;vertical-align:middle;width:400px;position:absolute;top:190px;right:30px;margin:20px;display:none;border:1px solid #fd7e14;opacity: 0.8;box-shadow: 0 0 10px;'><i class='fas fa-radiation mr-3'></i>" + message[idx] + "</i></div>");
     }
     else
     {
-        $("#successMessage").html(message[idx]);
+        $("#notifyMessage").html(message[idx]);
     }
     $("#notifyMessage").show('slow');
-    setTimeout('$("#notifyMessage").hide("slow")',10000);
+
+    let timerId = setTimeout('$("#notifyMessage").hide("slow")',10000);
+    $("#notifyMessage").on("click.hide", function(){
+        $("#notifyMessage").hide();
+        clearTimeout(timerId);
+    });
+
 }
 
 $(document).ready(function(){
+    $("#notifyMessage").click(function(){
+       $(this).hide();
+    });
+
     $('.table-history input:checkbox').click(function(){
          ($(this).prop('checked')) ? $(".btn-danger").attr('disabled', false) : $(".btn-danger").attr('disabled', true);
 
@@ -71,6 +81,7 @@ $(document).ready(function(){
 
             })
         }
+        $("#notifyMessage").hide("slow")
     });
 
         $(".input__ip__external").change(function(el){
@@ -90,6 +101,7 @@ $(document).ready(function(){
 
             })
         }
+        $("#notifyMessage").hide("slow")
     });
 
     $("#upload_file_form").submit(function (event){

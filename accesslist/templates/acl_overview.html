@@ -8,9 +8,10 @@
                 <div class="card text-center border-0">
                       <div class="card-body">
                           <ul class="list-group list-group-flush border-0">
-
+                            {% if obj %}
                             <li class="list-group-item"><h5 class="card-title">Обращение сформировано.</h5></li>
                             <li class="list-group-item border-0"><p class="card-text">Скоро сотрудники ОТБ займутся вашим обращением. </p></li>
+                            {% endif %}
                             {% if file_download and file_download != 'None' %}
                                 <li class="list-group-item d-none border-0"><a href="{{file_download}}" class="card-link card-download-file text-success"><i class="fas fa-file-word pr-1"></i> Скачать файл</a></li>
                                 <li class="list-group-item border-0">
@@ -20,14 +21,14 @@
                                         </div>
                                     </div>
                                 </li>
-                              {% elif file_download == 'None' %}
+                              {% elif not obj or file_download == 'None' %}
                                     <li class="list-group-item border-0"><h5 class="card-title">Ошибка 204</h5></li>
                                     <li class="list-group-item border-0"><div class="alert alert-warning" role="alert">
-                                     Что-то пошло не так :( Вероятно, не хватает данных для формирования обращения.
+                                     Что-то пошло не так :( Вероятно, не хватает данных для формирования обращения, либо истекла сессия.
                                         Вернитесь на шаг назад, убедитесь в правильности заполнения формы и повторите операцию.
                                     </div>
                                     </li>
-                                    <li class="list-group-item border-0"> <a class="btn btn-danger btn-lg" href="{% url 'acltraffic_urls' %}" class="card-link">Вернутся к ACL</a></li>
+                                    <li class="list-group-item border-0"> <a class="btn btn-danger btn-lg" href="{% url 'acltraffic_urls' acl_id=acl_id %}" class="card-link">Вернутся к ACL</a></li>
                               {% endif %}
 
                           {% if messages %}
@@ -50,6 +51,11 @@
 
             </div>
 <script>
+    {% if obj %}
+        $(".descr-list a").addClass("not-active");
+
+    {% endif %}
+
     $(".post-sidebar").addClass("d-none");
     $(function(){
         function animatedownload(){
@@ -59,7 +65,6 @@
         };
         window.setTimeout(animatedownload, 3000);
     });
-
 
 </script>
 {% endblock %}

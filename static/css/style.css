@@ -703,6 +703,8 @@ input:not([type='checkbox']):valid+span:after, textarea:valid+span:after {
   pointer-events: none;
   cursor: default;
   text-decoration: none;
+  color: black;
+  font-weight: 100;
 }
 .bs{
   text-align: center; vertical-align: middle; width: 36px;

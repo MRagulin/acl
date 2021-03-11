@@ -10,17 +10,13 @@ import datetime
 import time
 import uuid
 import ipaddress
-from django.shortcuts import redirect
-from django.urls import reverse
 
 FUN_SPEED = 0
 BASE_DIR = Path(__file__).resolve().parent.parent
-LOCAL_STORAGE:dict = {}  # Хранение данных для заполнения docx
-LOCAL_ACTION:dict = {}  # Хранение данных для активностей: docx, git, omni
 LOCAL_UID = None
 
 FORM_APPLICATION_KEYS = ['acl_create_info.html', 'acl_internal_resources.html', 'acl_dmz_resources.html', 'acl_external_resources.html', 'acl_traffic.html']
-FORM_URLS = ["acldemo_urls", "aclcreate_urls", "aclinternal_urls", "aclexternal_urls", "acldmz_urls", "acltraffic_urls", "acloverview_urls"]
+FORM_URLS = ["acldemo_urls", "aclcreate_urls", "aclinternal_urls", "acldmz_urls", "aclexternal_urls", "acltraffic_urls", "acloverview_urls"]
 POST_FORM_KEYS = ['name', 'email', 'tel', 'department', 'project', 'd_form', 'd_start', 'd_complate']
 POST_FORM_EMPTY = ['on', '', None]
 
@@ -55,26 +51,26 @@ def ip_status(ip=None)->dict:
     return data
 
 
-def request_handler(requests, namespace=''):
+def request_handler(request, namespace=''):
     """Функция для заполнения глобального массива LOCAL_STORAGE из POST параметров файлов acl*"""
     INFINITY = 'Нет'
-    global LOCAL_STORAGE
+    LOCAL_STORAGE = {}
     cnt_key = 0
     if namespace == FORM_APPLICATION_KEYS[0]: #first
             LOCAL_STORAGE[namespace] = []
             for idx, post_key in enumerate(POST_FORM_KEYS):
                 if idx == len(POST_FORM_KEYS) - 1:
-                    if requests.POST.get(post_key) in POST_FORM_EMPTY:
+                    if request.POST.get(post_key) in POST_FORM_EMPTY:
                         LOCAL_STORAGE[namespace].append(INFINITY)
                         continue
 
-                if requests.POST.get(post_key) not in POST_FORM_EMPTY:
-                     LOCAL_STORAGE[namespace].append(requests.POST.get(post_key))
+                if request.POST.get(post_key) not in POST_FORM_EMPTY:
+                     LOCAL_STORAGE[namespace].append(request.POST.get(post_key))
                 else:
                     LOCAL_STORAGE[namespace].append(INFINITY)
                    # return False
-            if requests.POST.get('action_make_docx') == 'on':
-                requests.session['action_make_docx'] = True
+            if request.POST.get('action_make_docx') == 'on':
+                request.session['action_make_docx'] = True
 
     else:
         if namespace == FORM_APPLICATION_KEYS[-1]: #last
@@ -82,7 +78,7 @@ def request_handler(requests, namespace=''):
         else:
             str_pattern = 'input__ip'
 
-        for k, v in requests.POST.items():
+        for k, v in request.POST.items():
                 if 'input_' in str(k):
                         if str_pattern in str(k):
                             if namespace in LOCAL_STORAGE:
@@ -711,7 +707,5 @@ def make_doc(request=None, data_set={}, fileuuid='')->str:
 
                 row_cnt += 1
 
-
-
     doc.save(os.path.join(BASE_DIR, APP_FILE))
-    return "..\\..\\..\\" + APP_FILE
+    return '\\' + APP_FILE
