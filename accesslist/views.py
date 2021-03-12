@@ -71,10 +71,10 @@ class ObjectMixin:
 
 class Aclhistory(View):
     def get(self, request, acl_id=None):
-        if acl_id is not None:
-            acllist= ACL.objects.filter(id__exact=acl_id)
-        else:
-            acllist = ACL.objects.order_by("-created", "-pkid")
+            if acl_id is not None:
+                acllist= ACL.objects.filter(id__exact=acl_id)
+            else:
+                acllist = ACL.objects.order_by("-created", "-pkid")
             paginator = Paginator(acllist, 10)
             page_number = request.GET.get('page', 1)
             page = paginator.get_page(page_number)
@@ -93,12 +93,13 @@ class Aclhistory(View):
 
             context = {
                 "acllists": page,
-                "is_paginated" : is_paginated,
+                "is_paginated": is_paginated,
                 "next_url": next_url,
                 "prev_url": prev_url
 
             }
-        return render(request, 'acl_history.html', context=context)
+
+            return render(request, 'acl_history.html', context=context)
 
 
 class AclCreate(ObjectMixin, View):
