@@ -143,7 +143,7 @@ $(document).ready(function(){
                    let status = JSON.parse(JSON.stringify(data));
                    if (status.ip != true || status.type != 1)
                    {
-                           [3, 4, 5].includes(status.type) ? ShowNotify(1,idx=3) : ShowNotify(1,idx=2);
+                           [3, 4, 5].includes(status.type) ? ShowNotify(1,message[3]) : ShowNotify(1,message[2]);
                    }
                 }
                 catch(e) {  console.error(e);
