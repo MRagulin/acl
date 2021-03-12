@@ -3,9 +3,8 @@
  {% if acllists %}
     <div class="p-1 w-80" style="margin-top: 50px" >
         <div class="p-1">
-            <button class="btn btn-danger" disabled>Удалить</button>
+            <button class="btn btn-danger btn-remove" disabled>Удалить</button>
         </div>
-
         <table class="table table-hover table-borderles table-sm table-history" style="border: 1px solid #dee2e6">
           <thead style="background:#efefef;">
             <tr>
@@ -20,14 +19,14 @@
             </tr>
           </thead>
           <tbody style="cursor: pointer">
-              {% for acllist in acllists %}
+              {% for acllist in acllists.object_list %}
             <tr data="{{acllist.id}}">
                 <td class="bs">
                         <a class="detail-icon" href="#"><i class="fa fa-plus"></i></a>
                 </td>
                  <td class="bs">
                      <label>
-                        <input data-index="0" name="btSelectItem" type="checkbox" value="0">
+                        <input data-index="0" name="btSelectItem" type="checkbox" value="0" data="{{ acllist.id }}">
                         <span></span>
                      </label>
                  </td>
@@ -59,6 +58,26 @@
             {% endfor %}
           </tbody>
         </table>
+
+{% if is_paginated %}
+ <nav aria-label="Page navigation">
+  <ul class="pagination justify-content-end">
+    <li class="page-item {% if not prev_url %} disabled {% endif %}">
+      <a class="page-link" href="{{ prev_url }}" tabindex="-1">Предыдущая</a>
+    </li>
+     {% for n in acllists.paginator.page_range %}
+         {% if acllists.number  == n %}
+            <li class="page-item active"><a class="page-link" href="?page={{ n }}">{{ n }}</a></li>
+         {% elif n > acllists.number|add:-3 and n < acllists.number|add:3 %}
+            <li class="page-item"><a class="page-link" href="?page={{ n }}">{{ n }}</a></li>
+         {% endif %}
+     {% endfor %}
+      <li class="page-item {% if not next_url %} disabled {% endif %}">
+      <a class="page-link" tabindex="-1" href="{{ next_url }}">Следующая</a>
+      </li>
+  </ul>
+</nav>
+{% endif %}
      </div>
       {% else %}
             <div class="post">

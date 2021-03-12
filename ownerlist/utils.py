@@ -11,6 +11,7 @@ import time
 import uuid
 import ipaddress
 
+
 FUN_SPEED = 0
 BASE_DIR = Path(__file__).resolve().parent.parent
 LOCAL_UID = None
@@ -709,3 +710,11 @@ def make_doc(request=None, data_set={}, fileuuid='')->str:
 
     doc.save(os.path.join(BASE_DIR, APP_FILE))
     return '\\' + APP_FILE
+
+
+def is_valid_uuid(uuid_to_test, version=4):
+    try:
+        uuid_obj = uuid.UUID(uuid_to_test, version=version)
+    except ValueError:
+        return False
+    return str(uuid_obj) == uuid_to_test

@@ -709,3 +709,34 @@ input:not([type='checkbox']):valid+span:after, textarea:valid+span:after {
 .bs{
   text-align: center; vertical-align: middle; width: 36px;
 }
+
+.pagination > li > a{
+  background-color: white;
+  color: #bd2130d6;
+}
+
+.pagination > li > a:focus,
+.pagination > li > a:hover,
+.page-item:focus,
+.page-item:hover
+{
+  background-color: #bd2130d6;
+  color: white;
+  border-color: #bd2130d6!important;
+}
+
+
+.pagination > .active > a, .page-item.active{
+  background-color: #bd2130d6!important;
+  color: white!important;
+  border-color: #bd2130d6!important;
+}
+
+.pagination > .active > a:hover{
+  background-color: #bd2130d6;
+  border: 1px solid #bd2130d6;
+}
+
+.page-link {
+  border: 0!important;
+}

@@ -8,11 +8,12 @@ from .models import ACL
 from ownerlist.models import Owners
 import os
 from pathlib import Path
-from ownerlist.utils import make_doc, request_handler
+from ownerlist.utils import make_doc, request_handler, is_valid_uuid
 from ownerlist.utils import FORM_APPLICATION_KEYS, FORM_URLS, ip_status
 import json
 import uuid
-
+from django.views.decorators.csrf import csrf_exempt
+from django.core.paginator import Paginator
 
 class ObjectMixin:
     template = None
@@ -73,8 +74,31 @@ class Aclhistory(View):
         if acl_id is not None:
             acllist= ACL.objects.filter(id__exact=acl_id)
         else:
-            acllist = ACL.objects.order_by("-created", "-pkid")[:10]
-        return render(request, 'acl_history.html', context={"acllists": acllist})
+            acllist = ACL.objects.order_by("-created", "-pkid")
+            paginator = Paginator(acllist, 10)
+            page_number = request.GET.get('page', 1)
+            page = paginator.get_page(page_number)
+
+            is_paginated = page.has_other_pages()
+
+            if page.has_previous():
+                prev_url = '?page={}'.format(page.previous_page_number())
+            else:
+                prev_url = ''
+
+            if page.has_next():
+                next_url = '?page={}'.format(page.next_page_number())
+            else:
+                next_url = ''
+
+            context = {
+                "acllists": page,
+                "is_paginated" : is_paginated,
+                "next_url": next_url,
+                "prev_url": prev_url
+
+            }
+        return render(request, 'acl_history.html', context=context)
 
 
 class AclCreate(ObjectMixin, View):
@@ -184,3 +208,16 @@ class AclOver(View):
 
 def CheckIp(request, ip=None):
     return HttpResponse(json.dumps(ip_status(ip)), content_type="application/json")
+
+@csrf_exempt
+def AclRemove(request, *args, **kwargs):
+    if request.method == 'POST':
+        result = {'status': 'Запись удалена'}
+        if 'data' in request.POST:
+                if is_valid_uuid(request.POST.get('data')):
+                       try:
+                            obj = ACL.objects.get(id=request.POST.get('data'))
+                            obj.delete()
+                       except ACL.DoesNotExist:
+                            result = {'error': 'Не всё записи удалены'}
+        return HttpResponse(json.dumps(result), content_type="application/json")

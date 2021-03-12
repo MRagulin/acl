@@ -1,5 +1,12 @@
 window.STAGING = 'A1'; //описание состояния заполнения формы
 let el_id = 0;
+let message =  ['Неправильный IP-адресс',
+        'Обратите внимание, возможно указан неправильный IP-адрес, либо он не является внутреннем.',
+        'Обратите внимание, возможно указан неправильный IP-адрес, либо он не является внешним.',
+        'Это зарезервированный IP-адрес, использовать его нежелательно.',
+        'Произошла ошибка при выполнении операции.',
+        'Операция выполнена.'
+    ];
 
 function hasNumber(myString) {
   return /\d/.test(myString);
@@ -30,26 +37,35 @@ function ValidateIPaddress(ipaddress) {
   }
   return (false)
 }
-function ShowNotify(idx)
+function ShowNotify(idx = 0, text='')
 {
-    let message =  ['Неправильный IP-адресс',
-        'Обратите внимание, возможно указан неправильный IP-адрес, либо он не является внутреннем.',
-        'Обратите внимание, возможно указан неправильный IP-адрес, либо он не является внешним.',
-        'Это зарезервированный IP-адрес, использовать его нежелательно.'
-    ];
     if($("#notifyMessage").length < 1)
     {
-        $("body").append("<div id='notifyMessage' class='alert alert-warning shadow rounded' style='text-align:center;vertical-align:middle;width:400px;position:absolute;top:190px;right:30px;margin:20px;display:none;border:1px solid #fd7e14;opacity: 0.8;box-shadow: 0 0 10px;'><i class='fas fa-radiation mr-3'></i>" + message[idx] + "</i></div>");
+        if (idx == 0) //Error
+        {
+            $("body").append("<div id='notifyMessage' class='alert alert-danger shadow rounded' style='text-align:center;vertical-align:middle;width:400px;position:absolute;top:60px;right:30px;margin:20px;display:none;border:1px solid #fd1414;opacity: 0.8;box-shadow: 0 0 10px;'><i class='fas fa-radiation mr-3'></i>" + text + "</i></div>");
+        }
+        else if (idx == 1) //Warning
+        {
+           $("body").append("<div id='notifyMessage' class='alert alert-warning shadow rounded' style='text-align:center;vertical-align:middle;width:400px;position:absolute;top:60px;right:30px;margin:20px;display:none;border:1px solid rgba(198,108,26,0.99);opacity: 0.8;box-shadow: 0 0 10px;'><i class='fas fa-warning mr-3'></i>" +text + "</i></div>");
+        }
+
+        else //Success
+        {
+             $("body").append("<div id='notifyMessage' class='alert alert-success shadow rounded' style='text-align:center;vertical-align:middle;width:400px;position:absolute;top:60px;right:30px;margin:20px;display:none;border:1px solid rgba(31,151,15,0.99);opacity: 0.8;box-shadow: 0 0 10px;'><i class='fas fa-anchor mr-3'></i>" +text + "</i></div>");
+        }
+
     }
     else
     {
-        $("#notifyMessage").html(message[idx]);
+        $("#notifyMessage").html(text);
     }
     $("#notifyMessage").show('slow');
 
-    let timerId = setTimeout('$("#notifyMessage").hide("slow")',10000);
+    let timerId = setTimeout('$("#notifyMessage").hide("slow").remove()',10000);
+
     $("#notifyMessage").on("click.hide", function(){
-        $("#notifyMessage").hide();
+        $("#notifyMessage").remove();
         clearTimeout(timerId);
     });
 
@@ -59,6 +75,41 @@ $(document).ready(function(){
     $("#notifyMessage").click(function(){
        $(this).hide();
     });
+
+    $(".btn-remove").click(function() {
+        let uiid_array = new Array();
+        let param = {};
+        $('.table-history input:checkbox:checked').each(function () {
+           // uiid_array.push($(this).attr('data'));
+               let data = $(this).attr('data');
+               let el = $(this).closest('tr')[0];
+               $.post('/acl/remove/', {data}).done(function(data){
+                try{
+                    let status = JSON.parse(JSON.stringify(data));
+
+                    status.hasOwnProperty('status') ? ShowNotify(idx=2, text=status['status']): ShowNotify(idx=0, text=status['error']);
+                    $(el).remove();
+                } catch (e) {
+                    console.error(status);
+                }
+            }).fail(function(){
+                ShowNotify(idx=0, text='Произошла ошибка при удалении элементов');
+            });
+    });
+
+        });
+        // if (uiid_array.length > 0 )
+        // {
+        //    // param = ;
+        // }
+    //     $.ajax({
+    //          url:'/acl/remove/',
+    //          type:'post',
+    //         // enctype: 'multipart/form-data',
+    //          data: uiid_array,
+    //
+    // })
+
 
     $('.table-history input:checkbox').click(function(){
          ($(this).prop('checked')) ? $(".btn-danger").attr('disabled', false) : $(".btn-danger").attr('disabled', true);
@@ -72,7 +123,7 @@ $(document).ready(function(){
                    let status = JSON.parse(JSON.stringify(data));
                    if (status.ip != true || status.type != 2)
                    {
-                            [3, 4, 5].includes(status.type) ? ShowNotify(3) : ShowNotify(1);
+                            [3, 4, 5].includes(status.type) ? ShowNotify(1, message[3]) : ShowNotify(1, message[1]);
                    }
                 }
                 catch(e) {  console.error(e);
@@ -92,7 +143,7 @@ $(document).ready(function(){
                    let status = JSON.parse(JSON.stringify(data));
                    if (status.ip != true || status.type != 1)
                    {
-                           [3, 4, 5].includes(status.type) ? ShowNotify(3) : ShowNotify(2);
+                           [3, 4, 5].includes(status.type) ? ShowNotify(1,idx=3) : ShowNotify(1,idx=2);
                    }
                 }
                 catch(e) {  console.error(e);
