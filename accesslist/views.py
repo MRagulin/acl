@@ -27,43 +27,50 @@ class ObjectMixin:
 
             if 'HTTP_REFERER' in request.META.keys():
                 if reverse(FORM_URLS[0]) in request.META.get('HTTP_REFERER'):
-                    request.session['uuid'] = str(uuid.uuid4())
+                    request.session['uuid'] = str(uuid.uuid4()) #uuid новой записи
                     request.session['LOCAL_STORAGE'] = {}
                     return HttpResponseRedirect(reverse(FORM_URLS[1], kwargs={'acl_id': request.session['uuid']}))
         else:
             if 'uuid' in request.session is not None:
-                 if str(acl_id) != request.session['uuid']:
-                     return HttpResponseRedirect(reverse(FORM_URLS[0]))
+                if str(acl_id) != request.session['uuid']:
+                    if '/new/' in request.path:
+                         return HttpResponseRedirect(reverse(FORM_URLS[0]))
+                    tmp = get_object_or_404(ACL, id=str(acl_id))
+                    request.session['LOCAL_STORAGE'] = json.loads(tmp.acltext)
 
-            if '/new/' not in request.path:
-                tmp = get_object_or_404(ACL, id=str(acl_id))
-                request.session['LOCAL_STORAGE'] = json.loads(tmp.acltext)
+                #if '/new/' not in request.path:
+                #        return redirect(reverse(self.url, kwargs={'acl_id': str(acl_id)}))
+
+
+
+
+
+            context = {'acl_id': str(acl_id),
+                       'FULL_STORAGE': request.session['LOCAL_STORAGE'],
+                       'FORM_APPLICATION_KEYS': FORM_APPLICATION_KEYS
+                       }
 
             if 'LOCAL_STORAGE' in request.session:
                 if self.template not in request.session['LOCAL_STORAGE']:
-                    return render(request, self.template, context={'acl_id': acl_id,
-                                                                   'FULL_STORAGE': request.session['LOCAL_STORAGE'],
-                                                                   'FORM_APPLICATION_KEYS': FORM_APPLICATION_KEYS})
+                    return render(request, self.template, context=context)
                 else:
-                    return render(request, self.template, context={'acl_id': acl_id,'FULL_STORAGE': request.session['LOCAL_STORAGE'],
-                                                                   'LOCAL_STORAGE': request.session['LOCAL_STORAGE'][self.template],
-                                                                   'FORM_APPLICATION_KEYS': FORM_APPLICATION_KEYS})
+                    context['LOCAL_STORAGE'] = request.session['LOCAL_STORAGE'][self.template]
+                    return render(request, self.template, context=context)
+
         return HttpResponseRedirect(reverse(FORM_URLS[0]))
 
     def post(self, request, acl_id=None):
         if acl_id is not None and 'uuid' in request.session and request.session['uuid'] == str(acl_id):
             tmp = request_handler(request, self.template)
             if tmp:
-               if self.template in request.session['LOCAL_STORAGE']:
-                   request.session['LOCAL_STORAGE'].update({self.template: tmp[self.template]})
-               else:
-                   request.session['LOCAL_STORAGE'][self.template] = tmp[self.template]
+                if self.template in request.session['LOCAL_STORAGE']:
+                    request.session['LOCAL_STORAGE'].update({self.template: tmp[self.template]})
+                else:
+                    request.session['LOCAL_STORAGE'][self.template] = tmp[self.template]
 
-               current_page = FORM_URLS.index(self.url)
-               request.session.modified = True
-
-
-               return redirect(reverse(FORM_URLS[current_page + 1], kwargs={'acl_id': acl_id}))
+                current_page = FORM_URLS.index(self.url)
+                request.session.modified = True
+                return redirect(reverse(FORM_URLS[current_page + 1], kwargs={'acl_id': acl_id}))
 
         messages.warning(request, 'Не все поля заполнены')
         return render(request, self.template, context={'acl_id': acl_id})
@@ -126,6 +133,30 @@ class AclCreate_traffic(ObjectMixin, View):
     template = 'acl_traffic.html'
     url = 'acltraffic_urls'
 
+
+# class AclCreateEdit(ObjectMixin, View):
+#     template = 'acl_create_info.html'
+#     url = 'aclcreate_urls'
+#
+#
+# class AclCreate_internalEdit(ObjectMixin, View):
+#     template = 'acl_internal_resources.html'
+#     url = 'aclinternal_urls'
+#
+#
+# class AclCreate_dmzEdit(ObjectMixin, View):
+#     template = 'acl_dmz_resources.html'
+#     url = 'acldmz_urls'
+#
+#
+# class AclCreate_externalEdit(ObjectMixin, View):
+#     template = 'acl_external_resources.html'
+#     url = 'aclexternal_urls'
+#
+#
+# class AclCreate_trafficEdit(ObjectMixin, View):
+#     template = 'acl_traffic.html'
+#     url = 'acltraffic_urls'
 
 class AclTest(View):
     def get(self, request):

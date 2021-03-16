@@ -1,6 +1,5 @@
 {% extends "base.html" %}
 {% block title %}
-
     История обращений
 {% endblock %}
 {% block content %}
@@ -60,7 +59,7 @@
               </td>
               <td>{{ acllist.created}}</td>
               <td class="text-secondary">{{ acllist.id}}</td>
-                <td class="text-secondary"><a href="{% url 'aclcreate_urls' %}{{ acllist.id}}/"><i class="far fa-file-alt">Подробнее</i></a></td>
+                <td class="text-secondary"><a href="{% url 'aclcreate_urls'%}{{ acllist.id }}/"><i class="fas fa-align-justify mr-2"></i>Подробнее</a></td>
             </tr>
             {% endfor %}
           </tbody>

@@ -8,7 +8,7 @@
         <ul class="descr-list">
          <li class="descr-item">
               {% if '/acl/overview/' not in request.path and '/acl/demo/' not in request.path %}
-                <a class="descr-link--active" href="{% url 'aclcreate_urls' %}">Заполнение формы</a>
+                <a class="descr-link--active" href="{% url 'aclcreate_urls'%} ">Заполнение формы</a>
               {% else %}
                   <a class="descr-link" href="{% url 'aclcreate_urls' %}">Заполнение формы</a>
               {% endif %}
@@ -29,28 +29,28 @@
           <span class="post-title">Статус</span>
           <ul class="post-list">
             <li class="post-list__item">
-              <a class="post-list__link" href="{% url 'aclcreate_urls' %}">
+              <a class="post-list__link" href="{% url 'aclcreate_urls'%}{{acl_id}}/">
                 <img class="post-link__circle" src="{% static 'img/check.svg' %}" alt="icon:check"> <!----active-->
               </a>
             </li>
             <li class="post-list__item">
-              <a class="post-list__link" href="{% url 'aclinternal_urls'%}">
+              <a class="post-list__link" href="{% url 'aclinternal_urls' %}{{acl_id}}/">
                 <img class="post-link__circle" src="{% static 'img/check.svg' %}" alt="icon:check">
               </a>
             </li>
             <li class="post-list__item">
-              <a class="post-list__link" href="{% url 'acldmz_urls' %}">
+              <a class="post-list__link" href="{% url 'acldmz_urls' %}{{acl_id}}/">
                 <img class="post-link__circle" src="{% static 'img/check.svg' %}" alt="icon:check">
 
               </a>
             </li>
             <li class="post-list__item">
-              <a class="post-list__link" href="{% url 'aclexternal_urls'%}">
+              <a class="post-list__link" href="{% url 'aclexternal_urls'%}{{acl_id}}/">
                 <img class="post-link__circle" src="{% static 'img/check.svg' %}" alt="icon:check">
               </a>
             </li>
             <li class="post-list__item">
-              <a class="post-list__link" href="{% url 'acltraffic_urls'%}">
+              <a class="post-list__link" href="{% url 'acltraffic_urls' %}{{acl_id}}/">
                  <img class="post-link__circle" src="{% static 'img/check.svg' %}" alt="icon:check">
               </a>
             </li>
