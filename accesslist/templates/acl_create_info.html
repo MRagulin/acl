@@ -3,8 +3,11 @@
 
 {% block row %}
  <div class="col-12">
-
-    <form method="post" action="{% url 'aclcreate_urls' acl_id=acl_id %}" name="acl-form-contacts">
+    {% if '/new/' in request.path %}
+        <form method="post" action="{% url 'aclcreate_urls' acl_id=acl_id %}" name="acl-form-contacts">
+    {% else %}
+        <form method="post" action="{% url 'aclcreate_urls'%}{{ acl_id }}/" name="acl-form-contacts">
+    {% endif %}
     {% csrf_token %}
 
 <div class="pl-3 pr-3 pt-3">

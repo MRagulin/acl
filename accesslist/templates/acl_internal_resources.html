@@ -10,8 +10,12 @@
              <h4 class="main-title text-center mb-1">2. Описание доступа к ресурсам <span class="badge badge-danger">Required</span></h4>
              <p class="main-description">2.1 Список внутренних ресурсов (СГ АльфаСтрахование)</p>
         </div>
-
+ {% if '/new/' in request.path %}
 <form class="form-inline" method="post" action="{% url 'aclinternal_urls'  acl_id=acl_id %}" name="acl-form-internal">
+{% else %}
+<form class="form-inline" method="post" action="{% url 'aclinternal_urls'%}{{ acl_id }}/" name="acl-form-internal">
+{% endif %}
+
     {% csrf_token %}
         <div class="form-row">
             <table class="table table-md table-ip-internal" border="0">

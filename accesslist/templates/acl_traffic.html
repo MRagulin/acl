@@ -9,8 +9,12 @@
              <h4 class="main-title text-center mb-1">2. Описание доступа к ресурсам <span class="badge badge-danger">Required</span></h4>
              <p class="main-description">2.4 Потоки трафика**</p>
         </div>
-
+ {% if '/new/' in request.path %}
 <form class="form-inline" method="post" action="{% url 'acltraffic_urls' acl_id=acl_id %}" name="acl-form-internal">
+{% else %}
+<form class="form-inline" method="post" action="{% url 'acltraffic_urls' %}{{ acl_id }}/" name="acl-form-internal">
+{% endif %}
+
     {% csrf_token %}
         <div class="form-row">
             <table class="table table-md table-ip-internal" border="0">
@@ -125,7 +129,16 @@
 </div>
 <script>
     $(".post-sidebar").removeClass("d-none");
-
+    {% if '/new/' not in request.path %}
+    $(".form-inline").submit(function () {
+        if  (window.confirm("Данное обращение уже создано, хотите сформировать еще раз?")){
+            return true;
+        } else
+        {
+            return false;
+        }
+    });
+    {% endif %}
     //toggleClass("post-link__circle--active");
   //  $(".post-list__item img").removeClass("post-link__circle").addClass("post-link__circle--active");
    // $(".post-list > li:nth-child(4) >> img").removeClass("post-link__circle").addClass("post-link__circle--active");

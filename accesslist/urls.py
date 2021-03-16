@@ -4,7 +4,7 @@ from .views import *
 
 urlpatterns = [
     path("overview/", AclOver.as_view(), name="acloverview_urls"),
-    path("overview/<uuid:acl_id>/new/", AclOver.as_view(), name="acloverview_urls"),
+
 
     path("test/", AclTest.as_view(), name="acltest_urls"),
     path("welcome/", AclDemo.as_view(), name="acldemo_urls"),
@@ -56,6 +56,12 @@ urlpatterns = [
         url(r"^(?P<acl_id>[0-9a-f-]+)/new/$", AclCreate_dmz.as_view(), name="acldmz_urls"),
     ])),
 
+    re_path("overview/", include([
+        url(r"^$", AclCreate_dmz.as_view(), name="acloverview_urls"),
+        url(r"^(?P<acl_id>[0-9a-f-]+)/$", AclOver.as_view(), name="acloverview_urls"),
+        url(r"^(?P<acl_id>[0-9a-f-]+)/new/$", AclOver.as_view(), name="acloverview_urls"),
+    ])),
+    #path("overview/<uuid:acl_id>/new/", AclOver.as_view(), name="acloverview_urls"),
     #path("external/", AclCreate_external.as_view(), name="aclexternal_urls"),
     #path("traffic/", AclCreate_traffic.as_view(), name="acltraffic_urls"),
     #path("dmz/", AclCreate_dmz.as_view(), name="acldmz_urls"),

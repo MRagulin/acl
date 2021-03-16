@@ -35,8 +35,10 @@ class ObjectMixin:
                 if str(acl_id) != request.session['uuid']:
                     if '/new/' in request.path:
                          return HttpResponseRedirect(reverse(FORM_URLS[0]))
-                    tmp = get_object_or_404(ACL, id=str(acl_id))
-                    request.session['LOCAL_STORAGE'] = json.loads(tmp.acltext)
+
+            if '/new/' not in request.path:
+                tmp = get_object_or_404(ACL, id=str(acl_id))
+                request.session['LOCAL_STORAGE'] = json.loads(tmp.acltext)
 
                 #if '/new/' not in request.path:
                 #        return redirect(reverse(self.url, kwargs={'acl_id': str(acl_id)}))
@@ -60,7 +62,9 @@ class ObjectMixin:
         return HttpResponseRedirect(reverse(FORM_URLS[0]))
 
     def post(self, request, acl_id=None):
-        if acl_id is not None and 'uuid' in request.session and request.session['uuid'] == str(acl_id):
+        if acl_id is not None:
+            #if '/new/' in request.path:
+                #
             tmp = request_handler(request, self.template)
             if tmp:
                 if self.template in request.session['LOCAL_STORAGE']:
@@ -70,7 +74,15 @@ class ObjectMixin:
 
                 current_page = FORM_URLS.index(self.url)
                 request.session.modified = True
-                return redirect(reverse(FORM_URLS[current_page + 1], kwargs={'acl_id': acl_id}))
+                if '/new/' in request.path:
+                    if 'uuid' not in request.session or request.session['uuid'] == str(acl_id):
+                        return redirect(reverse(FORM_URLS[current_page + 1], kwargs={'acl_id': acl_id}))
+                    else:
+                        HttpResponseRedirect(reverse(FORM_URLS[0]))
+
+                owner_form = request.session['LOCAL_STORAGE'][FORM_APPLICATION_KEYS[0]]
+                save__form(request, owner_form, acl_id)
+                return redirect("{}{}/".format(reverse(FORM_URLS[current_page + 1]), acl_id))
 
         messages.warning(request, 'Не все поля заполнены')
         return render(request, self.template, context={'acl_id': acl_id})
@@ -180,19 +192,40 @@ def ACldefault(request):
     request.session.set_expiry(0)
     return HttpResponseRedirect(reverse('acldemo_urls'))
 
+def save__form(request, owner_form:None, acl_id)->None:
+    user, created = Owners.objects.get_or_create(email=owner_form[1])
+    if created:
+        user.username = owner_form[0]
+        user.phone = owner_form[2]
+        user.active = True
+        user.department = owner_form[3]
+        user.save()
+    try:
+        obj, created = ACL.objects.get_or_create(id=str(acl_id))
+        if obj:
+            obj.acltext = json.dumps(request.session['LOCAL_STORAGE'])
+            obj.is_executed = False
+            obj.status = 'FL'
+            obj.owner = user
+            obj.project = owner_form[4]
+            obj.save()
+
+    except Exception as e:
+        messages.error(request, 'Ошибка, мы не смогли записать данные в БД. {}'.format(e))
+
 
 class AclOver(View):
     def get(self, request, acl_id=None):
         if acl_id is None or 'LOCAL_STORAGE' not in request.session or 'uuid' not in request.session:
-                return HttpResponseRedirect(reverse('acldemo_urls'))
-
+            return HttpResponseRedirect(reverse('acldemo_urls'))
         obj = None
         file_download = None
-        if request.session['uuid'] == str(acl_id):
-            #print("Overview page: {} ".format(request.session['LOCAL_STORAGE']))
-            if len(request.session['LOCAL_STORAGE']) >= 4 and all(KEY in request.session['LOCAL_STORAGE'] for KEY in FORM_APPLICATION_KEYS):
+        if '/new/' in request.path:
+            if 'uuid' in request.session and request.session['uuid'] != str(acl_id):
+                HttpResponseRedirect(reverse(FORM_URLS[0]))
+        if len(request.session['LOCAL_STORAGE']) >= 4 and all(KEY in request.session['LOCAL_STORAGE'] for KEY in FORM_APPLICATION_KEYS):
                 if 'action_make_docx' in request.session:
-                        if 'uuid' in request.session and request.session['uuid'] == str(acl_id):
+                        #if 'uuid' in request.session and request.session['uuid'] == str(acl_id):
                             file_download = 'None'
                             try:
                                 file_download = make_doc(request, request.session['LOCAL_STORAGE'], str(acl_id))
@@ -204,29 +237,8 @@ class AclOver(View):
                             except Exception as e:
                                 messages.error(request, 'К сожалению, при создании файла, что-то пошло не так. '
                                                         'Мы уже занимаемся устранением. {}'.format(e))
-
-
                 owner_form = request.session['LOCAL_STORAGE'][FORM_APPLICATION_KEYS[0]]
-
-                user, created = Owners.objects.get_or_create(email=owner_form[1])
-                if created:
-                        user.username = owner_form[0]
-                        user.phone = owner_form[2]
-                        user.active = True
-                        user.department = owner_form[3]
-                        user.save()
-                try:
-                    obj, created = ACL.objects.get_or_create(id=str(acl_id))
-                    if obj:
-                        obj.acltext = json.dumps(request.session['LOCAL_STORAGE'])
-                        obj.is_executed = False
-                        obj.status = 'FL'
-                        obj.owner = user
-                        obj.project = owner_form[4]
-                        obj.save()
-
-                except Exception as e:
-                    messages.error(request, 'Ошибка, мы не смогли записать данные в БД. {}'.format(e))
+                save__form(request, owner_form, acl_id)
 
                 del request.session['uuid']
                 del request.session['LOCAL_STORAGE']
