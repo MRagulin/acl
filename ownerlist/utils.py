@@ -10,7 +10,8 @@ import datetime
 import time
 import uuid
 import ipaddress
-
+from django.views import View
+from django.http import JsonResponse
 
 FUN_SPEED = 0
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -20,7 +21,30 @@ FORM_APPLICATION_KEYS = ['acl_create_info.html', 'acl_internal_resources.html', 
 FORM_URLS = ["acldemo_urls", "aclcreate_urls", "aclinternal_urls", "acldmz_urls", "aclexternal_urls", "acltraffic_urls", "acloverview_urls"]
 POST_FORM_KEYS = ['name', 'email', 'tel', 'department', 'project', 'd_form', 'd_start', 'd_complate']
 POST_FORM_EMPTY = ['on', '', None]
+JSON_DUMPS_PARAMS = {
+    'ensure_ascii': False
+}
 
+
+class BaseView(View):
+    def dispatch(self, request, *args, **kwargs):
+        try:
+            response = super().dispatch(request, *args, **kwargs)
+        except Exception as e:
+            return self.__response({'errorMessage': str(e)}, status=400)
+        if isinstance(response, (dict, list)):
+            return self.__response(response)
+        else:
+                return response
+
+    @staticmethod
+    def __response(data, *, status=200):
+        return JsonResponse(
+            data,
+            status=status,
+            safe=not isinstance(data, list),
+            json_dumps_params=JSON_DUMPS_PARAMS
+        )
 
 def ip_status(ip=None)->dict:
     """Проверка типа IP адресса"""

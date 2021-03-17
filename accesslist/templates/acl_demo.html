@@ -15,16 +15,13 @@
                             <p class="text-success font-weight-bold">Обращения по созданию сетевого доступа (ACL) должны учитывать несколько важных принципов:</p>
                             <div class="list-group text-left">
                                 <ul class="form-group">
-                                 <li class="text-secondary" style="padding: 0.75rem 1.25rem;"><i class="fas fa-bug mr-2"></i>Перед публикацией проекта во внешней сети Интернет проект должен пройти аудит защищённости, проводимый командой Отдела технической безопасности.</li>
-                                 <li class="text-secondary" style="padding: 0.75rem 1.25rem;"><i class="fas fa-server mr-2"></i>Сервер, с которого осуществляется доступ во внешнюю сеть, должен быть размещен в DMZ, либо отдельном сегменте сети.</li>
-                                 <li class="text-secondary" style="padding: 0.75rem 1.25rem;"><i class="fas fa-database mr-2"></i>Сервера баз данных должны размещаться не в DMZ, а в сегментах сети Компании, в  которые и из которых доступ во внешние сети отсутствует.</li>
-                                 <li class="text-secondary" style="padding: 0.75rem 1.25rem;"><i class="fab fa-hubspot mr-2"></i></i>Открытие доступа по управляющим протоколам (в т.ч. ssh, rdp, smb и пр.) с серверов ИС, размещенных в DMZ, в другие сегменты ЛВС Компании запрещено и не осуществляется.</li>
-                                </ul>
+                                <li class="text-secondary" style="padding: 0.75rem 1.25rem;"><i class="fas fa-bug mr-2"></i>Перед публикацией проекта во внешней сети Интернет проект должен пройти аудит защищённости, проводимый командой Отдела технической безопасности.</li>
+                                <li class="text-secondary" style="padding: 0.75rem 1.25rem;"><i class="fas fa-server mr-2"></i>Сервер, с которого осуществляется доступ во внешнюю сеть, должен быть размещен в DMZ, либо отдельном сегменте сети.</li>
+                                <li class="text-secondary" style="padding: 0.75rem 1.25rem;"><i class="fab fa-hubspot mr-2"></i></i>Открытие доступа по управляющим протоколам (в т.ч. ssh, rdp, smb и пр.) с серверов ИС, размещенных в DMZ, в другие сегменты ЛВС Компании запрещено и не осуществляется.</li>
+                                <li class="text-secondary" style="padding: 0.75rem 1.25rem;"><i class="fas fa-database mr-2"></i>Сервера баз данных должны размещаться не в DMZ, а в сегментах сети Компании, в  которые и из которых доступ во внешние сети отсутствует.</li>
+                               </ul>
                             </div>
                         </div>
-
-
-
                      <div class="form-check form-check-inline start-0">
                          <div class="mr-5">
                          <input class="form-check-input" type="checkbox" id="flexAgreementCheck" required>
@@ -34,7 +31,6 @@
                          </div>
                          <a href="{% url 'aclcreate_urls' %}" class="btn btn-success btn-lg btn-start not-active">Начать</a>
                     </div>
-
                       </div>
                 </div>
 
@@ -49,7 +45,5 @@
         };
         window.setTimeout(animatedownload, 3000);
     });
-
-
 </script>
 {% endblock %}

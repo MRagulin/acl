@@ -8,14 +8,16 @@ from .models import ACL
 from ownerlist.models import Owners
 import os
 from pathlib import Path
-from ownerlist.utils import make_doc, request_handler, is_valid_uuid
-from ownerlist.utils import FORM_APPLICATION_KEYS, FORM_URLS, ip_status
+from ownerlist.utils import make_doc, request_handler, is_valid_uuid, ip_status
+from ownerlist.utils import FORM_APPLICATION_KEYS, FORM_URLS, BaseView
 import json
 import uuid
 from django.views.decorators.csrf import csrf_exempt
 from django.core.paginator import Paginator
 
+
 class ObjectMixin:
+    """Миксин обработки запросов и отобращение страниц"""
     template = None
     url = None
 
@@ -27,27 +29,21 @@ class ObjectMixin:
 
             if 'HTTP_REFERER' in request.META.keys():
                 if reverse(FORM_URLS[0]) in request.META.get('HTTP_REFERER'):
-                    request.session['uuid'] = str(uuid.uuid4()) #uuid новой записи
+                    request.session['uuid'] = str(uuid.uuid4())
                     request.session['LOCAL_STORAGE'] = {}
                     return HttpResponseRedirect(reverse(FORM_URLS[1], kwargs={'acl_id': request.session['uuid']}))
         else:
             if 'uuid' in request.session is not None:
                   if '/new/' in request.path:
                       if str(acl_id) != request.session['uuid']:
-                         return HttpResponseRedirect(reverse(FORM_URLS[0])) #Demo
+                         return HttpResponseRedirect(reverse(FORM_URLS[0]))
                   elif str(acl_id) == request.session['uuid']:
                      return redirect(reverse(self.url, kwargs={'acl_id': request.session['uuid']}))
 
             if '/new/' not in request.path:
                 tmp = get_object_or_404(ACL, id=str(acl_id))
                 request.session['LOCAL_STORAGE'] = json.loads(tmp.acltext)
-
-                #if '/new/' not in request.path:
-                #        return redirect(reverse(self.url, kwargs={'acl_id': str(acl_id)}))
-
-
-
-
+                request.session['action_make_docx'] = True
 
             context = {'acl_id': str(acl_id),
                        'FULL_STORAGE': request.session['LOCAL_STORAGE'],
@@ -66,8 +62,6 @@ class ObjectMixin:
 
     def post(self, request, acl_id=None):
         if acl_id is not None:
-            #if '/new/' in request.path:
-                #
             tmp = request_handler(request, self.template)
             if tmp:
                 if self.template in request.session['LOCAL_STORAGE']:
@@ -78,7 +72,7 @@ class ObjectMixin:
                 current_page = FORM_URLS.index(self.url)
                 request.session.modified = True
                 if '/new/' in request.path:
-                    if 'uuid' not in request.session or request.session['uuid'] == str(acl_id):
+                    if 'uuid' not in request.session or request.session['uuid'] != str(acl_id):
                         return redirect(reverse(FORM_URLS[current_page + 1], kwargs={'acl_id': acl_id}))
                     else:
                         HttpResponseRedirect(reverse(FORM_URLS[0]))
@@ -91,7 +85,8 @@ class ObjectMixin:
         return render(request, self.template, context={'acl_id': acl_id})
 
 
-class Aclhistory(View):
+class Aclhistory(BaseView, View):
+    """История запросов"""
     def get(self, request, acl_id=None):
             if acl_id is not None:
                 acllist= ACL.objects.filter(id__exact=acl_id)
@@ -118,67 +113,38 @@ class Aclhistory(View):
                 "is_paginated": is_paginated,
                 "next_url": next_url,
                 "prev_url": prev_url
-
             }
 
             return render(request, 'acl_history.html', context=context)
 
 
-class AclCreate(ObjectMixin, View):
+class AclCreate(BaseView, ObjectMixin, View):
     template = 'acl_create_info.html'
     url = 'aclcreate_urls'
 
 
-class AclCreate_internal(ObjectMixin, View):
+class AclCreate_internal(BaseView, ObjectMixin, View):
     template = 'acl_internal_resources.html'
     url = 'aclinternal_urls'
 
 
-class AclCreate_dmz(ObjectMixin, View):
+class AclCreate_dmz(BaseView, ObjectMixin, View):
     template = 'acl_dmz_resources.html'
     url = 'acldmz_urls'
 
 
-class AclCreate_external(ObjectMixin, View):
+class AclCreate_external(BaseView, ObjectMixin, View):
     template = 'acl_external_resources.html'
     url = 'aclexternal_urls'
 
 
-class AclCreate_traffic(ObjectMixin, View):
+class AclCreate_traffic(BaseView, ObjectMixin, View):
     template = 'acl_traffic.html'
     url = 'acltraffic_urls'
 
 
-# class AclCreateEdit(ObjectMixin, View):
-#     template = 'acl_create_info.html'
-#     url = 'aclcreate_urls'
-#
-#
-# class AclCreate_internalEdit(ObjectMixin, View):
-#     template = 'acl_internal_resources.html'
-#     url = 'aclinternal_urls'
-#
-#
-# class AclCreate_dmzEdit(ObjectMixin, View):
-#     template = 'acl_dmz_resources.html'
-#     url = 'acldmz_urls'
-#
-#
-# class AclCreate_externalEdit(ObjectMixin, View):
-#     template = 'acl_external_resources.html'
-#     url = 'aclexternal_urls'
-#
-#
-# class AclCreate_trafficEdit(ObjectMixin, View):
-#     template = 'acl_traffic.html'
-#     url = 'acltraffic_urls'
-
-class AclTest(View):
-    def get(self, request):
-        return render(request, 'acl_test.html')
-
-
-class AclDemo(View):
+class AclDemo(BaseView, View):
+    """Страница приветствия"""
     def get(self, request):
         request.session['LOCAL_STORAGE'] = {}
         request.session['uuid'] = 0
@@ -191,11 +157,13 @@ class AclDemo(View):
         return render(request, 'acl_demo.html')
 
 
-def ACldefault(request):
+def ACldefault(BaseView, request):
     request.session.set_expiry(0)
     return HttpResponseRedirect(reverse('acldemo_urls'))
 
+
 def save__form(request, owner_form:None, acl_id)->None:
+    """Сохранение данныех из сесии в БД"""
     user, created = Owners.objects.get_or_create(email=owner_form[1])
     if created:
         user.username = owner_form[0]
@@ -217,7 +185,8 @@ def save__form(request, owner_form:None, acl_id)->None:
         messages.error(request, 'Ошибка, мы не смогли записать данные в БД. {}'.format(e))
 
 
-class AclOver(View):
+class AclOver(BaseView, View):
+    """Страница формирования ACL файла и других активностей"""
     def get(self, request, acl_id=None):
         if acl_id is None or 'LOCAL_STORAGE' not in request.session or 'uuid' not in request.session:
             return HttpResponseRedirect(reverse('acldemo_urls'))
@@ -226,9 +195,9 @@ class AclOver(View):
         if '/new/' in request.path:
             if 'uuid' in request.session and request.session['uuid'] != str(acl_id):
                 HttpResponseRedirect(reverse(FORM_URLS[0]))
+        """Проверяем состояние массива с данными"""
         if len(request.session['LOCAL_STORAGE']) >= 4 and all(KEY in request.session['LOCAL_STORAGE'] for KEY in FORM_APPLICATION_KEYS):
                 if 'action_make_docx' in request.session:
-                        #if 'uuid' in request.session and request.session['uuid'] == str(acl_id):
                             file_download = 'None'
                             try:
                                 file_download = make_doc(request, request.session['LOCAL_STORAGE'], str(acl_id))
@@ -252,12 +221,13 @@ class AclOver(View):
             return render(request, 'acl_overview.html', context={'file_download': file_download, 'acl_id': acl_id})
 
 
-
 def CheckIp(request, ip=None):
+    """Функция возвращает данные по IP"""
     return HttpResponse(json.dumps(ip_status(ip)), content_type="application/json")
 
 @csrf_exempt
 def AclRemove(request, *args, **kwargs):
+    """Функция удалеяет данные по uuid"""
     if request.method == 'POST':
         result = {'status': 'Запись удалена'}
         if 'data' in request.POST:
@@ -268,3 +238,4 @@ def AclRemove(request, *args, **kwargs):
                        except ACL.DoesNotExist:
                             result = {'error': 'Не всё записи удалены'}
         return HttpResponse(json.dumps(result), content_type="application/json")
+    return HttpResponse(status=405)
