@@ -8,7 +8,7 @@ from .models import ACL
 from ownerlist.models import Owners
 import os
 from pathlib import Path
-from ownerlist.utils import make_doc, request_handler, is_valid_uuid, ip_status
+from ownerlist.utils import make_doc, request_handler, is_valid_uuid, ip_status, logger
 from ownerlist.utils import FORM_APPLICATION_KEYS, FORM_URLS, BaseView
 import json
 import uuid
@@ -73,6 +73,7 @@ class ObjectMixin:
                 request.session.modified = True
                 if '/new/' in request.path:
                     if 'uuid' not in request.session or request.session['uuid'] != str(acl_id):
+                        logger.warning('Попытка записи в чужой uuid')
                         return redirect(reverse(FORM_URLS[current_page + 1], kwargs={'acl_id': acl_id}))
                     else:
                         HttpResponseRedirect(reverse(FORM_URLS[0]))
@@ -206,6 +207,7 @@ class AclOver(BaseView, View):
 
                             except PermissionError:
                                 messages.error(request, 'К сожалению, мы не смогли создать файл, так как нехватает прав.')
+                                logger.warning('Ошибка при создании файла')
                             except Exception as e:
                                 messages.error(request, 'К сожалению, при создании файла, что-то пошло не так. '
                                                         'Мы уже занимаемся устранением. {}'.format(e))

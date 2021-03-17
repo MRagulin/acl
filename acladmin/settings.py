@@ -16,10 +16,6 @@ import os
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/3.1/howto/deployment/checklist/
-
-# SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = '#8g9jc-u$r!z83lc1bi!e+wif&n^u+*0yy3otebb19lbu)2@dy'
 
 # SECURITY WARNING: don't run with debug turned on in production!
@@ -134,8 +130,25 @@ STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'static'),
 ]
 
-
-
+LOGPATH = os.path.join(BASE_DIR, 'log//debug.log')
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+            'file': {
+            'level': 'INFO',
+            'class': 'logging.FileHandler',
+            'filename': LOGPATH,
+                    },
+            },
+            'loggers': {
+            'django': {
+                    'handlers': ['file'],
+                    'level': 'INFO',
+                    'propagate': True,
+                    },
+                },
+}
 
 
 

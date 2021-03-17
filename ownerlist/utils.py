@@ -12,6 +12,7 @@ import uuid
 import ipaddress
 from django.views import View
 from django.http import JsonResponse
+import logging
 
 FUN_SPEED = 0
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -25,6 +26,7 @@ JSON_DUMPS_PARAMS = {
     'ensure_ascii': False
 }
 
+logger = logging.getLogger(__name__)
 
 class BaseView(View):
     def dispatch(self, request, *args, **kwargs):
