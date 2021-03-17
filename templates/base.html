@@ -39,6 +39,15 @@
 
 <div class="wrapper">
             <div class="menu-sidebar">
+            <div class="user p-3 d-none">
+                    <div class="photo rounded pr-2" style="max-width: 60px; color: #6c757d;border-radius: 50%;">
+                        <i class="fas fa-user fa-3x"></i>
+                    </div>
+                    <div class="info rounded align-bottom" style="max-width: 170px">
+                        <p>Рагулин Михаил</p>
+                    </div>
+             </div>
+
                 <div class="menu-sidebar-text">
                   <nav class="nav-group">
                     {% if 'acl' in request.path and 'history' not in request.path %}
