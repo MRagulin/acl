@@ -32,9 +32,11 @@ class ObjectMixin:
                     return HttpResponseRedirect(reverse(FORM_URLS[1], kwargs={'acl_id': request.session['uuid']}))
         else:
             if 'uuid' in request.session is not None:
-                if str(acl_id) != request.session['uuid']:
-                    if '/new/' in request.path:
-                         return HttpResponseRedirect(reverse(FORM_URLS[0]))
+                  if '/new/' in request.path:
+                      if str(acl_id) != request.session['uuid']:
+                         return HttpResponseRedirect(reverse(FORM_URLS[0])) #Demo
+                  elif str(acl_id) == request.session['uuid']:
+                     return redirect(reverse(self.url, kwargs={'acl_id': request.session['uuid']}))
 
             if '/new/' not in request.path:
                 tmp = get_object_or_404(ACL, id=str(acl_id))
@@ -49,7 +51,8 @@ class ObjectMixin:
 
             context = {'acl_id': str(acl_id),
                        'FULL_STORAGE': request.session['LOCAL_STORAGE'],
-                       'FORM_APPLICATION_KEYS': FORM_APPLICATION_KEYS
+                       'FORM_APPLICATION_KEYS': FORM_APPLICATION_KEYS,
+                       'template_name': self.template,
                        }
 
             if 'LOCAL_STORAGE' in request.session:

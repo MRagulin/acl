@@ -1,4 +1,7 @@
 {% extends 'base.html' %}
+{% load random_numbers %}
+
+
 
 {% block content %}
 {% load static %}
@@ -7,16 +10,16 @@
           <h1 class="title-block">Создание <span>ACL</span></h1>
         <ul class="descr-list">
          <li class="descr-item">
-              {% if '/acl/overview/' not in request.path and '/acl/demo/' not in request.path %}
-                <a class="descr-link--active" href="{% url 'aclcreate_urls'%}{{acl_id}}/">Заполнение формы</a>
+              {% if '/acl/overview/' not in request.path and '/acl/welcome/' not in request.path %}
+                <a class="descr-link--active" href="{{ request.path }}">Заполнение формы</a>
               {% else %}
-                  <a class="descr-link" href="{% url 'aclcreate_urls' %}{{acl_id}}/">Заполнение формы</a>
+                  <a class="descr-link not-active" href="{% url 'aclcreate_urls' %}{{acl_id}}/">Заполнение формы</a>
               {% endif %}
           </li>
 
           <li class="descr-item">
              {% if '/acl/overview/' in request.path %}
-                <a class="descr-link--active not-active" href="{% url 'acloverview_urls' %}{{acl_id}}/">Формирование Обращения</a>
+                <a class="descr-link--active not-active" href="{{ request.path }}">Формирование Обращения</a>
              {% else %}
                  <a class="descr-link not-active" href="{% url 'acloverview_urls' %}{{acl_id}}/">Формирование Обращения</a>
              {% endif %}
@@ -68,6 +71,10 @@
         {% if KEY in FULL_STORAGE %}
             $(".post-list > li:nth-child({{forloop.counter}}) >> img").removeClass("post-link__circle").addClass("post-link__circle--active");
         {% endif %}
+
+         {% if KEY in template_name %}
+                $(".post-list > li:nth-child({{forloop.counter}}) >> img").css({'background-color':'#6c757d', 'border-color': '#6c757d'});
+         {% endif %}
     {% endfor %}
 
     {% if FULL_STORAGE|length >= 4 %}
