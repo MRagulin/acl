@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-mkdir -p /var/www/ACL/log
+mkdir -p /var/www/acladmin/log
 apt-get update
 apt-get install libxslt-dev libxml2-dev libpam-dev libedit-dev
 apt-get install python3-pip apache2 libapache2-mod-wsgi-py3
