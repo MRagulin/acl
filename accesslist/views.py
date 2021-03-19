@@ -75,8 +75,8 @@ class ObjectMixin:
                     if 'uuid' not in request.session or request.session['uuid'] != str(acl_id):
                         logger.warning('Попытка записи в чужой uuid')
                         return redirect(reverse(FORM_URLS[current_page + 1], kwargs={'acl_id': acl_id}))
-                    else:
-                        HttpResponseRedirect(reverse(FORM_URLS[0]))
+                    #else:
+                    #    return HttpResponseRedirect(reverse(FORM_URLS[0]))
 
                 owner_form = request.session['LOCAL_STORAGE'][FORM_APPLICATION_KEYS[0]]
                 save__form(request, owner_form, acl_id)
@@ -158,7 +158,7 @@ class AclDemo(BaseView, View):
         return render(request, 'acl_demo.html')
 
 
-def ACldefault(BaseView, request):
+def ACldefault(request):
     request.session.set_expiry(0)
     return HttpResponseRedirect(reverse('acldemo_urls'))
 
@@ -184,7 +184,7 @@ def save__form(request, owner_form:None, acl_id)->None:
 
     except Exception as e:
         messages.error(request, 'Ошибка, мы не смогли записать данные в БД. {}'.format(e))
-
+    return obj or None
 
 class AclOver(BaseView, View):
     """Страница формирования ACL файла и других активностей"""
@@ -193,9 +193,17 @@ class AclOver(BaseView, View):
             return HttpResponseRedirect(reverse('acldemo_urls'))
         obj = None
         file_download = None
-        if '/new/' in request.path:
-            if 'uuid' in request.session and request.session['uuid'] != str(acl_id):
-                HttpResponseRedirect(reverse(FORM_URLS[0]))
+        # if '/new/' in request.path:
+        #     if 'uuid' in request.session and request.session['uuid'] != str(acl_id):
+        #         HttpResponseRedirect(reverse(FORM_URLS[0]))
+        # else:
+        if 'uuid' in request.session is not None:
+                    if '/new/' in request.path:
+                        if str(acl_id) != request.session['uuid']:
+                            return HttpResponseRedirect(reverse(FORM_URLS[0]))
+                    elif str(acl_id) == request.session['uuid']:
+                        return redirect(reverse('acloverview_urls', kwargs={'acl_id': request.session['uuid']}))
+
         """Проверяем состояние массива с данными"""
         if len(request.session['LOCAL_STORAGE']) >= 4 and all(KEY in request.session['LOCAL_STORAGE'] for KEY in FORM_APPLICATION_KEYS):
                 if 'action_make_docx' in request.session:
@@ -212,7 +220,7 @@ class AclOver(BaseView, View):
                                 messages.error(request, 'К сожалению, при создании файла, что-то пошло не так. '
                                                         'Мы уже занимаемся устранением. {}'.format(e))
                 owner_form = request.session['LOCAL_STORAGE'][FORM_APPLICATION_KEYS[0]]
-                save__form(request, owner_form, acl_id)
+                obj = save__form(request, owner_form, acl_id)
 
                 del request.session['uuid']
                 del request.session['LOCAL_STORAGE']

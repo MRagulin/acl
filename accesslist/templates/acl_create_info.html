@@ -42,11 +42,18 @@
 
               <label class="contact-form__label">
                 <span class="contact-form__text">Телефон</span>
-                <input type="tel" name="tel"value="{% if LOCAL_STORAGE %}{{ LOCAL_STORAGE.2 }}{% endif %}"  class="contact__input" placeholder="89096971821" pattern="[0-9]{4,}">
+                <input type="tel" name="tel"value="{% if LOCAL_STORAGE %}{{ LOCAL_STORAGE.2 }}{% endif %}"  class="contact__input" placeholder="89096971821" pattern="(\+)?[0-9]{4,}">
                    <span class="validity"></span>
               </label>
-            </div>
 
+
+             <label class="contact-form__label">
+                <span class="contact-form__text" style="max-width: 140px">Описание
+                    проекта*</span>
+                <input type="url" name="link" value="{% if LOCAL_STORAGE %}{{ LOCAL_STORAGE.5 }}{% endif %}" class="contact__input" placeholder="https://wiki.alfastrah.ru/pages/viewpage.action?pageId=133435707" pattern=".+(wiki.alfastrah.ru)+(.){5,}" required>
+                <span class="validity"></span>
+              </label>
+</div>
 
           </div>
           <div class="form-row__bottom form-check-inline">

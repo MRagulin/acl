@@ -9,9 +9,9 @@ import json
 from django.shortcuts import redirect
 from django.urls import reverse
 import re
+from .utils import BaseView
 
-
-class IpTable(View):
+class IpTable(BaseView, View):
     def get(self, request):
         return render(request, 'iptable.html')
 
@@ -29,12 +29,12 @@ class IpTable(View):
             return HttpResponse(json.dumps(result), content_type="application/text")
         return render(request, 'iptable.html', context=result)
 
-class TreeView(View):
+class TreeView(BaseView, View):
     def get(self, request):
         return render(request, 'index.html')
 
 
-class SearchView(View):
+class SearchView(BaseView, View):
     def get(self, request):
         context = {}
         search = request.path.split('/')
@@ -48,6 +48,6 @@ class SearchView(View):
         return render(request, 'search.html', context=context)
 
 
-class Vpn(View):
+class Vpn(BaseView, View):
     def get(self, request):
         return render(request, 'vpn.html')

@@ -464,9 +464,9 @@ width: 100%;
   #align-items: center;
 }
 
-.contact-form__label:last-child {
+/*.contact-form__label:last-child {
   margin-bottom: 0;
-}
+}*/
 
 .contact-form__text {
   margin-right: 20px;

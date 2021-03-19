@@ -13,14 +13,14 @@ import ipaddress
 from django.views import View
 from django.http import JsonResponse
 import logging
-
+from datetime import datetime
 FUN_SPEED = 0
 BASE_DIR = Path(__file__).resolve().parent.parent
 LOCAL_UID = None
 
 FORM_APPLICATION_KEYS = ['acl_create_info.html', 'acl_internal_resources.html', 'acl_dmz_resources.html', 'acl_external_resources.html', 'acl_traffic.html']
 FORM_URLS = ["acldemo_urls", "aclcreate_urls", "aclinternal_urls", "acldmz_urls", "aclexternal_urls", "acltraffic_urls", "acloverview_urls"]
-POST_FORM_KEYS = ['name', 'email', 'tel', 'department', 'project', 'd_form', 'd_start', 'd_complate']
+POST_FORM_KEYS = ['name', 'email', 'tel', 'department', 'project', 'link', 'd_form', 'd_start', 'd_complate']
 POST_FORM_EMPTY = ['on', '', None]
 JSON_DUMPS_PARAMS = {
     'ensure_ascii': False
@@ -33,6 +33,7 @@ class BaseView(View):
         try:
             response = super().dispatch(request, *args, **kwargs)
         except Exception as e:
+            logger.warning('[Ошибка] {} {} {}'.format(str(e), request.META.get('REMOTE_ADDR'), datetime.today().strftime('%Y-%m-%d-%H:%M:%S')))
             return self.__response({'errorMessage': str(e)}, status=400)
         if isinstance(response, (dict, list)):
             return self.__response(response)
