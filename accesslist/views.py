@@ -7,14 +7,13 @@ from django.http import HttpResponse
 from .models import ACL
 from ownerlist.models import Owners
 import os
-from pathlib import Path
 from ownerlist.utils import make_doc, request_handler, is_valid_uuid, ip_status, logger
 from ownerlist.utils import FORM_APPLICATION_KEYS, FORM_URLS, BaseView
 import json
 import uuid
 from django.views.decorators.csrf import csrf_exempt
 from django.core.paginator import Paginator
-
+from django.conf import settings
 
 class ObjectMixin:
     """Миксин обработки запросов и отобращение страниц"""
@@ -150,11 +149,16 @@ class AclDemo(BaseView, View):
         request.session['LOCAL_STORAGE'] = {}
         request.session['uuid'] = 0
         if 'file_download' in request.session:
-                BASE = os.path.join(Path(__file__).resolve().parent.parent)
-                BASE += os.path.join(request.session['file_download'])
+            try:
+                BASE = os.path.basename(request.session['file_download'])
+                BASE = os.path.join(settings.BASE_DIR, 'static//docx//' + BASE)
                 if os.path.exists(BASE):
                     os.remove(BASE)
+            except:
+                pass
+            finally:
                 del request.session['file_download']
+                BASE = None
         return render(request, 'acl_demo.html')
 
 

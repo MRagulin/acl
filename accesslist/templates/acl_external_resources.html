@@ -42,7 +42,7 @@
                                             <div class="input-group-prepend">
                                                 <div class="input-group-text">/</div>
                                             </div>
-                                       <input type="number" value="{{item.1}}" class="form-control" name="input__mask_{% random_int 0 100 %}"  style="max-width: 110px;" pattern="^([0-9]){1,2}$" required>
+                                       <input type="number" value="{{item.1}}" class="form-control" max="30" name="input__mask_{% random_int 0 100 %}"  style="max-width: 110px;" pattern="^([0-9]){1,2}$" required>
                                         <span class="validity"></span>
                                       </div>
                                 </td>
@@ -67,7 +67,7 @@
                                             <div class="input-group-prepend">
                                                 <div class="input-group-text">/</div>
                                             </div>
-                                       <input type="number" value="{{item.1}}" class="form-control input__ip__external" placeholder="25" name="input__mask"  style="max-width: 110px;" pattern="^([0-9]){1,2}$" required>
+                                       <input type="number" value="{{item.1}}" class="form-control input__ip__external" placeholder="25" max="30" name="input__mask"  style="max-width: 110px;" pattern="^([0-9]){1,2}$" required>
                                         <span class="validity"></span>
                                       </div>
                                 </td>

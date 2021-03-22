@@ -28,7 +28,11 @@
                                         Вернитесь на шаг назад, убедитесь в правильности заполнения формы и повторите операцию.
                                     </div>
                                     </li>
+                                {% if acl_id %}
                                     <li class="list-group-item border-0"> <a class="btn btn-danger btn-lg" href="{% url 'acltraffic_urls' acl_id=acl_id %}" class="card-link">Вернутся к ACL</a></li>
+                                {% else %}
+                                    <li class="list-group-item border-0"> <a class="btn btn-danger btn-lg" href="{% url 'acltraffic_urls' %}{{ acl_id }}/" class="card-link">Вернутся к ACL</a></li>
+                                {% endif %}
                               {% endif %}
 
                           {% if messages %}
