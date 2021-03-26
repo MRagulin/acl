@@ -35,7 +35,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'fontawesome-free',
     'ownerlist',
-    'accesslist'
+    'accesslist',
+    'acladmin'
 ]
 
 MIDDLEWARE = [

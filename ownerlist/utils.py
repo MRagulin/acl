@@ -13,7 +13,10 @@ import ipaddress
 from django.views import View
 from django.http import JsonResponse
 import logging
-from datetime import datetime
+import xlrd
+import tempfile
+from django.shortcuts import reverse, redirect
+
 FUN_SPEED = 0
 BASE_DIR = Path(__file__).resolve().parent.parent
 LOCAL_UID = None
@@ -28,13 +31,17 @@ JSON_DUMPS_PARAMS = {
 
 logger = logging.getLogger(__name__)
 
+
 class BaseView(View):
     def dispatch(self, request, *args, **kwargs):
         try:
             response = super().dispatch(request, *args, **kwargs)
         except Exception as e:
-            logger.warning('[Ошибка] {} {} {}'.format(str(e), request.META.get('REMOTE_ADDR'), datetime.today().strftime('%Y-%m-%d-%H:%M:%S')))
-            return self.__response({'errorMessage': str(e)}, status=400)
+            logger.error('[Ошибка] {} {} {}'.format(str(e), request.META.get('REMOTE_ADDR'), datetime.datetime.today().strftime('%Y-%m-%d-%H:%M:%S')))
+            messages.error(request, str(e))
+            return redirect(reverse(FORM_URLS[0]))
+
+            #return self.__response({'errorMessage': str(e)}, status=400)
         if isinstance(response, (dict, list)):
             return self.__response(response)
         else:
@@ -134,7 +141,7 @@ def upload_file_handler(request, functionhandler = None):
     """Функция обработки загрузки файлов и вызова функции для парсинга xls"""
     result = {}
     if 'input--file--upload' in request.FILES:
-        UPLOAD_PATH = os.path.join(BASE_DIR, 'upload')
+        UPLOAD_PATH = tempfile.gettempdir() #os.path.join(BASE_DIR, 'upload')
         myfile = request.FILES['input--file--upload']
         fs = FileSystemStorage(location=UPLOAD_PATH)
         fs.save(myfile.name, myfile)
@@ -152,7 +159,10 @@ def upload_file_handler(request, functionhandler = None):
         result = ExtractDataXls(request, uploaded_file_url).execute_file_parsing()
         # race condition
         time.sleep(1)
-        os.remove(uploaded_file_url)
+        try:
+            os.remove(uploaded_file_url)
+        finally:
+            uploaded_file_url = None
         if result > 0:
             return {'ok': 'Добавлено новых значений: {}'.format(result)}
         return {'error': 'Данных для добавления - нету'}
@@ -226,12 +236,7 @@ class ExtractDataXls:
         self.ip_addr_idx = 1
         self.count_total: int = 0 #total records in db
         self.error_count: int = 0 #total errors
-        try:
-            import xlrd
-        except ImportError:
-            messages.add_message(request, messages.ERROR, 'Error load xlrd module')
-            return 0
-        self.rb = xlrd.open_workbook(filename, formatting_info=True)
+        self.rb = xlrd.open_workbook(filename, formatting_info=True, encoding_override='utf-8')
         self.current_page = None
         self.sheet_tags = self.rb.sheet_names()
         self.Vlans = apps.get_model('ownerlist', 'Vlans')
@@ -702,10 +707,10 @@ class ExtractDataXls:
 
 def make_doc(request=None, data_set={}, fileuuid='')->str:
     """Функция для генерации docx файла"""
-    TEMPLATE_FILE = os.path.join(BASE_DIR, 'templates\\ACL.docx')
+    TEMPLATE_FILE = os.path.join(BASE_DIR, 'templates//ACL.docx')
     if fileuuid == '':
         fileuuid = str(uuid.uuid4())
-    APP_FILE = 'static\\docx\\Application_' + fileuuid + '.docx'
+    APP_FILE = 'static/docx/Application_' + fileuuid + '.docx'
     try:
         from docx import Document
         from docx.shared import Pt
