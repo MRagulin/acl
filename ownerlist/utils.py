@@ -13,7 +13,7 @@ import ipaddress
 from django.views import View
 from django.http import JsonResponse
 import logging
-from datetime import datetime
+#from datetime import datetime
 FUN_SPEED = 0
 BASE_DIR = Path(__file__).resolve().parent.parent
 LOCAL_UID = None
