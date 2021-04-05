@@ -740,3 +740,18 @@ input:not([type='checkbox']):valid+span:after, textarea:valid+span:after {
 .page-link {
   border: 0!important;
 }
+
+.table-ip {
+
+  table-layout: fixed;
+  word-wrap: break-word;
+}
+.table-ip th, table td {
+  overflow: hidden;
+}
+
+.list-group-item.active {
+  background-color: #CE253D!important;
+  border-color: #bd2130d6!important;
+
+}

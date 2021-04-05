@@ -10,10 +10,60 @@ from django.shortcuts import redirect
 from django.urls import reverse
 import re
 from .utils import BaseView
+from .models import Iplist, Tags
+from django.core.paginator import Paginator
 
 class IpTable(BaseView, View):
     def get(self, request):
-        return render(request, 'iptable.html')
+        context = {}
+        if not 'dataset' in request.GET:
+            response = redirect(reverse('iptable_urls'))
+            response['Location'] += '?dataset=1&&page=1'
+            return response
+
+        page_dataset = request.GET.get('dataset', 1)
+        page_offset = request.GET.get('page', 1)
+
+        if page_dataset is None:
+            page_dataset = 1
+        else:
+            page_dataset = int(page_dataset)
+
+        if page_dataset != 0:
+            data = Iplist.objects.filter(tags__id=page_dataset)
+        else:
+            data = Iplist.objects.filter(tags__id=1)
+
+        paginator = Paginator(data, 15)
+        page_number = request.GET.get('page', 1)
+        page = paginator.get_page(page_number)
+
+        is_paginated = page.has_other_pages()
+
+        if page.has_previous():
+                prev_url = '?dataset={}&&page={}'.format(page_dataset, page.previous_page_number())
+        else:
+                prev_url = ''
+
+        if page.has_next():
+                next_url = '?dataset={}&&page={}'.format(page_dataset,page.next_page_number())
+
+        else:
+            next_url = ''
+
+        context = {
+                "dataset": page,
+                "page_dataset": page_dataset,
+                "is_paginated": is_paginated,
+                "url_mask": '?dataset={}&&page='.format(page_dataset),
+                "next_url": next_url,
+                "prev_url": prev_url
+            }
+
+        assets = Tags.objects.all()#[:15]
+        context['assets'] = assets
+
+        return render(request, 'iptable.html', context)
 
     def post(self, request):
         result = None

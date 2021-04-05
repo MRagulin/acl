@@ -1,9 +1,6 @@
 {% extends 'base.html' %}
 
 {% block content %}
-      Тут пока ничего нет, но мы скоро это исправим.
-  <div class="col-12 d-flex">
-  <div class="col-8 p-1">
       {% if messages %}
           {% for message in messages %}
               {% if message.tags == 'error' %}
@@ -15,9 +12,107 @@
               </div>
           {% endfor %}
       {% endif %}
+
+    {% if not dataset %}
+      Тут пока ничего нет, но мы скоро это исправим.
+    {% else %}
+
+
+  <div class="col-12 d-flex">
+  <div class="col-9 p-1">
+
+{% if is_paginated %}
+ <nav aria-label="Page navigation">
+  <ul class="pagination justify-content-end">
+    <li class="page-item {% if not prev_url %} disabled {% endif %}">
+      <a class="page-link" href="{{ prev_url }}" tabindex="-1">Предыдущая</a>
+    </li>
+     {% for n in dataset.paginator.page_range %}
+         {% if dataset.number  == n %}
+            <li class="page-item active"><a class="page-link" href="{{url_mask}}{{ n }}">{{ n }}</a></li>
+         {% elif n > dataset.number|add:-3 and n < dataset.number|add:3 %}
+            <li class="page-item"><a class="page-link" href="{{url_mask}}{{ n }}">{{ n }}</a></li>
+         {% endif %}
+     {% endfor %}
+      <li class="page-item {% if not next_url %} disabled {% endif %}">
+      <a class="page-link" tabindex="-1" href="{{ next_url }}">Следующая</a>
+      </li>
+  </ul>
+</nav>
+{% endif %}
+
+   <table class="table table-hover table-borderles table-sm table-ip" style="border: 1px solid #dee2e6;">
+          <thead style="background:#efefef;">
+            <tr>
+              <th width="35px">#</th>
+              <th width="35px"></th>
+              <th scope="col" style="man-width: 250px">Имя хоста</th>
+              <th scope="col">Ip-адрес</th>
+              <th scope="col">Ответственный</th>
+              <th scope="col">Комментарий</th>
+              <th scope="col" width="1px"></th>
+            </tr>
+          </thead>
+          <tbody style="cursor: pointer">
+
+          {% for data in dataset %}
+
+               <tr>
+                <td class="bs">
+                        <a class="detail-icon" href="#"><i class="fa fa-plus"></i></a>
+                </td>
+                <td class="bs">
+                     <label>
+                        <input data-index="0" name="btSelectItem" type="checkbox" value="0" data="{{ data.id }}">
+                        <span></span>
+                     </label>
+                 </td>
+               <td>{{data.hostname}}</td>
+               <td>{{data.ipv4}}</td>
+               <td>{{data.owner.username}}</td>
+               <td>
+                   {{ data.comment|truncatechars:100}}    <!--|truncatechars:150 -->
+               </td>
+               <td></td>
+               </tr>
+
+          {% endfor %}
+          </tbody>
+   </table>
+ {% endif %}
    </div>
-    <div class="col-4 border-left" style="height:90vh">
-     <div class="col-12 p-1">
+    <div class="col-3 row" style="height:90vh">
+
+    <div class="col-12 p-1 mb-2 align-self-start">
+          <div class="card" style="max-width: 305px;">
+              <p class="card-header text-center text-secondary " style="background-color: #fff;font-weight: 500;">
+                 <i class="fas fa-align-justify"></i> Набор данных
+              </p>
+         <div class="card-body overflow-auto" style="max-height: 450px;overflow: auto">
+
+                  <div class="list-group">
+                      {% if assets %}
+                          {% for asset in assets %}
+                               {%  if page_dataset == asset.id %}
+                                <a href="?dataset={{ asset.id }}" id="{{ asset.id }}" class="list-group-item list-group-item-action active" style="padding: 0.15em 1.25rem;!important">{{ asset.name|truncatewords:28 }} </a>
+                                {% else %}
+                                  <a href="?dataset={{ asset.id }}" id="{{ asset.id }}" class="list-group-item list-group-item-action" style="padding: 0.15em 1.25rem;!important">{{ asset.name|truncatewords:28 }} </a>
+                              {%  endif %}
+
+
+                          {% endfor %}
+
+                      {% else %}
+                           <a href="?dataset=0" class="list-group-item list-group-item-action" style="padding: 0.15em 1.25rem;!important">default</a>
+                      {% endif %}
+                </div>
+
+         </div>
+  </div>
+  </div>
+
+
+     <div class="col-12 p-1 align-self-end">
           <div class="card" style="width: 250px; height: 150px">
               <p class="card-header text-center text-secondary " style="background-color: #fff;font-weight: 500;">
                  <i class="far fa-plus-square"></i> Добавить данные
@@ -32,9 +127,11 @@
                   </div>
           </div>
      </div>
-
+  </div>
 
 
   </div>
   </div>
+  </div>
+
 {% endblock %}
