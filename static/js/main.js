@@ -7,9 +7,12 @@ let message =  ['Неправильный IP-адресс',
         'Произошла ошибка при выполнении операции.',
         'Операция выполнена.',
         'Поле IP адресс - нужно заполнить правильными данными',
+        'Обратите внимание, необходимо указать по крайней мере один протокол и порт (для транспортного уровня и выше), пример: udp:53, tcp:3306, icmp итд.'
 
     ];
 
+const protocols = ['DNS','DHCP','TFTP','TLS','SSL','FTP','HTTP','IMAP4','POP3','SIP','SMTP','SNMP','SSH','Telnet',
+                'RTP','TCP','UDP','IP','IPv4','IPv6','ICMP','IGMP','ARP','Netflow','Flow','NTP']
 function hasNumber(myString) {
   return /\d/.test(myString);
 }

@@ -63,11 +63,11 @@
                       </span>
                     </a>
                    {% if 'vpn' in request.path %}
-                    <a href="{% url 'vpn' %}" class="nav-link nav-link--active">
+                    <a href="{% url 'vpn' %}" class="nav-link nav-link--active d-none">
                    {% else %}
-                       <a href="{% url 'vpn' %}" class="nav-link">
+                       <a href="{% url 'vpn' %}" class="nav-link d-none">
                    {% endif %}
-                      <span class="nav-text">
+                      <span class="nav-text d-none">
                        <i class="fas fa-laptop-house pr-1"></i> Ресурсы VPN
                       </span>
                     </a>

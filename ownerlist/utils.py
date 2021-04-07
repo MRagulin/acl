@@ -36,12 +36,12 @@ class BaseView(View):
         try:
             response = super().dispatch(request, *args, **kwargs)
         except Exception as e:
-            logger.warning('[Ошибка] {} {} {}'.format(str(e), request.META.get('REMOTE_ADDR'), datetime.today().strftime('%Y-%m-%d-%H:%M:%S')))
+            logger.warning('[Ошибка] {} {} {}'.format(str(e), request.META.get('REMOTE_ADDR'), datetime.datetime.today().strftime('%Y-%m-%d-%H:%M:%S')))
             return self.__response({'errorMessage': str(e)}, status=400)
         if isinstance(response, (dict, list)):
             return self.__response(response)
         else:
-                return response
+             return response
 
     @staticmethod
     def __response(data, *, status=200):
