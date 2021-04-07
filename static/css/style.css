@@ -776,5 +776,5 @@ input:not([type='checkbox']):valid+span:after, textarea:valid+span:after {
 }
 
 .validity{
-  width: 3px;
+  width: 10px;
 }
