@@ -13,7 +13,7 @@
           {% endfor %}
       {% endif %}
 
-    {% if not dataset %}
+    {% if not dataset and not assets %}
       Тут пока ничего нет, но мы скоро это исправим.
     {% else %}
 
@@ -26,7 +26,6 @@
           <h1 class="title-block">Таблица IP адресов</h1>
       </div>
 
-
    <table class="table table-hover table-borderles table-sm table-ip" style="border: 1px solid #dee2e6;">
           <thead style="background:#efefef;">
             <tr>
@@ -37,6 +36,7 @@
               <th scope="col">Ответственный</th>
               <th scope="col">Комментарий</th>
               <th scope="col" width="1px"></th>
+              <th width="35px"></th>
             </tr>
           </thead>
           <tbody style="cursor: pointer">
@@ -45,7 +45,7 @@
 
                <tr>
                 <td class="bs">
-                        <a class="detail-icon" href="#"><i class="fa fa-plus"></i></a>
+                        <a class="ip-detail-show" href="#"><i class="fa fa-plus"></i></a>
                 </td>
                 <td class="bs">
                      <label>
@@ -56,10 +56,13 @@
                <td>{{data.hostname}}</td>
                <td>{{data.ipv4}}</td>
                <td>{{data.owner.username}}</td>
-               <td>
-                   {{ data.comment|truncatechars:100}}    <!--|truncatechars:150 -->
+               <td class="td-long-text">
+                   {{ data.comment}}    <!--|truncatechars:150 -->
                </td>
                <td></td>
+                <td class="bs">
+                        <a class="ip-detail-edit" href="#"><i class="far fa-edit"></i></a>
+                </td>
                </tr>
 
           {% endfor %}
@@ -119,19 +122,22 @@
 
 
      <div class="col-12 p-1 align-self-end">
-          <div class="card" style="width: 250px; height: 150px">
-              <p class="card-header text-center text-secondary " style="background-color: #fff;font-weight: 500;">
-                 <i class="far fa-plus-square"></i> Добавить данные
-              </p>
+          <div class="card" style="width: 315px; height: 150px">
+              <a class="card-header text-center text-secondary" style="background-color: #fff;font-weight: 500;cursor: pointer">
+                 <i class="far fa-plus-square"></i> <span role="button" tabindex="0" class="btn-add">Добавить данные</span>
+              </a>
               <div class="card-body">
                   <div class="text-center p-3" style="border: 1px dashed #bd2130; cursor: pointer;">
                       <form action="{%  url 'iptable_urls' %}" method="post" enctype="multipart/form-data" class="fs-2" id="upload_file_form">
                           {% csrf_token %}
                           <input type="file" id="input--file--upload" name="input--file--upload" value="">
-                          <label for="input--file--upload" class="input--file--label text-secondary">Из файла</label>
+                          <i class="far fa-file-excel"></i><label for="input--file--upload" class="input--file--label text-secondary pl-1">Загрузить из файла</label>
                       </form>
                   </div>
           </div>
+{#              <div class="card-footer text-center border-0" style="background-color: #fff;font-weight: 500;">#}
+{#                 <i class="fas fa-plus pr-1 text-secondary"></i> <a href="#" class="-hand-pointer text-secondary">В ручную</a>#}
+{#              </div>#}
      </div>
   </div>
 
@@ -140,4 +146,225 @@
   </div>
   </div>
 
+<div class="modal" tabindex="-1" role="dialog">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Изменить данные</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+       <form action="#" method="post" name="ip-data" id="ip-data">
+           {% csrf_token %}
+
+{#           <div class="form-group">#}
+            <label for="ip-addr" class="col-form-label">IP-адрес*:</label>
+            <input type="text" class="form-control" id="ip-addr" pattern="^([0-9]{1,3}\.){3}[0-9]{1,3}$" autofocus required>
+{#           <p class="align-text-bottom float-right text-primary btn-resolv-ip" style="cursor: pointer"><small>Получить IP адрес</small></p>#}
+     <!--   -->
+{#          </div>#}
+
+       {#          <div class="form-group">#}
+            <label for="domain" class="col-form-label">Домен:</label>
+            <input type="text" class="form-control" id="domain" autofocus>
+            <input type="hidden" value="0" id="idx">
+            <p class="align-text-bottom float-right text-primary btn-resolv-dmn" style="cursor: pointer"><small>Получить имя домена</small></p>
+{#          </div>#}
+
+
+{#            <div class="form-group">#}
+            <label for="owner" class="col-form-label">Ответственный:</label>
+            <input type="text" class="form-control" id="owner">
+{#          </div>#}
+
+
+
+{#          <div class="form-group">#}
+            <label for="comment-text" class="col-form-label">Комментарий:</label>
+            <textarea class="form-control" id="comment-text" rows="10"></textarea>
+{#          </div>#}
+
+{#          <div class="form-group">#}
+            <label for="message-text" class="col-form-label">Набор данных:</label>
+
+{#            <select class="form-select" style="max-width: 355px" id="asset-select">#}
+            <input list="assets" name="assets" id="asset-select" style="width: 355px" value="">
+            <datalist id="assets">
+
+                 {% if assets %}
+                          {% for asset in assets %}
+                               {%  if page_dataset == asset.id %}
+                                   <script>
+                                    $("#asset-select").val('{{ asset.name}}');
+                                   </script>
+                                   <option>{{ asset.name}}</option>
+                              {% else %}
+                                    <option>{{ asset.name}}</option>
+                              {% endif %}
+                           {% endfor %}
+                 {% endif %}
+            </datalist>
+{#            </select>#}
+{#          </div>#}
+
+
+          <div class="modal-footer-warning d-none">
+              <button type="button" class="btn btn-danger btn-delete-ip">Удалить</button>
+          </div>
+
+      <div class="modal-footer">
+
+        <button type="submit" class="btn btn-secondary btn-submit" value="Сохранить">Сохранить</button>
+        <button type="button" class="btn btn-secondary btn-cancel" data-dismiss="modal" value="Закрыть">Закрыть</button>
+      </div>
+     </form>
+       </div>
+    </div>
+  </div>
+</div>
+<script>
+    $(".btn-cancel").click(function(){
+        location.reload();
+    });
+    $(".btn-add, .ip-detail-edit").click(function(){
+        $(".modal input[type=text], .modal input[type=hidden], .modal textarea").each(function(){
+
+            $(this).val('');
+        });
+        let btn = this.className;
+        if (btn.indexOf('add') > 0)
+        {
+           $(".modal-title").text('Добавить данные');
+           $(".modal-footer-warning").addClass("d-none");
+
+        }
+        else {
+            $(".modal-title").text('Изменить данные');
+            $(".modal-footer-warning").removeClass("d-none");
+            let tr = $(this).closest('tr')[0];
+            let td = $(tr).find('td');
+            $("#idx").val(($(td[1]).find('input').attr('data')));
+            $("#domain").val($(td[2]).text());
+            $("#ip-addr").val($(td[3]).text());
+            $("#owner").val($(td[4]).text());
+            $("#comment-text").val($.trim($(td[5]).text()));
+        }
+
+        $(".modal").modal();
+        $("#ip-addr").focus();
+    });
+
+    $(".btn-delete-ip").click(function(){
+       let ip = $("#idx").val();
+       if (ip !== '')
+       {
+           let ask = confirm('Подтвердите удаление ?');
+           if (ask)
+           {
+               $.post("{% url 'ipdelete_urls' %}", {idx: $("#idx").val(),
+                                    csrfmiddlewaretoken: '{{ csrf_token }}',
+            }
+
+        ).done(function(data){
+            ShowNotify(2, "Данные удалены");
+            $('.modal').modal('hide');
+
+        }).fail(function(data){
+            if (data === Object(data)) {
+                ShowNotify(0, data.responseText);
+                return 0;
+            }
+           ShowNotify(0, "Произошла ошибка, попробуйте позже");
+        });
+           }
+       }
+    });
+
+    $("#ip-data").on('submit', function(e) {
+        e.preventDefault();
+        let ip = $("#ip-addr").val();
+        if ($.trim(ip) == '' || !ValidateIPaddress(ip))
+        {
+            ShowNotify(0, message[6]);
+            $("#ip-addr").focus();
+            return false;
+        }
+
+
+        $.post("{% url 'ipsave_urls' %}", {idx: $("#idx").val(),
+                                    domain: $("#domain").val(),
+                                    ip:  $("#ip-addr").val(),
+                                    owner: $("#owner").val(),
+                                    comment: $.trim($("#comment-text").val()),
+                                    asset: $("#asset-select").val(),
+                                    csrfmiddlewaretoken: '{{ csrf_token }}',
+            }
+
+        ).done(function(data){
+            ShowNotify(2, "Данные сохранены");
+            {#if ($("#idx").val() == '')#}
+            {#    $('.modal').modal('hide');#}
+        }).fail(function(data){
+            if (data === Object(data)) {
+                ShowNotify(0, data.responseText);
+                return 0;
+            }
+           ShowNotify(0, "Произошла ошибка, попробуйте позже");
+        });
+
+
+    });
+
+    $(".btn-resolv-dmn").click(function(){
+        let ip = $("#ip-addr").val();
+        if (ip !== '' && (ValidateIPaddress(ip)))
+        {
+                $("#domain").attr('disabled', true);
+
+                $.post("{% url 'ipresolv_urls' %}", {
+                                        ip:  ip,
+                                        csrfmiddlewaretoken: '{{ csrf_token }}',
+                }
+
+            ).done(function(data){
+                try{
+                    let status = JSON.parse(JSON.stringify(data));
+                    if (status.hasOwnProperty('status'))
+                    {
+                        status = status['status'];
+                    }
+                    if (status instanceof Array)
+                        {
+                            status = status[0];
+                        }
+                    if (status != 'undefined' && status!= '')
+                    {
+                        $("#domain").val(status);
+                    }
+
+
+
+                    //alert(data);
+                }catch (e) {
+                    $("#domain").attr('disabled', false);
+                }
+
+
+
+
+                $("#domain").attr('disabled', false);
+            }).fail(function(data){
+                $("#domain").attr('disabled', false);
+            })
+
+        } else
+        {
+            ShowNotify(0, message[6]);
+            return false;
+        }
+
+    });
+</script>
 {% endblock %}

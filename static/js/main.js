@@ -5,7 +5,9 @@ let message =  ['Неправильный IP-адресс',
         'Обратите внимание, возможно указан неправильный IP-адрес, либо он не является внешним.',
         'Это зарезервированный IP-адрес, использовать его нежелательно.',
         'Произошла ошибка при выполнении операции.',
-        'Операция выполнена.'
+        'Операция выполнена.',
+        'Поле IP адресс - нужно заполнить правильными данными',
+
     ];
 
 function hasNumber(myString) {
@@ -37,22 +39,22 @@ function ValidateIPaddress(ipaddress) {
   }
   return (false)
 }
-function ShowNotify(idx = 0, text='')
+function ShowNotify(idx = 0, text='Error')
 {
     if($("#notifyMessage").length < 1)
     {
         if (idx == 0) //Error
         {
-            $("body").append("<div id='notifyMessage' class='alert alert-danger shadow rounded' style='text-align:center;vertical-align:middle;width:400px;position:absolute;top:60px;right:30px;margin:20px;display:none;border:1px solid #fd1414;opacity: 0.8;box-shadow: 0 0 10px;'><i class='fas fa-radiation mr-3'></i>" + text + "</i></div>");
+            $("body").append("<div id='notifyMessage' class='alert alert-danger shadow rounded' style='text-align:center;vertical-align:middle;width:400px;position:absolute;top:60px;right:30px;margin:20px;display:none;border:1px solid #fd1414;opacity: 0.8;box-shadow: 0 0 10px;z-index:2000;'><i class='fas fa-radiation mr-3'></i>" + text + "</i></div>");
         }
         else if (idx == 1) //Warning
         {
-           $("body").append("<div id='notifyMessage' class='alert alert-warning shadow rounded' style='text-align:center;vertical-align:middle;width:400px;position:absolute;top:60px;right:30px;margin:20px;display:none;border:1px solid rgba(198,108,26,0.99);opacity: 0.8;box-shadow: 0 0 10px;'><i class='fas fa-warning mr-3'></i>" +text + "</i></div>");
+           $("body").append("<div id='notifyMessage' class='alert alert-warning shadow rounded' style='text-align:center;vertical-align:middle;width:400px;position:absolute;top:60px;right:30px;margin:20px;display:none;border:1px solid rgba(198,108,26,0.99);opacity: 0.8;box-shadow: 0 0 10px;z-index:2000;'><i class='fas fa-warning mr-3'></i>" +text + "</i></div>");
         }
 
         else //Success
         {
-             $("body").append("<div id='notifyMessage' class='alert alert-success shadow rounded' style='text-align:center;vertical-align:middle;width:400px;position:absolute;top:60px;right:30px;margin:20px;display:none;border:1px solid rgba(31,151,15,0.99);opacity: 0.8;box-shadow: 0 0 10px;'><i class='fas fa-anchor mr-3'></i>" +text + "</i></div>");
+             $("body").append("<div id='notifyMessage' class='alert alert-success shadow rounded' style='text-align:center;vertical-align:middle;width:400px;position:absolute;top:60px;right:30px;margin:20px;display:none;border:1px solid rgba(31,151,15,0.99);opacity: 0.8;box-shadow: 0 0 10px;z-index:2000;'><i class='fas fa-anchor mr-3'></i>" +text + "</i></div>");
         }
 
     }
@@ -98,17 +100,6 @@ $(document).ready(function(){
     });
 
         });
-        // if (uiid_array.length > 0 )
-        // {
-        //    // param = ;
-        // }
-    //     $.ajax({
-    //          url:'/acl/remove/',
-    //          type:'post',
-    //         // enctype: 'multipart/form-data',
-    //          data: uiid_array,
-    //
-    // })
 
 
     $('.table-history input:checkbox').click(function(){

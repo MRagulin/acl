@@ -13,6 +13,9 @@ import ipaddress
 from django.views import View
 from django.http import JsonResponse
 import logging
+import xlrd
+
+
 #from datetime import datetime
 FUN_SPEED = 0
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -226,11 +229,11 @@ class ExtractDataXls:
         self.ip_addr_idx = 1
         self.count_total: int = 0 #total records in db
         self.error_count: int = 0 #total errors
-        try:
-            import xlrd
-        except ImportError:
-            messages.add_message(request, messages.ERROR, 'Error load xlrd module')
-            return 0
+        # try:
+        #
+        # except ImportError:
+        #     messages.add_message(request, messages.ERROR, 'Error load xlrd module')
+        #     return 0
         self.rb = xlrd.open_workbook(filename, formatting_info=True)
         self.current_page = None
         self.sheet_tags = self.rb.sheet_names()

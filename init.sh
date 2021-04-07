@@ -13,5 +13,6 @@ apt-get install python-psycopg2
 pip3 install psycopg2
 pip3 install Django==3.1.6
 pip3 install python-docx
-
+pip3 install fontawesome-free
+pip3 install xlrd
 printf "Finish"

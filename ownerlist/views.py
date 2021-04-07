@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from django.views.generic import View
 from django.shortcuts import redirect
-from django.http import HttpResponse, JsonResponse
+from django.http import HttpResponse, JsonResponse, HttpResponseBadRequest, HttpResponseNotFound
 from .forms import UploadFileForm
 from .utils import upload_file_handler, ExtractDataXls, search_text
 from django.contrib import messages
@@ -10,8 +10,10 @@ from django.shortcuts import redirect
 from django.urls import reverse
 import re
 from .utils import BaseView
-from .models import Iplist, Tags
+from .models import Iplist, Tags, Owners
 from django.core.paginator import Paginator
+from django.views.decorators.csrf import csrf_exempt
+import socket
 
 class IpTable(BaseView, View):
     def get(self, request):
@@ -30,7 +32,7 @@ class IpTable(BaseView, View):
             page_dataset = int(page_dataset)
 
         if page_dataset != 0:
-            data = Iplist.objects.filter(tags__id=page_dataset)
+            data = Iplist.objects.filter(tags__id=page_dataset).order_by('ipv4')
         else:
             data = Iplist.objects.filter(tags__id=1)
 
@@ -101,3 +103,72 @@ class SearchView(BaseView, View):
 class Vpn(BaseView, View):
     def get(self, request):
         return render(request, 'vpn.html')
+
+@csrf_exempt
+def ip_resolve(request, *args, **kwargs):
+    if request.method == 'POST':
+        ip = request.POST.get('ip', '')
+        result = {'status': ''}
+        if not re.match(r"^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$", ip):
+            return HttpResponseBadRequest('Неправильный IP-адрес')
+        if ip:
+            try:
+                result = socket.gethostbyaddr(ip)
+            except Exception as e:
+                return HttpResponse(json.dumps(result), content_type="application/json")
+        return HttpResponse(json.dumps(result), content_type="application/json")
+    return HttpResponse(status=405)
+
+@csrf_exempt
+def ip_delete(request, *args, **kwargs):
+    if request.method == 'POST':
+        idx = request.POST.get('idx')
+        result = {'status': 'Данные удалены'}
+        try:
+            obj = Iplist.objects.get(id=idx)
+            obj.delete()
+        except Iplist.DoesNotExist:
+            HttpResponseNotFound('IP адрес не найден')
+        return HttpResponse(json.dumps(result), content_type="application/json")
+    return HttpResponse(status=405)
+
+@csrf_exempt
+def ip_save(request, *args, **kwargs):
+    """Функция изменяет или создает данные по ip"""
+    if request.method == 'POST':
+        result = {'status': 'Данные сохранены'}
+        if 'ip' in request.POST:
+            ip = request.POST.get('ip')
+            idx = request.POST.get('idx', '')
+            tags = request.POST.get('asset', '')
+            if not re.match(r"^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$", ip):
+                return HttpResponseBadRequest('Неправильный IP-адрес')
+            try:
+                   if idx != '':
+                        obj = Iplist.objects.get(id=idx)
+                        obj.ipv4 = ip
+                   else:
+                       obj = Iplist.objects.create(ipv4=ip)
+                   if tags == '':
+                        tags = 'DEFAULT'
+                   tag, created = Tags.objects.get_or_create(name=tags)
+                   owner, created_obj = Owners.objects.get_or_create(username=request.POST.get('owner', ''))
+                   if obj:
+                        obj.hostname = request.POST.get('domain', '')
+                        if owner:
+                            obj.owner = owner
+                        obj.comment = request.POST.get('comment', '')
+                        if tag:
+                            if idx != '':
+                                obj.tags.add(*[tag.id])
+                            else:
+                                obj.tags.set([tag.id])
+                        obj.save()
+
+            except Iplist.DoesNotExist:
+                 return HttpResponseNotFound('IP адрес не найден')
+            except Exception as e:
+                return HttpResponseNotFound(str(e))
+
+        return HttpResponse(json.dumps(result), content_type="application/json")
+    return HttpResponse(status=405)

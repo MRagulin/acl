@@ -50,7 +50,7 @@
           <div class="post-header__row-bottom">
             <div class="post-header__block-icon"></div>
               {% for tag in el.tags.all %}
-                 <span class="post-header__block-tab">{{ tag.name }}</span>
+                  <a href="/iptable/?dataset={{ tag.id }}"><span class="post-header__block-tab">{{ tag.name }}</span></a>
               {% endfor %}
             </div>
         </div>
