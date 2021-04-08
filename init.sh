@@ -20,5 +20,10 @@ pip3 install Django==3.1.6
 pip3 install psycopg2
 pip3 install xlrd
 pip3 install python-docx
+<<<<<<< HEAD
 pip3 install fontawesome-free==5.15.2
+=======
+pip3 install fontawesome-free
+pip3 install xlrd
+>>>>>>> 'frontend'
 printf "Finish"

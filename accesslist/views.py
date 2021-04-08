@@ -76,8 +76,11 @@ class ObjectMixin:
                         return redirect(reverse(FORM_URLS[current_page + 1], kwargs={'acl_id': acl_id}))
                     #else:
                     #    return HttpResponseRedirect(reverse(FORM_URLS[0]))
-
-                owner_form = request.session['LOCAL_STORAGE'][FORM_APPLICATION_KEYS[0]]
+                if FORM_APPLICATION_KEYS[0] in request.session['LOCAL_STORAGE']:
+                        owner_form = request.session['LOCAL_STORAGE'][FORM_APPLICATION_KEYS[0]]
+                else:
+                    messages.warning(request, 'Для продолжения, необходимо заполнить контактные данные.')
+                    return redirect("{}{}/".format(reverse(FORM_URLS[1]), acl_id))
                 save__form(request, owner_form, acl_id)
                 return redirect("{}{}/".format(reverse(FORM_URLS[current_page + 1]), acl_id))
 
@@ -138,7 +141,7 @@ class AclCreate_external(BaseView, ObjectMixin, View):
     url = 'aclexternal_urls'
 
 
-class AclCreate_traffic(BaseView, ObjectMixin, View):
+class AclCreate_traffic(ObjectMixin, View):
     template = 'acl_traffic.html'
     url = 'acltraffic_urls'
 

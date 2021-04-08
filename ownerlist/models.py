@@ -3,7 +3,12 @@ from .utils import IP2Int
 
 
 class Tags(models.Model):
-    name = models.CharField(blank=True, max_length=128, unique=True, verbose_name="Имя тега", default="default")
+    name = models.CharField(max_length=128, unique=True, verbose_name="Имя тега", default="default")
+
+    def save(self, *args, **kwargs):
+        if str(self.name).strip() == '':
+            self.name = 'DEFAULT'
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return "Тег: {}".format(self.name)

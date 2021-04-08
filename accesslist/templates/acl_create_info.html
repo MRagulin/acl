@@ -13,6 +13,19 @@
 <div class="pl-3 pr-3 pt-3">
            <div class="main-block">
             <h4 class="main-title">1. Контактная информация <span class="badge badge-danger">Required</span></h4>
+
+               {% if messages %}
+                          {% for message in messages %}
+                              {% if message.tags == 'error' %}
+                                  <div class="alert alert-danger m-1 w-50">
+                              {% else %}
+                                  <div class="alert alert-warning m-1 w-50">
+                              {% endif %}
+                                {{ message }}
+                              </div>
+                          {% endfor %}
+                {% endif %}
+
           </div>
           <div class="main-form">
             <div class="contact-form">

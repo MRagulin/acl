@@ -10,9 +10,9 @@
              <p class="main-description">2.4 Потоки трафика**</p>
         </div>
  {% if '/new/' in request.path %}
-<form class="form-inline" method="post" action="{% url 'acltraffic_urls' acl_id=acl_id %}" name="acl-form-internal">
+<form class="form-inline" method="post" action="{% url 'acltraffic_urls' acl_id=acl_id %}" name="acl-form-internal" class="acl-form-internal">
 {% else %}
-<form class="form-inline" method="post" action="{% url 'acltraffic_urls' %}{{ acl_id }}/" name="acl-form-internal">
+<form class="form-inline" method="post" action="{% url 'acltraffic_urls' %}{{ acl_id }}/" name="acl-form-internal" class="acl-form-internal">
 {% endif %}
 
     {% csrf_token %}
@@ -35,27 +35,27 @@
                     {% for item in LOCAL_STORAGE %}
                      <tr>
                                 <td class="">
-                                    <input type="text" value="{{ item.0}}" class="form-control" name="input__domain_source_{% random_int 0 100 %}" autofocus minlength="7" maxlength="32" size="15" required>
+                                    <input type="text" value="{{ item.0}}" class="form-control" name="input__domain_source_{% random_int 0 100 %}" autofocus minlength="3" maxlength="32" size="15" required>
                                     <span class="validity"></span>
                                 </td>
 
                                 <td class="">
-                                        <input type="text" value="{{ item.1}}" class="form-control input__ip__external" name="input__ip_source_{% random_int 0 100 %}" autofocus minlength="7" maxlength="15" size="15" pattern="^((\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.){3}(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])$" required>
+                                        <input type="text" value="{{ item.1}}" class="form-control input__ip__external" name="input__ip_source_{% random_int 0 100 %}" autofocus minlength="3" maxlength="15" size="15" pattern="^((\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.){3}(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])|(any)$" required>
                                         <span class="validity"></span>
                                 </td>
 
                                 <td>
-                                        <input type="text" value="{{ item.2}}" class="form-control" name="input__domain_dest_{% random_int 0 100 %}" autofocus minlength="7" maxlength="32" size="15" required>
+                                        <input type="text" value="{{ item.2}}" class="form-control" name="input__domain_dest_{% random_int 0 100 %}" autofocus minlength="3" maxlength="32" size="15" required>
                                         <span class="validity"></span>
                                 </td>
 
                                 <td class="">
-                                        <input type="text" value="{{ item.3}}" class="form-control" placeholder="195.239.64.79 input__ip__external" name="input__host_source_{% random_int 0 100 %}" autofocus minlength="7" maxlength="15" size="15" pattern="^((\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.){3}(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])$" required>
+                                        <input type="text" value="{{ item.3}}" class="form-control" placeholder="195.239.64.79 input__ip__external" name="input__host_source_{% random_int 0 100 %}" autofocus minlength="3" maxlength="15" size="15" pattern="^((\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.){3}(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])|(any)$" required>
                                         <span class="validity"></span>
                                 </td>
 
                                 <td class="">
-                                        <input type="text" value="{{ item.4}}" class="form-control" name="input__host_port_{% random_int 0 100 %}" autofocus minlength="6" maxlength="15" size="15" pattern="^((\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.){3}(\d{1,2}|1\d" required>
+                                        <input type="text" value="{{ item.4}}" class="form-control input__host_port" name="input__host_port_{% random_int 0 100 %}" autofocus minlength="3" maxlength="15" size="15" pattern=".{3,}" required>
                                         <span class="validity"></span>
                                 </td>
 
@@ -72,27 +72,27 @@
                     {% else %}
                      <tr>
                                 <td class="">
-                                    <input type="text"  class="form-control" placeholder="dpgw.alfastrah.ru" name="input__domain_source" autofocus minlength="7" maxlength="32" size="15" required>
+                                    <input type="text"  class="form-control" placeholder="dpgw.alfastrah.ru" name="input__domain_source" autofocus minlength="3" maxlength="32" size="15" required>
                                     <span class="validity"></span>
                                 </td>
 
                                 <td class="">
-                                        <input type="text"  class="form-control input__ip__external" placeholder="195.239.64.162" name="input__ip_source" autofocus minlength="7" maxlength="15" size="15" pattern="^((\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.){3}(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])$" required>
+                                        <input type="text"  class="form-control input__ip__external" placeholder="195.239.64.162" name="input__ip_source" autofocus minlength="3" maxlength="15" size="15" pattern="^((\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.){3}(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])|(any)$" required>
                                         <span class="validity"></span>
                                 </td>
 
                                 <td>
-                                        <input type="text"  class="form-control" placeholder="Z14-1709-gw.alfastrah.ru" name="input__domain_dest" autofocus minlength="7" maxlength="32" size="15" required>
+                                        <input type="text"  class="form-control" placeholder="Z14-1709-gw.alfastrah.ru" name="input__domain_dest" autofocus minlength="3" maxlength="32" size="15" required>
                                         <span class="validity"></span>
                                 </td>
 
                                 <td class="">
-                                        <input type="text"  class="form-control input__ip__external" placeholder="195.239.64.79" name="input__host_source" autofocus minlength="7" maxlength="15" size="15" pattern="^((\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.){3}(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])$" required>
+                                        <input type="text"  class="form-control input__ip__external" placeholder="195.239.64.79" name="input__host_source" autofocus minlength="3" maxlength="15" size="15" pattern="^((\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.){3}(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])|(any)$" required>
                                         <span class="validity"></span>
                                 </td>
 
                                 <td class="">
-                                        <input type="text"  class="form-control" placeholder="TCP:80,443,9000-9100" name="input__host_port" autofocus minlength="4" maxlength="15" size="15" pattern="^((\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.){3}(\d{1,2}|1\d" required>
+                                        <input type="text"  class="form-control input__host_port" placeholder="TCP:80,443,9000-9100" name="input__host_port" autofocus minlength="3" maxlength="15" size="15" pattern=".{3,}" required>
                                         <span class="validity"></span>
                                 </td>
 
@@ -128,6 +128,31 @@
     </div>
 </div>
 <script>
+    $(".btn-success").click(function(e){
+            let result = false;
+            let protocol = $(".input__host_port").val();
+            if (protocol.length > 0)
+            {
+                for (let i = 0; i < protocols.length; i++) {
+                    if (protocol.toUpperCase().search(protocols[i]) != -1)
+                    {
+                        result = true;
+                        break
+                    }
+
+                }
+
+                if (!result)
+                {
+                     e.preventDefault();
+                     ShowNotify(0, message[7]);
+                     $(".input__host_port").focus();
+                     return false;
+                }
+            }
+
+    });
+
     $(".post-sidebar").removeClass("d-none");
     {% if '/new/' not in request.path %}
     $(".form-inline").submit(function () {

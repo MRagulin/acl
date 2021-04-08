@@ -740,3 +740,41 @@ input:not([type='checkbox']):valid+span:after, textarea:valid+span:after {
 .page-link {
   border: 0!important;
 }
+
+.table-ip {
+
+  table-layout: fixed;
+  word-wrap: break-word;
+}
+.table-ip th, table td {
+  overflow: hidden;
+}
+
+.list-group-item.active {
+  background-color: #CE253D!important;
+  border-color: #bd2130d6!important;
+
+}
+
+.td-long-text{
+  overflow: hidden;
+ text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.modal-footer-warning{
+  float: left;
+  -webkit-box-align: start;
+    -ms-flex-align: start;
+    align-items: start;
+    -webkit-box-pack: start;
+    -ms-flex-pack: start;
+    justify-content: flex-start;
+      padding: 1rem;
+  display: flex;
+  border-top: 1px solid #e9ecef;
+}
+
+.validity{
+  width: 10px;
+}
