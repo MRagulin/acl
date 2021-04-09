@@ -14,15 +14,9 @@ from django.views import View
 from django.http import JsonResponse
 import logging
 import xlrd
-<<<<<<< HEAD
 import tempfile
 from django.shortcuts import reverse, redirect
 
-=======
-
-
-#from datetime import datetime
->>>>>>> 'frontend'
 FUN_SPEED = 0
 BASE_DIR = Path(__file__).resolve().parent.parent
 LOCAL_UID = None
@@ -43,16 +37,10 @@ class BaseView(View):
         try:
             response = super().dispatch(request, *args, **kwargs)
         except Exception as e:
-<<<<<<< HEAD
             logger.error('[Ошибка] {} {} {}'.format(str(e), request.META.get('REMOTE_ADDR'), datetime.datetime.today().strftime('%Y-%m-%d-%H:%M:%S')))
             messages.error(request, str(e))
-            return redirect(reverse(FORM_URLS[0]))
-
-            #return self.__response({'errorMessage': str(e)}, status=400)
-=======
-            logger.warning('[Ошибка] {} {} {}'.format(str(e), request.META.get('REMOTE_ADDR'), datetime.datetime.today().strftime('%Y-%m-%d-%H:%M:%S')))
             return self.__response({'errorMessage': str(e)}, status=400)
->>>>>>> 'frontend'
+
         if isinstance(response, (dict, list)):
             return self.__response(response)
         else:
@@ -247,16 +235,8 @@ class ExtractDataXls:
         self.ip_addr_idx = 1
         self.count_total: int = 0 #total records in db
         self.error_count: int = 0 #total errors
-<<<<<<< HEAD
         self.rb = xlrd.open_workbook(filename, formatting_info=True, encoding_override='utf-8')
-=======
-        # try:
-        #
-        # except ImportError:
-        #     messages.add_message(request, messages.ERROR, 'Error load xlrd module')
-        #     return 0
-        self.rb = xlrd.open_workbook(filename, formatting_info=True)
->>>>>>> 'frontend'
+
         self.current_page = None
         self.sheet_tags = self.rb.sheet_names()
         self.Vlans = apps.get_model('ownerlist', 'Vlans')
