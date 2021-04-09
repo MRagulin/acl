@@ -201,7 +201,7 @@ class AclOver(BaseView, View):
         obj = None
         file_download = None
 
-        #t = t / 0
+        t = t / 0
         # if '/new/' in request.path:
         #     if 'uuid' in request.session and request.session['uuid'] != str(acl_id):
         #         HttpResponseRedirect(reverse(FORM_URLS[0]))

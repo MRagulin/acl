@@ -11,7 +11,7 @@ import time
 import uuid
 import ipaddress
 from django.views import View
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponseRedirect
 import logging
 import xlrd
 import tempfile
@@ -39,7 +39,7 @@ class BaseView(View):
         except Exception as e:
             logger.error('[Ошибка] {} {} {}'.format(str(e), request.META.get('REMOTE_ADDR'), datetime.datetime.today().strftime('%Y-%m-%d-%H:%M:%S')))
             messages.error(request, str(e))
-            return self.__response({'errorMessage': str(e)}, status=400)
+            return HttpResponseRedirect(reverse('acldemo_urls')) #self.__response({'errorMessage': str(e)}, status=400)
 
         if isinstance(response, (dict, list)):
             return self.__response(response)
