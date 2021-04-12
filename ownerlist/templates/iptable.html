@@ -317,6 +317,58 @@
 
     });
 
+    {#$(".btn-resolv-ip").click(function(){#}
+    {#    let ip = $("#domain").val();#}
+    {#    if (ip !== '' && (ValidateIPaddress(ip)))#}
+    {#    {#}
+    {#            $("#domain").attr('disabled', true);#}
+    {##}
+    {#            $.post("{% url 'ipresolv_urls' %}", {#}
+    {#                                    ip:  ip,#}
+    {#                                    csrfmiddlewaretoken: '{{ csrf_token }}',#}
+    {#            }#}
+    {##}
+    {#        ).done(function(data){#}
+    {#            try{#}
+    {#                let status = JSON.parse(JSON.stringify(data));#}
+    {#                if (status.hasOwnProperty('status'))#}
+    {#                {#}
+    {#                    status = status['status'];#}
+    {#                }#}
+    {#                if (status instanceof Array)#}
+    {#                    {#}
+    {#                        status = status[0];#}
+    {#                    }#}
+    {#                if (status != 'undefined' && status!= '')#}
+    {#                {#}
+    {#                    $("#domain").val(status);#}
+    {#                }#}
+    {##}
+    {##}
+    {##}
+    {#                //alert(data);#}
+    {#            }catch (e) {#}
+    {#                $("#domain").attr('disabled', false);#}
+    {#            }#}
+    {##}
+    {##}
+    {##}
+    {##}
+    {#            $("#domain").attr('disabled', false);#}
+    {#        }).fail(function(data){#}
+    {#            $("#domain").attr('disabled', false);#}
+    {#        })#}
+    {##}
+    {#    } else#}
+    {#    {#}
+    {#        ShowNotify(0, message[6]);#}
+    {#        return false;#}
+    {#    }#}
+    {##}
+    {#});#}
+
+
+
     $(".btn-resolv-dmn").click(function(){
         let ip = $("#ip-addr").val();
         if (ip !== '' && (ValidateIPaddress(ip)))

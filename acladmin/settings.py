@@ -131,23 +131,37 @@ STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'static'),
 ]
 
-LOGPATH = os.path.join(BASE_DIR, 'log//debug.log')
+if os.name == 'nt':
+    LOGPATH = os.path.join(BASE_DIR, 'log\\debug.log')
+else:
+    LOGPATH = os.path.join(BASE_DIR, 'log//debug.log')
+
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
+    'formatters': {
+        'console': {
+            'format': '%(name)-12s %(levelname)-8s %(message)s'
+        },
+        'file': {
+            'format': '%(asctime)s %(name)-12s %(levelname)-8s %(message)s'
+        }
+    },
     'handlers': {
             'file': {
-            'level': 'INFO',
+            'level': 'WARNING',
             'class': 'logging.FileHandler',
+            'formatter': 'file',
             'filename': LOGPATH,
                     },
             },
-            'loggers': {
-            'django': {
-                    'handlers': ['file'],
-                    'level': 'INFO',
-                    'propagate': True,
-                    },
+
+    'loggers': {
+            'acladmin.custom': {
+                        'handlers': ['file'],
+                        'level': 'ERROR',
+                        'propagate': True,
+                        },
                 },
 }
 

@@ -7,8 +7,8 @@ let message =  ['Неправильный IP-адресс',
         'Произошла ошибка при выполнении операции.',
         'Операция выполнена.',
         'Поле IP адресс - нужно заполнить правильными данными',
-        'Обратите внимание, необходимо указать по крайней мере один протокол и порт (для транспортного уровня и выше), пример: udp:53, tcp:3306, icmp итд.'
-
+        'Обратите внимание, необходимо указать по крайней мере один протокол и порт (для транспортного уровня и выше), пример: udp:53, tcp:3306, icmp итд.',
+        'Вы действительно хотите удалить?'
     ];
 
 const protocols = ['DNS','DHCP','TFTP','TLS','SSL','FTP','HTTP','IMAP4','POP3','SIP','SMTP','SNMP','SSH','Telnet',
@@ -84,8 +84,8 @@ $(document).ready(function(){
     $(".btn-remove").click(function() {
         let uiid_array = new Array();
         let param = {};
+        if (!confirm(message[8])) return false;
         $('.table-history input:checkbox:checked').each(function () {
-           // uiid_array.push($(this).attr('data'));
                let data = $(this).attr('data');
                let el = $(this).closest('tr')[0];
                $.post('/acl/remove/', {data}).done(function(data){
