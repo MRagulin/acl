@@ -184,8 +184,11 @@ def save__form(request, owner_form:None, acl_id)->None:
         if obj:
             obj.acltext = json.dumps(request.session['LOCAL_STORAGE'])
             obj.is_executed = False
-            obj.status = 'FL'
             obj.owner = user
+            if len(request.session['LOCAL_STORAGE']) <= 1:
+                obj.status = 'NOTFL'
+            else:
+                obj.status = 'FL'
             obj.project = owner_form[4]
             obj.save()
 
@@ -201,7 +204,7 @@ class AclOver(BaseView, View):
         obj = None
         file_download = None
 
-        t = t / 0
+        #t = t / 0
         # if '/new/' in request.path:
         #     if 'uuid' in request.session and request.session['uuid'] != str(acl_id):
         #         HttpResponseRedirect(reverse(FORM_URLS[0]))
@@ -214,7 +217,7 @@ class AclOver(BaseView, View):
                         return redirect(reverse('acloverview_urls', kwargs={'acl_id': request.session['uuid']}))
 
         """Проверяем состояние массива с данными"""
-        if len(request.session['LOCAL_STORAGE']) >= 4 and all(KEY in request.session['LOCAL_STORAGE'] for KEY in FORM_APPLICATION_KEYS):
+        if len(request.session['LOCAL_STORAGE']) >= 1: #and all(KEY in request.session['LOCAL_STORAGE'] for KEY in FORM_APPLICATION_KEYS):
                 if 'action_make_docx' in request.session:
                             file_download = 'None'
                             try:

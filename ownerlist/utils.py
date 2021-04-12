@@ -16,6 +16,8 @@ import logging
 import xlrd
 import tempfile
 from django.shortcuts import reverse, redirect
+from docx import Document
+from docx.shared import Pt
 
 FUN_SPEED = 0
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -711,12 +713,6 @@ def make_doc(request=None, data_set={}, fileuuid='')->str:
     if fileuuid == '':
         fileuuid = str(uuid.uuid4())
     APP_FILE = 'static/docx/Application_' + fileuuid + '.docx'
-    try:
-        from docx import Document
-        from docx.shared import Pt
-    except ImportError:
-        messages.error(request, 'Error load docx module')
-        return ''
     doc = Document(TEMPLATE_FILE)
     doc.styles['Normal'].font.name = 'Verdana'
     doc.styles['Normal'].font.size = Pt(10)
@@ -732,6 +728,8 @@ def make_doc(request=None, data_set={}, fileuuid='')->str:
 
         else:
             row_cnt = 0
+            if data not in data_set:
+                continue
             for key, value in enumerate(data_set[data], start=1):
                 if row_cnt >= table_rows:
                         table_tmp.add_row()
