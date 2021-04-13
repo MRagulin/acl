@@ -8,15 +8,110 @@ let message =  ['Неправильный IP-адресс',
         'Операция выполнена.',
         'Поле IP адресс - нужно заполнить правильными данными',
         'Обратите внимание, необходимо указать по крайней мере один протокол и порт (для транспортного уровня и выше), пример: udp:53, tcp:3306, icmp итд.',
-        'Вы действительно хотите удалить?'
+        'Вы действительно хотите удалить?',
+        'Неизвестная ошибка'
     ];
 
-const protocols = ['DNS','DHCP','TFTP','TLS','SSL','FTP','HTTP','IMAP4','POP3','SIP','SMTP','SNMP','SSH','Telnet',
-                'RTP','TCP','UDP','IP','IPv4','IPv6','ICMP','IGMP','ARP','Netflow','Flow','NTP']
+const protocols = ['TCP', 'UDP', 'ICMP', 'IGMP', 'IGMPv3', 'RIP', 'RIP2', 'VRRP', 'BGP4', 'NETFLOW'];
+
 function hasNumber(myString) {
   return /\d/.test(myString);
 }
+function resolvDomain(domain = '', el = null){
+        if (domain == '')
+            return ''
+         let ipform = $(el).closest('td')[0];
+             ipform = $(ipform).next();
+             ipform = $(ipform).find("input[class*='ip']")[0];
+             if (ipform) $(ipform).attr("disable", true);
 
+
+        $.post("iptable/domainresolv/", {
+                                        domain:  domain,
+                                        csrfmiddlewaretoken: '{{ csrf_token }}',
+                }
+
+            ).done(function(data){
+                try{
+                    let status = JSON.parse(JSON.stringify(data));
+                    if (status.hasOwnProperty('status'))
+                    {
+                        status = status['status'];
+                    }
+                    if (status instanceof Array)
+                        {
+                            status = status[0];
+                        }
+                    if (status != 'undefined' && status!= '')
+                    {
+                             if (status && el)
+                                {
+                                    if (ipform)
+                                    {
+                                        $(ipform).val(status);
+                                        if (ipform) $(ipform).attr("disable", false);
+                                    }
+                                    console.log(status);
+                                }
+
+                        return status
+                    }
+
+
+                }catch (e) {
+                    if (ipform) $(ipform).attr("disable", false);
+                    return '';
+                }
+
+            }).fail(function(data){
+                if (ipform) $(ipform).attr("disable", false);
+               return '';
+            });
+
+}
+function extractUuid(myString)
+{
+    try
+    {
+        return myString.match(/^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/);
+    }
+    catch (e) {
+        return '';
+    }
+
+}
+function deletebyuuid(data=toString(), el = null)
+{
+    $.post('/acl/remove/', {data}).done(function(data){
+                try{
+                    let status = JSON.parse(JSON.stringify(data));
+
+                    if (status.hasOwnProperty('status') )
+                    {
+                        ShowNotify(idx=2, text=status['status']);
+                        if (el != null)
+                        {
+                            try{
+                                $(el).remove();
+                            } catch (e) {
+                                
+                            }
+                            
+                        }
+                        return true;
+                    } else
+                    {
+                        ShowNotify(idx=0, text=status['error']);
+                    }
+
+                } catch (e) {
+                    console.error(status);
+                }
+            }).fail(function(){
+                ShowNotify(idx=0, text='Произошла ошибка при удалении элементов');
+            });
+    return false;
+}
 function GetCurrentDate()
 {
     //Old SQL style
@@ -82,25 +177,37 @@ $(document).ready(function(){
     });
 
     $(".btn-remove").click(function() {
-        let uiid_array = new Array();
-        let param = {};
         if (!confirm(message[8])) return false;
-        $('.table-history input:checkbox:checked').each(function () {
+        if (window.location.href.indexOf('history') == -1) {
+             let data = extractUuid(window.location.href);
+             if (data != '')
+             {
+                  deletebyuuid(data);
+                  window.location.href = '/';
+             }
+              else{
+                alert(message[9]);
+             }
+
+        }
+        else
+        {
+               $('.table-history input:checkbox:checked').each(function () {
                let data = $(this).attr('data');
                let el = $(this).closest('tr')[0];
-               $.post('/acl/remove/', {data}).done(function(data){
-                try{
-                    let status = JSON.parse(JSON.stringify(data));
+               if (data) {
+                   if (deletebyuuid(data, el)) {
 
-                    status.hasOwnProperty('status') ? ShowNotify(idx=2, text=status['status']): ShowNotify(idx=0, text=status['error']);
-                    $(el).remove();
-                } catch (e) {
-                    console.error(status);
-                }
-            }).fail(function(){
-                ShowNotify(idx=0, text='Произошла ошибка при удалении элементов');
-            });
+                   }
+               }
+               else {
+                   alert(message[9]);
+               }
+
     });
+        }
+
+
 
         });
 
@@ -262,6 +369,16 @@ $(".btn-start").click(function(){
             return false;
         }
 });
+
+$("input[name*='domain']").change(function(){
+      if ($(this).is(":empty")){
+          if ($(this).val() == 'any')
+              return 0;
+          else
+            return resolvDomain($(this).val(), $(this));
+      }
+});
+
 
 $("#flexAgreementCheck").click(function(){
         if ($("#flexAgreementCheck:checked").length > 0) {

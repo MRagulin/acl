@@ -162,7 +162,7 @@
 {#           <div class="form-group">#}
             <label for="ip-addr" class="col-form-label">IP-адрес*:</label>
             <input type="text" class="form-control" id="ip-addr" pattern="^([0-9]{1,3}\.){3}[0-9]{1,3}$" autofocus required>
-{#           <p class="align-text-bottom float-right text-primary btn-resolv-ip" style="cursor: pointer"><small>Получить IP адрес</small></p>#}
+            <p class="align-text-bottom float-right text-primary btn-resolv-dmn" style="cursor: pointer"><small>Получить имя домена</small></p>
      <!--   -->
 {#          </div>#}
 
@@ -170,7 +170,7 @@
             <label for="domain" class="col-form-label">Домен:</label>
             <input type="text" class="form-control" id="domain" autofocus>
             <input type="hidden" value="0" id="idx">
-            <p class="align-text-bottom float-right text-primary btn-resolv-dmn" style="cursor: pointer"><small>Получить имя домена</small></p>
+            <p class="align-text-bottom float-right text-primary btn-resolv-ip" style="cursor: pointer"><small>Получить IP адрес</small></p>
 {#          </div>#}
 
 
@@ -317,55 +317,55 @@
 
     });
 
-    {#$(".btn-resolv-ip").click(function(){#}
-    {#    let ip = $("#domain").val();#}
-    {#    if (ip !== '' && (ValidateIPaddress(ip)))#}
-    {#    {#}
-    {#            $("#domain").attr('disabled', true);#}
-    {##}
-    {#            $.post("{% url 'ipresolv_urls' %}", {#}
-    {#                                    ip:  ip,#}
-    {#                                    csrfmiddlewaretoken: '{{ csrf_token }}',#}
-    {#            }#}
-    {##}
-    {#        ).done(function(data){#}
-    {#            try{#}
-    {#                let status = JSON.parse(JSON.stringify(data));#}
-    {#                if (status.hasOwnProperty('status'))#}
-    {#                {#}
-    {#                    status = status['status'];#}
-    {#                }#}
-    {#                if (status instanceof Array)#}
-    {#                    {#}
-    {#                        status = status[0];#}
-    {#                    }#}
-    {#                if (status != 'undefined' && status!= '')#}
-    {#                {#}
-    {#                    $("#domain").val(status);#}
-    {#                }#}
-    {##}
-    {##}
-    {##}
-    {#                //alert(data);#}
-    {#            }catch (e) {#}
-    {#                $("#domain").attr('disabled', false);#}
-    {#            }#}
-    {##}
-    {##}
-    {##}
-    {##}
-    {#            $("#domain").attr('disabled', false);#}
-    {#        }).fail(function(data){#}
-    {#            $("#domain").attr('disabled', false);#}
-    {#        })#}
-    {##}
-    {#    } else#}
-    {#    {#}
-    {#        ShowNotify(0, message[6]);#}
-    {#        return false;#}
-    {#    }#}
-    {##}
-    {#});#}
+    $(".btn-resolv-ip").click(function(){
+        let domain = $("#domain").val().trim();
+        if (domain !== '')
+        {
+                $("#ip-addr").attr('disabled', true);
+
+                $.post("{% url 'domainresolv_urls' %}", {
+                                        domain:  domain,
+                                        csrfmiddlewaretoken: '{{ csrf_token }}',
+                }
+
+            ).done(function(data){
+                try{
+                    let status = JSON.parse(JSON.stringify(data));
+                    if (status.hasOwnProperty('status'))
+                    {
+                        status = status['status'];
+                    }
+                    if (status instanceof Array)
+                        {
+                            status = status[0];
+                        }
+                    if (status != 'undefined' && status!= '')
+                    {
+                        $("#ip-addr").val(status);
+                    }
+
+
+
+                    //alert(data);
+                }catch (e) {
+                    $("#domain").attr('disabled', false);
+                }
+
+
+
+
+                $("#ip-addr").attr('disabled', false);
+            }).fail(function(data){
+                $("#ip-addr").attr('disabled', false);
+            })
+
+        } else
+        {
+            ShowNotify(0, message[6]);
+            return false;
+        }
+
+    });
 
 
 

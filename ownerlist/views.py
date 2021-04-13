@@ -119,6 +119,23 @@ def ip_resolve(request, *args, **kwargs):
         return HttpResponse(json.dumps(result), content_type="application/json")
     return HttpResponse(status=405)
 
+
+@csrf_exempt
+def domain_resolve(request, *args, **kwargs):
+    if request.method == 'POST':
+        domain = request.POST.get('domain', '')
+        result = {'status': ''}
+        if not re.match(r"^(?=.{1,255}$)(?!-)[A-Za-z0-9\-]{1,63}(\.[A-Za-z0-9\-]{1,63})*\.?(?<!-)$", domain):
+            return HttpResponseBadRequest('Неправильный домен')
+        if domain:
+            try:
+                result = socket.gethostbyname(domain)
+            except Exception as e:
+                return HttpResponse(json.dumps(result), content_type="application/json")
+        return HttpResponse(json.dumps(result), content_type="application/json")
+    return HttpResponse(status=405)
+
+
 @csrf_exempt
 def ip_delete(request, *args, **kwargs):
     if request.method == 'POST':
