@@ -26,7 +26,7 @@ function resolvDomain(domain = '', el = null){
              if (ipform) $(ipform).attr("disable", true);
 
 
-        $.post("iptable/domainresolv/", {
+        $.post("/iptable/domainresolv/", {
                                         domain:  domain,
                                         csrfmiddlewaretoken: '{{ csrf_token }}',
                 }
@@ -73,7 +73,7 @@ function extractUuid(myString)
 {
     try
     {
-        return myString.match(/^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/);
+        return myString.match(/[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}/)[0];
     }
     catch (e) {
         return '';
@@ -180,7 +180,7 @@ $(document).ready(function(){
         if (!confirm(message[8])) return false;
         if (window.location.href.indexOf('history') == -1) {
              let data = extractUuid(window.location.href);
-             if (data != '')
+             if (data != '' && data != null)
              {
                   deletebyuuid(data);
                   window.location.href = '/';
