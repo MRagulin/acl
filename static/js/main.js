@@ -9,7 +9,8 @@ let message =  ['Неправильный IP-адресс',
         'Поле IP адресс - нужно заполнить правильными данными',
         'Обратите внимание, необходимо указать по крайней мере один протокол и порт (для транспортного уровня и выше), пример: udp:53, tcp:3306, icmp итд.',
         'Вы действительно хотите удалить?',
-        'Неизвестная ошибка'
+        'Неизвестная ошибка',
+        'Функцинал еще не реализован, мы в процессе его создания.'
     ];
 
 const protocols = ['TCP', 'UDP', 'ICMP', 'IGMP', 'IGMPv3', 'RIP', 'RIP2', 'VRRP', 'BGP4', 'NETFLOW'];
@@ -379,6 +380,9 @@ $("input[name*='domain']").change(function(){
       }
 });
 
+$(".help-icon-mask").click(function(){
+    $(".modal-help-mask").modal('show');
+});
 
 $("#flexAgreementCheck").click(function(){
         if ($("#flexAgreementCheck:checked").length > 0) {

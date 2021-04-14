@@ -22,7 +22,7 @@
                 <thead>
                      <tr>
                          <th>IP-адрес источника</th>
-                         <th>Префикс-сети</th>
+                         <th>Префикс-сети <i class="far fa-question-circle help-icon-mask" style="cursor: pointer;margin-left: 5px"></i></th>
                          <th>Описание</th>
                          <th></th>
                      </tr>
@@ -67,7 +67,7 @@
                                             <div class="input-group-prepend">
                                                 <div class="input-group-text">/</div>
                                             </div>
-                                       <input type="number" value="{{item.1}}" class="form-control input__ip__external" placeholder="25" max="30" name="input__mask"  style="max-width: 110px;" pattern="^([0-9]){1,2}$" required>
+                                       <input type="number" value="{{item.1}}" class="form-control input__ip__external" placeholder="32" max="30" name="input__mask"  style="max-width: 110px;" pattern="^([0-9]){1,2}$" required>
                                         <span class="validity"></span>
                                       </div>
                                 </td>

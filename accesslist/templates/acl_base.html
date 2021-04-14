@@ -60,7 +60,30 @@
            {% block row %}
            {% endblock %}
         </div>
+
+  <div class="modal modal-help-mask" tabindex="-1" role="dialog">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Маска сети</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
       </div>
+      <div class="modal-body">
+          <p>Маска подсети как и IP-адрес тоже является числом, и она определяет диапазон IP-адресов, которые может использовать сеть.
+              С ее помощью сети могут делиться на небольшие подсети, которые подключаются к Интернету.
+              Маска подсети будет обозначать эти подсети.</p>
+
+          <div class="bd-callout bd-callout-info">
+              Если вы указываете <span class="font-weight-bold">один сервер или компьютер</span> (в данном случае IP), можете указать маску <code>/32</code>, если вы указываете диапазон подсетей,
+                но не знаете маску данной подсети, укажите <code>/1</code> - наши специалисты сами найдут информацию для создания правильного ACL.</p>
+        </div>
+       </div>
+    </div>
+  </div>
+ </div>
+ </div>
     </div>
 <script>
     {% for KEY in FORM_APPLICATION_KEYS %}
