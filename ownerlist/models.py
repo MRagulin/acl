@@ -31,6 +31,7 @@ class Owners(models.Model):
     phone = models.CharField(blank=True, max_length=256, verbose_name="Телефон")
     active = models.BooleanField(null=True, default=True)
     department = models.CharField(blank=True, max_length=256, verbose_name="Департамент")
+    #lastip = models.ForeignKey(models.Iplist, null=True, on_delete=models.SET_NULL, default=Iplist.get_default_ip)
 
     @classmethod
     def get_default_owner(cls):
@@ -52,6 +53,11 @@ class Iplist(models.Model):
 
     def __str__(self):
         return "IP адрес: {}".format(self.ipv4)
+    #
+    # @classmethod
+    # def get_default_ip(cls):
+    #     ip, obj = Iplist.objects.get_or_create(ipv4='127.0.0.1')
+    #     return ip.id
 
     """Переопределяем IP как Int значения"""
     def save(self, *args, **kwargs):

@@ -8,6 +8,7 @@ class ACL(models.Model):
     acltext = models.JSONField(blank=True, null=True, default=list)
     is_executed = models.BooleanField(null=True, default=False)
     owner = models.ForeignKey(Owners, null=True, on_delete=models.SET_NULL, default=Owners.get_default_owner)
+    taskid = models.CharField(blank=True, default="0", editable=True, max_length=64)
     project = models.CharField(blank=True, max_length=128)
     created = models.DateField(blank=True, auto_now_add=True)
     APL_STATUS = [

@@ -5,9 +5,9 @@ from django.urls import reverse
 from django.contrib import messages
 from django.http import HttpResponse
 from .models import ACL
-from ownerlist.models import Owners
+from ownerlist.models import Owners, Iplist
 import os
-from ownerlist.utils import make_doc, request_handler, is_valid_uuid, ip_status, logger
+from ownerlist.utils import make_doc, request_handler, is_valid_uuid, ip_status, logger, get_client_ip
 from ownerlist.utils import FORM_APPLICATION_KEYS, FORM_URLS, BaseView
 import json
 import uuid
@@ -180,6 +180,11 @@ def save__form(request, owner_form:None, acl_id)->None:
         user.department = owner_form[3]
         user.save()
     try:
+        ip, created_ip = Iplist.objects.get_or_create(ipv4=get_client_ip(request))
+
+        ip.owner = user
+        ip.save()
+
         obj, created = ACL.objects.get_or_create(id=str(acl_id))
         if obj:
             obj.acltext = json.dumps(request.session['LOCAL_STORAGE'])
