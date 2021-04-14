@@ -313,6 +313,43 @@ $(document).ready(function(){
         }
 
     });
+
+        $(".table-ip-internal").delegate(".input__ip__external", "change", function () {
+        let ip =  $(this).val().trim();
+        let el = $(this).closest('td')[0];
+        el = $(el).next('td');
+        if (!el) return false;
+        if (el.length > 0)
+            el = $(el).find("input[name*='input__mask']");
+        if (!el) return false;
+        if (ip == '') return false;
+
+        switch (ip) {
+            case '195.239.64.0':
+               $(el).val('25');
+            break;
+
+            case '195.239.64.192':
+               $(el).val('29');
+            break;
+
+            case '195.239.64.200':
+               $(el).val('29');
+            break;
+
+            case '195.239.64.224':
+               $(el).val('28');
+            break;
+
+            case '195.239.64.128':
+               $(el).val('26');
+            break;
+        }
+
+    });
+
+
+
     $(".table-ip-internal").delegate('.btn-action-add','click', function() {
 
     let tr    = $(this).closest('tr')[0];

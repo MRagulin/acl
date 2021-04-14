@@ -650,7 +650,7 @@ input:not([type='checkbox']):valid+span:after, textarea:valid+span:after {
 }
 
 .table-ip-internal td:last-child{
-    min-width: 100px;
+    min-width: 108px;
 }
 
 .bottom-form-save{
