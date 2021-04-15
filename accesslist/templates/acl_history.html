@@ -6,12 +6,46 @@
      <div class="post">
           <h1 class="title-block">История обращений ACL</h1>
       </div>
+ <div class="modal modal-stage" tabindex="-1" role="dialog">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Изменить статус</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+<form action="{% url 'acl_stage_change' %}" method="post" name="stage-data" id="stage-data">
+ <div class="form-group">
+    <label for="stage-names">Выберите значение</label>
+    <select class="form-control" id="stage-names">
+        {% if acl.APL_STATUS %}
+            {% for status in  acl.APL_STATUS %}
+                <option data="{{ status.0 }}">{{ status.1 }}</option>
+            {% endfor %}
+        {% endif %}
+    </select>
+   </div>
+   <div class="form-group">
+    <label for="stage-descr">Описание:</label>
+    <textarea class="form-control" id="tage-descr" type="text" rows="3" placeholder="Обращение - 920421301346" autofocus></textarea>
+  </div>
+
+</div>
+  <div class="modal-footer">
+        <button type="submit" class="btn btn-secondary btn-submit" value="Сохранить">Сохранить и закрыть</button>
+        <button type="button" class="btn btn-secondary btn-cancel" data-dismiss="modal" value="Закрыть">Закрыть</button>
+      </div>
+</form>
+    </div>
+  </div>
+  </div>
  {% if acllists %}
     <div class="p-1 mt-1 w-80">
-        <div class="p-1 d-inline-flex">
+        <div class="p-1 history-activity" style="display: none">
+            <button class="btn btn-secondary btn-stage m-1" disabled>Изменить статус</button>
             <button class="btn btn-danger btn-remove m-1" disabled>Удалить</button>
-            <button class="btn btn-primary btn-state m-1" disabled>Изменить статус</button>
-
         </div>
         <table class="table table-hover table-borderles table-sm table-history" style="border: 1px solid #dee2e6">
           <thead style="background:#efefef;">
@@ -35,6 +69,7 @@
                  <td class="bs">
                      <label>
                         <input data-index="0" name="btSelectItem" type="checkbox" value="0" data="{{ acllist.id }}">
+                        <input type="hidden" name="message" value="{{ acllist.taskid }}">
                         <span></span>
                      </label>
                  </td>

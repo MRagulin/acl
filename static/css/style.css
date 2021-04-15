@@ -762,6 +762,16 @@ input:not([type='checkbox']):valid+span:after, textarea:valid+span:after {
   white-space: nowrap;
 }
 
+.history-activity{
+  float: right;
+  -webkit-box-align: end;
+    -ms-flex-align: end;
+    align-items: end;
+    -webkit-box-pack: end;
+    -ms-flex-pack: end;
+    justify-content: flex-end;
+      padding: 1rem;
+}
 .modal-footer-warning{
   float: left;
   -webkit-box-align: start;

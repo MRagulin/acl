@@ -212,9 +212,20 @@ $(document).ready(function(){
 
         });
 
-
     $('.table-history input:checkbox').click(function(){
-         ($(this).prop('checked')) ? $(".btn-danger").attr('disabled', false) : $(".btn-danger").attr('disabled', true);
+        if  ($(this).prop('checked'))
+        {
+            $(".history-activity").show();
+            $(".btn-danger, .btn-stage").attr('disabled', false);
+        } else
+        {
+            if ($('.table-history input:checkbox:checked').length == 0)
+            {
+             $(".history-activity").hide();
+             $(".btn-danger, .btn-stage").attr('disabled', true);
+            }
+
+        }
 
     });
     $(".input__ip__internal").change(function(el){
@@ -327,6 +338,7 @@ $(document).ready(function(){
         switch (ip) {
             case '195.239.64.0':
                $(el).val('25');
+
             break;
 
             case '195.239.64.192':
@@ -399,6 +411,13 @@ $(function(){
  window.setInterval(hide_alert, 70000);
 });
 
+$(".btn-stage").click(function(){
+    let ht = $(".table-history input:checkbox:checked").parent().parent();
+        ht = $(ht).find("input[type='hidden']")[0];
+    $("#tage-descr").text($(ht).val());
+    $(".modal-stage").modal('show');
+    $("#tage-descr").focus();
+});
 
 $(".btn-start").click(function(){
         if ($("#flexAgreementCheck:checked").length == 0)
@@ -419,6 +438,39 @@ $("input[name*='domain']").change(function(){
 
 $(".help-icon-mask").click(function(){
     $(".modal-help-mask").modal('show');
+});
+
+$(".modal-stage").submit(function (e) {
+    e.preventDefault();
+    let stage = $("#stage-names").find(':selected').attr('data');
+    let uuid =  $(".table-history input:checkbox:checked").attr('data');
+    let text = $("#tage-descr").val().trim();
+
+    if (uuid && stage)
+    {
+         $.post('/acl/change/', {stage, uuid, text}).done(function(data){
+                try{
+                    let status = JSON.parse(JSON.stringify(data));
+
+                    if (status.hasOwnProperty('status') )
+                    {
+                        ShowNotify(idx=2, text=status['status']);
+                    } else
+                    {
+                        ShowNotify(idx=0, text=status['error']);
+                    }
+
+                } catch (e) {
+                    console.error(status);
+                }
+            }).fail(function(){
+                ShowNotify(idx=0, text='Произошла ошибка при изменении элементов');
+                return false;
+            });
+
+    }
+    $(".modal-stage").modal('hide');
+    window.location.href = '/acl/history/';
 });
 
 $("#flexAgreementCheck").click(function(){

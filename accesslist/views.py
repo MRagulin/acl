@@ -112,6 +112,7 @@ class Aclhistory(BaseView, View):
                 next_url = ''
 
             context = {
+                "acl": ACL,
                 "acllists": page,
                 "is_paginated": is_paginated,
                 "next_url": next_url,
@@ -246,6 +247,32 @@ class AclOver(BaseView, View):
             return render(request, 'acl_overview.html', context={'file_download': file_download, 'obj': obj.id})
         else:
             return render(request, 'acl_overview.html', context={'file_download': file_download, 'acl_id': acl_id})
+
+@csrf_exempt
+def AclStageChange(request,  *args, **kwargs):
+    if request.method == 'POST':
+        #messages.info(request, 'Статус изменен')
+        result = {'status': 'Статус изменен'}
+
+        uuid =  request.POST.get('uuid', '')
+        text = request.POST.get('text', '')
+        stage = request.POST.get('stage', '')
+
+        if (uuid!= '' and is_valid_uuid(uuid) and stage!=''):
+                try:
+                   acl = ACL.objects.get(id = uuid)
+                   if acl:
+                       acl.status = stage
+                       acl.taskid = text
+                       acl.save()
+
+                except ACL.DoesNotExist:
+                    return HttpResponse(json.dumps('Ошибка, таких данных нет'), content_type="application/json")
+
+                return HttpResponse(json.dumps(result), content_type="application/json")
+        return HttpResponse(json.dumps('Ошибка данных'), content_type="application/json")
+    return HttpResponse(status=405)
+
 
 
 def CheckIp(request, ip=None):
