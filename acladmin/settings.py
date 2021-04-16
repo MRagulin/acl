@@ -161,6 +161,7 @@ LOGGING = {
                         'handlers': ['file'],
                         'level': 'ERROR',
                         'propagate': True,
+                        'filename': LOGPATH,
                         },
                 },
 }

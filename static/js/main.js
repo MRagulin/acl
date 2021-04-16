@@ -325,7 +325,7 @@ $(document).ready(function(){
 
     });
 
-        $(".table-ip-internal").delegate(".input__ip__external", "change", function () {
+        $(".table-ip-internal").delegate("input[class*='input__ip']", "change", function () {
         let ip =  $(this).val().trim();
         let el = $(this).closest('td')[0];
         el = $(el).next('td');
@@ -333,29 +333,37 @@ $(document).ready(function(){
         if (el.length > 0)
             el = $(el).find("input[name*='input__mask']");
         if (!el) return false;
-        if (ip == '') return false;
+        if (ip == '' || window.location.href.indexOf('traffic') > 0) return false;
 
-        switch (ip) {
-            case '195.239.64.0':
-               $(el).val('25');
+        if (ip.indexOf('/') > 0)
+        {
+            ip = ip.split('/');
+            $(this).val(ip[0]);
+            $(el).val(ip[1]);
+        }
+         else {
+            switch (ip) {
+                case '195.239.64.0':
+                    $(el).val('25');
 
-            break;
+                    break;
 
-            case '195.239.64.192':
-               $(el).val('29');
-            break;
+                case '195.239.64.192':
+                    $(el).val('29');
+                    break;
 
-            case '195.239.64.200':
-               $(el).val('29');
-            break;
+                case '195.239.64.200':
+                    $(el).val('29');
+                    break;
 
-            case '195.239.64.224':
-               $(el).val('28');
-            break;
+                case '195.239.64.224':
+                    $(el).val('28');
+                    break;
 
-            case '195.239.64.128':
-               $(el).val('26');
-            break;
+                case '195.239.64.128':
+                    $(el).val('26');
+                    break;
+            }
         }
 
     });

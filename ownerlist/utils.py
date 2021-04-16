@@ -17,6 +17,7 @@ import xlrd
 import tempfile
 from django.shortcuts import reverse, redirect
 from docx import Document
+from docx.shared import RGBColor
 from docx.shared import Pt
 
 FUN_SPEED = 0
@@ -716,7 +717,6 @@ class ExtractDataXls:
             return self.ExtractIPInfo(domain_idx=col_index['domain'], ip_idx=col_index['ip'], owner_idx=col_index['owner'],
                                   comment_idx=col_index['comment'], stop_recurse=True, HasTags=Tags)
 
-
 def make_doc(request=None, data_set={}, fileuuid='')->str:
     """Функция для генерации docx файла"""
     TEMPLATE_FILE = os.path.join(BASE_DIR, 'templates//ACL.docx')
@@ -735,7 +735,6 @@ def make_doc(request=None, data_set={}, fileuuid='')->str:
                 if row_idx >= table_rows:
                     table_tmp.add_row()
                 table_tmp.cell(row_idx, 1).text = row_data
-
         else:
             row_cnt = 0
             if data not in data_set:
@@ -747,6 +746,12 @@ def make_doc(request=None, data_set={}, fileuuid='')->str:
                     table_tmp.cell(key, cell_idx).text = cell_val
 
                 row_cnt += 1
+
+    if 'taskid' in request.session:
+        if (request.session['taskid'] != ''):
+            p = doc.add_paragraph(request.session['taskid'])
+            table = doc.tables[0]
+            table._element.addnext(p._p)
 
     doc.save(os.path.join(BASE_DIR, APP_FILE))
     return '\\' + APP_FILE

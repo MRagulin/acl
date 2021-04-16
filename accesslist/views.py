@@ -42,6 +42,7 @@ class ObjectMixin:
             if '/new/' not in request.path:
                 tmp = get_object_or_404(ACL, id=str(acl_id))
                 request.session['LOCAL_STORAGE'] = json.loads(tmp.acltext)
+                request.session['taskid'] = tmp.taskid
                 request.session['action_make_docx'] = True
 
             context = {'acl_id': str(acl_id),
@@ -191,10 +192,11 @@ def save__form(request, owner_form:None, acl_id)->None:
             obj.acltext = json.dumps(request.session['LOCAL_STORAGE'])
             obj.is_executed = False
             obj.owner = user
-            if len(request.session['LOCAL_STORAGE']) <= 1:
-                obj.status = 'NOTFL'
-            else:
-                obj.status = 'FL'
+            if created:
+                if len(request.session['LOCAL_STORAGE']) <= 1:
+                    obj.status = 'NOTFL'
+                else:
+                    obj.status = 'FL'
             obj.project = owner_form[4]
             obj.save()
 
