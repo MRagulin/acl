@@ -142,7 +142,7 @@ LOGGING = {
     'formatters':
         {
             'file': {
-                'format': '%(levelname)s|%(asctime)s|%(module)s|%(process)d|%(thread)d|%(message)s',
+                'format': '%(levelname)s|%(asctime)s|%(module)s|%(process)d|%(filename)s|%(lineno)d|%(message)s',
                 'datefmt': '%d/%b/%Y %H:%M:%S'
                     }
          },

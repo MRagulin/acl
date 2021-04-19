@@ -19,6 +19,8 @@ from django.shortcuts import reverse, redirect
 from docx import Document
 from docx.shared import RGBColor
 from docx.shared import Pt
+import socket
+
 
 FUN_SPEED = 0
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -40,7 +42,7 @@ class BaseView(View):
         try:
             response = super().dispatch(request, *args, **kwargs)
         except Exception as e:
-            logger.error('[Ошибка] {} {} {}'.format(str(e), request.META.get('REMOTE_ADDR'), datetime.datetime.today().strftime('%Y-%m-%d-%H:%M:%S')))
+            logger.error('{}|{}|{}|{}'.format(request.path, str(e), request.META.get('REMOTE_ADDR'), datetime.datetime.today().strftime('%Y-%m-%d-%H:%M:%S')))
             messages.error(request, str(e))
             return HttpResponseRedirect(reverse('acldemo_urls')) #self.__response({'errorMessage': str(e)}, status=400)
 
@@ -212,6 +214,45 @@ def DeepSearch(request, string: str = ''):
             if result:
                 messages.add_message(request, messages.INFO,
                                      'По запросу {} ничего не найдено, но мы нашли похожую информацию:'.format(string))
+    if not result:
+        if re.match(r"[a-zA-Z0-9][a-zA-Z0-9-._]{1,61}", tmp):
+
+            result = Iplist.objects.filter(hostname=tmp)[:5]
+
+            if not result:
+                if '://' in tmp:
+                    tmp = tmp.split('://')[1]
+
+                if ('.vesta.ru' in tmp or '.alfastrah.ru' in tmp):
+                    tmp = tmp.split('.')[0]
+
+
+                result = Iplist.objects.filter(hostname__icontains=tmp)[:5]
+                if result:
+                    messages.add_message(request, messages.INFO,
+                                         'По запросу {} ничего не найдено, но мы нашли похожую информацию:'.format(
+                                             string))
+                if not result:
+                    result = Iplist.objects.filter(comment__icontains=tmp)[:5]
+                    if result:
+                        messages.add_message(request, messages.INFO,
+                                             'По запросу {} ничего не найдено, но мы нашли похожую информацию:'.format(
+                                                 string))
+                    else:
+                        try:
+                            tmp = socket.gethostbyname(tmp)
+                        except:
+                            pass
+                            if tmp:
+                                result = Iplist.objects.filter(ipv4__contains=tmp)[:5]
+                            if result:
+                                messages.add_message(request, messages.INFO,
+                                                     'По запросу {} ничего не найдено, но мы нашли похожую информацию:'.format(
+                                                         string))
+
+
+
+
         #result = Iplist.objects.filter(ipv4__contains=string)[:5]
     #time.sleep(5)
     return result
