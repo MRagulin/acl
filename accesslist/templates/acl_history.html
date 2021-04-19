@@ -22,7 +22,12 @@
     <select class="form-control" id="stage-names">
         {% if acl.APL_STATUS %}
             {% for status in  acl.APL_STATUS %}
-                <option data="{{ status.0 }}">{{ status.1 }}</option>
+                {% if status.0 == 'FL' %}
+                    <option data="{{ status.0 }}" selected="selected">{{ status.1 }}</option>
+                {% else %}
+                    <option data="{{ status.0 }}">{{ status.1 }}</option>
+                {% endif %}
+
             {% endfor %}
         {% endif %}
     </select>

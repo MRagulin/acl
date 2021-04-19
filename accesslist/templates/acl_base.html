@@ -96,7 +96,7 @@
          {% endif %}
     {% endfor %}
 
-    {% if FULL_STORAGE|length >= 4 %}
+    {% if FULL_STORAGE|length > 1 %}
         $(".descr-list a").last().removeClass('not-active');
     {% endif %}
 </script>

@@ -30,6 +30,7 @@ class ObjectMixin:
                 if reverse(FORM_URLS[0]) in request.META.get('HTTP_REFERER'):
                     request.session['uuid'] = str(uuid.uuid4())
                     request.session['LOCAL_STORAGE'] = {}
+                    request.session['taskid'] = None
                     return HttpResponseRedirect(reverse(FORM_URLS[1], kwargs={'acl_id': request.session['uuid']}))
         else:
             if 'uuid' in request.session is not None:
@@ -42,7 +43,7 @@ class ObjectMixin:
             if '/new/' not in request.path:
                 tmp = get_object_or_404(ACL, id=str(acl_id))
                 request.session['LOCAL_STORAGE'] = json.loads(tmp.acltext)
-                request.session['taskid'] = tmp.taskid
+                request.session['taskid'] = tmp.taskid or ''
                 request.session['action_make_docx'] = True
 
             context = {'acl_id': str(acl_id),
@@ -153,6 +154,7 @@ class AclDemo(BaseView, View):
     def get(self, request):
         request.session['LOCAL_STORAGE'] = {}
         request.session['uuid'] = 0
+        request.session['taskid'] = None
         if 'file_download' in request.session:
             try:
                 BASE = os.path.basename(request.session['file_download'])
@@ -244,6 +246,7 @@ class AclOver(BaseView, View):
 
                 del request.session['uuid']
                 del request.session['LOCAL_STORAGE']
+                del request.session['taskid']
 
         if obj:
             return render(request, 'acl_overview.html', context={'file_download': file_download, 'obj': obj.id})

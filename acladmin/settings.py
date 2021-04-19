@@ -139,31 +139,32 @@ else:
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
-    'formatters': {
-        'console': {
-            'format': '%(name)-12s %(levelname)-8s %(message)s'
-        },
-        'file': {
-            'format': '%(asctime)s %(name)-12s %(levelname)-8s %(message)s'
-        }
-    },
-    'handlers': {
+    'formatters':
+        {
             'file': {
-            'level': 'WARNING',
-            'class': 'logging.FileHandler',
-            'formatter': 'file',
-            'filename': LOGPATH,
-                    },
-            },
+                'format': '%(levelname)s|%(asctime)s|%(module)s|%(process)d|%(thread)d|%(message)s',
+                'datefmt': '%d/%b/%Y %H:%M:%S'
+                    }
+         },
+
+    'handlers': {
+             'file': {
+                'level' : 'WARNING',
+                'class' : 'logging.handlers.RotatingFileHandler',
+                'filename': LOGPATH,
+                'maxBytes': 1024*1024*5, # 5MB
+                'backupCount': 0,
+                'formatter': 'file',
+        },
+    },
 
     'loggers': {
-            'acladmin.custom': {
-                        'handlers': ['file'],
-                        'level': 'ERROR',
-                        'propagate': True,
-                        'filename': LOGPATH,
-                        },
-                },
+        '': {
+            'handlers': ['file'],
+            'level': 'WARNING',
+            'propagate': True,
+        },
+    },
 }
 
 
