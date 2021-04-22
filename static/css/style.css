@@ -83,7 +83,7 @@ body {
 }
 
 .menu-sidebar > .menu-sidebar-text {
-    margin-top: 130px;
+    margin-top: 15px;
     margin-right: 50px;
     width: 100%;
 }
@@ -800,4 +800,22 @@ input:not([type='checkbox']):valid+span:after, textarea:valid+span:after {
 
 .bd-callout-info {
   border-left-color: #5bc0de!important;
+}
+
+.input-group-addon {
+    padding: 6px 12px;
+    font-size: 14px;
+    font-weight: 400;
+    color: #555;
+    text-align: center;
+    background-color: #eee;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.input-group-addon:first-child {
+    border-right: 0;
+    border-bottom-right-radius: 0;
+    border-top-right-radius: 0;
+
 }
