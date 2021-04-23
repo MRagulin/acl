@@ -14,6 +14,9 @@ import uuid
 from django.views.decorators.csrf import csrf_exempt
 from django.core.paginator import Paginator
 from django.conf import settings
+from django.contrib.auth.mixins import LoginRequiredMixin
+
+
 
 class ObjectMixin:
     """Миксин обработки запросов и отобращение страниц"""
@@ -90,7 +93,8 @@ class ObjectMixin:
         return render(request, self.template, context={'acl_id': acl_id})
 
 
-class Aclhistory(BaseView, View):
+
+class Aclhistory(LoginRequiredMixin, BaseView, View):
     """История запросов"""
     def get(self, request, acl_id=None):
             if acl_id is not None:

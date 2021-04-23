@@ -43,6 +43,7 @@
 <div class="wrapper">
             <div class="menu-sidebar">
             <div class="user p-3 d-inline-flex" style="margin-top: 50px;    border-bottom: 1px solid #ccc;     width: 100%;">
+                {% if user.id is not None %}
                     <div class="photo rounded pr-2" style="width: 60px; height: 60px; color: #6c757d;border-radius: 50%!important;border:1px solid #ccc;text-align: center">
                         <div class="w-80" style="margin-top: 10px;margin-left: 10px;">
                             <i class="fas fa-user fa-2x"></i>
@@ -50,10 +51,15 @@
 
                     </div>
                     <div class="info rounded align-bottom pl-3" style="max-width: 170px; line-height: 5px; padding-top: 15px;">
-                       <span style="display: inline-block; vertical-align: middle;"> <p style="font-weight:600;font-size:13px;color:#545b62">{{ user.get_username }}</p></span><br>
-                       <span style="display: inline-block; vertical-align: middle;"> <p style="font-weight:600;font-size:13px;color:#545b62">{{ request.user }}</p></span><br>
-                       <span style="display: inline-block; vertical-align: middle;"> <p style="font-weight:600;font-size:13px;color:#545b62">{{ user.is_authenticated  }}</p></span><br>
+                       <span style="display: inline-block; vertical-align: middle;"> <p style="font-weight:600;font-size:14px;color:#545b62">{{ user.get_username }}</p></span><br>
+                        <a href="{% url 'logout' %}" class="text-danger mt-2" style="font-weight: 600;font-size: 13px;">Выйти</a>
+                   </div>
+
+                {% else %}
+                    <div class="text-center" style="padding-left: 30px">
+                        <a href="{% url 'login' %}" class="btn-lg btn-danger">Войти</a>
                     </div>
+                {% endif %}
 
              </div>
 

@@ -26,18 +26,20 @@
     <p>Пожалуйста, авторизуйтесь</p>
   {% endif %}
 {% endif %}
-
+        {% for item in form.fields %}
+            {{ item.value }}
+        {%endfor %}
 
         <form id="loginform" class="form-horizontal p-2" role="form" method="post" name="loginform" action="{% url 'login' %}">
                             {% csrf_token %}
                             <div style="margin-bottom: 25px" class="input-group">
                                         <span class="input-group-addon"><i class="fa fa-user"></i></span>
-                                        <input id="login-username" type="text" class="form-control" name="username" value="" placeholder="Имя пользователя или пароль" autofocus required>
+                                        <input id="login-username" value="{{ request.POST.username }}" type="text" class="form-control" name="username" value="" placeholder="Имя пользователя (IvanovII)" autofocus required>
                                     </div>
 
                             <div style="margin-bottom: 25px" class="input-group">
                                         <span class="input-group-addon"><i class="fa fa-lock"></i></span>
-                                        <input id="login-password" type="password" class="form-control" name="password" placeholder="Пароль" required>
+                                        <input id="login-password" type="password" class="form-control" name="password" placeholder="Пароль" value="{{ request.POST.password }}" required>
                                     </div>
 
 
@@ -71,8 +73,11 @@
 
 </div>
 </div>
-    </div>
+</div>
 <script>
+    {% if user.id is not None %}
+        document.location.href='/';
+    {% endif %}
 $('.modal').modal('show');
 $("#login-username").focus();
 </script>

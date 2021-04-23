@@ -2,22 +2,15 @@
 {% load static %}
 {% block row %}
  <div class="col-2 d-none d-md-block d-lg-block" style="min-width: 373px;">
-
             <img class="img-fluid" src="{% static 'img/demo.png' %}" style="min-height: 550px">
             </div>
             <div class="col-7 mt-3">
              {% if messages %}
-{#     <script>#}
-{#    {% for message in messages %}#}
-{#           ShowNotify(idx=0, text={{ message }});#}
-{#    {% endfor %}#}
- {#     </script> #}
-
-     {% for message in messages %}
-          <div class="alert alert-danger text-center align-content-center align-bottom col-2" style="max-width: 850px">
-            Ошибка: {{ message }}
-          </div>
-    {% endfor %}
+                 {% for message in messages %}
+                      <div class="alert alert-danger text-center align-content-center align-bottom col-2" style="max-width: 850px">
+                        Ошибка: {{ message }}
+                      </div>
+                {% endfor %}
 {% endif %}
                 <div class="card text-center border-0">
                       <div class="card-body">
@@ -36,19 +29,26 @@
                                </ul>
                             </div>
                         </div>
-                     <div class="form-check form-check-inline start-0">
-                         <div class="mr-5">
-                         <input class="form-check-input" type="checkbox" id="flexAgreementCheck" required>
-                          <label class="form-check-label" for="flexAgreementCheck">
-                            Всё понятно
-                          </label>
-                         </div>
+
+                          {% if user.is_authenticated %}
+                          <div class="form-check form-check-inline start-0">
+                            <div class="mr-5">
+                                <input class="form-check-input" type="checkbox" id="flexAgreementCheck" required>
+                                <label class="form-check-label" for="flexAgreementCheck">
+                                    Всё понятно
+                                </label>
+                             </div>
                          <a href="{% url 'aclcreate_urls' %}" class="btn btn-success btn-lg btn-start not-active">Начать</a>
-                    </div>
+                        </div>
+                          {% endif %}
                       </div>
                 </div>
 
             </div>
+
+{% if user.is_authenticated %}
+{% endif %}
+
 <script>
     $(".post-sidebar").addClass("d-none");
     $(function(){
