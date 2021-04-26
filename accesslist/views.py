@@ -94,13 +94,19 @@ class ObjectMixin:
 
 
 
-class Aclhistory(LoginRequiredMixin, BaseView, View):
+class Aclhistory(BaseView, LoginRequiredMixin, View):
     """История запросов"""
     def get(self, request, acl_id=None):
             if acl_id is not None:
-                acllist= ACL.objects.filter(id__exact=acl_id)
+                if request.user.is_staff:
+                    acllist= ACL.objects.filter(id__exact=acl_id)
+                else:
+                    acllist = ACL.objects.filter(id__exact=acl_id, owner__email__iexact=request.user.email)
             else:
-                acllist = ACL.objects.order_by("-created", "-pkid")
+                if request.user.is_staff:
+                    acllist = ACL.objects.order_by("-created", "-pkid")
+                else:
+                    acllist = ACL.objects.filter(owner__email__iexact=request.user.email).order_by("-created", "-pkid")
             paginator = Paginator(acllist, 10)
             page_number = request.GET.get('page', 1)
             page = paginator.get_page(page_number)
@@ -210,7 +216,7 @@ def save__form(request, owner_form:None, acl_id)->None:
         messages.error(request, 'Ошибка, мы не смогли записать данные в БД. {}'.format(e))
     return obj or None
 
-class AclOver(BaseView, View):
+class AclOver(BaseView, LoginRequiredMixin, View):
     """Страница формирования ACL файла и других активностей"""
     def get(self, request, acl_id=None):
         if acl_id is None or 'LOCAL_STORAGE' not in request.session or 'uuid' not in request.session:
@@ -218,11 +224,6 @@ class AclOver(BaseView, View):
         obj = None
         file_download = None
 
-        #t = t / 0
-        # if '/new/' in request.path:
-        #     if 'uuid' in request.session and request.session['uuid'] != str(acl_id):
-        #         HttpResponseRedirect(reverse(FORM_URLS[0]))
-        # else:
         if 'uuid' in request.session is not None:
                     if '/new/' in request.path:
                         if str(acl_id) != request.session['uuid']:

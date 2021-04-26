@@ -40,6 +40,10 @@
                              </div>
                          <a href="{% url 'aclcreate_urls' %}" class="btn btn-success btn-lg btn-start not-active">Начать</a>
                         </div>
+                          {% else %}
+                              <div class="text-center" style="padding-left: 30px">
+                                <a href="/accounts/login/" class="btn-lg btn-danger btn-auth">Войти</a>
+                            </div>
                           {% endif %}
                       </div>
                 </div>
@@ -51,6 +55,11 @@
 
 <script>
     $(".post-sidebar").addClass("d-none");
+    $(".btn-auth").click(function(e){
+        e.preventDefault();
+        $(".modal-auth").modal('show');
+        $("#login-username").focus();
+    });
     $(function(){
         function animatedownload(){
                 $(".spinner-border").hide();

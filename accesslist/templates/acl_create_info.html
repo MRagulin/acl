@@ -1,7 +1,7 @@
 {% extends 'acl_base.html' %}
 {% load static %}
-
 {% block row %}
+{% if LOCAL_STORAGE %}
  <div class="col-12">
     {% if '/new/' in request.path %}
         <form method="post" action="{% url 'aclcreate_urls' acl_id=acl_id %}" name="acl-form-contacts">
@@ -39,7 +39,7 @@
             <div class="contact-form">
               <label class="contact-form__label">
                 <span class="contact-form__text">ФИО</span>
-                <input type="text" class="contact__input" value="{% if LOCAL_STORAGE %}{{ LOCAL_STORAGE.0 }}{% endif %}" placeholder="Иванов Иван" name="name" pattern="[А-Яа-яЁё\s]{3,32}" title="Username should only contain lowercase letters. e.g. john" autofocus required>
+                <input type="text" class="contact__input" value="{% if LOCAL_STORAGE %}{{ LOCAL_STORAGE.0 }}{% endif %}" placeholder="Иванов Иван" name="name" pattern="[А-Яа-яЁё\s]{3,32}"  autofocus required>
                 <span class="validity"></span>
 
               </label>
@@ -82,7 +82,6 @@
 
               <label class="contact-form__label-checkbox">
                 <span class="contact-form__text">Дата ввода в эсплуатацию </span>
-{#                <input type="date" class="contact__input" name="d_start" id="contact__input__start" placeholder="21.01.2020" value="2023-12-01" min="2020-01-01" max="2030-01-01" required>#}
                  <input type="date" class="contact__input" name="d_start" id="contact__input__start" min="2020-01-01" max="2040-01-01" placeholder="21.01.2020" value="{{LOCAL_STORAGE.7}}" required>
 
                 <span class="validity"></span>
@@ -90,17 +89,20 @@
 
               <label class="contact-form__label-checkbox">
                 <span class="contact-form__text">Дата вывода из эксплуатации</span>
-                <input type="date" class="contact__input" id="contact__input__term" value="{% if LOCAL_STORAGE %}{% if LOCAL_STORAGE.8 != 'Нет' %}{{ LOCAL_STORAGE.8}}{% endif %}{% endif %}" name="d_complate" placeholder="30.12.2030" min="2020-01-01" max="2040-01-01" required {% if LOCAL_STORAGE.8 == 'Нет' %}disabled{% endif %}>
+               {% if LOCAL_STORAGE.8 == 'Нет' %}
+				<input type="date" class="contact__input" id="contact__input__term" value="" name="d_complate" placeholder="30.12.2030" min="2020-01-01" max="2040-01-01" required disabled>
+				{% else %}
+				<input type="date" class="contact__input" id="contact__input__term" value="{{ LOCAL_STORAGE.8}}" name="d_complate" placeholder="30.12.2030" min="2020-01-01" max="2040-01-01" required>
+				{% endif %}
                 <span class="validity"></span>
                 <div style="white-space:nowrap;padding-top:5px;">
                     <input type="checkbox" class="checkbox__real" id="checkbox__real__term" name="d_complete" {% if LOCAL_STORAGE.8 == 'Нет' %}checked{% endif %}>
                     <label for="checkbox__real__term" style="vertical-align: bottom;">Бессрочно</label>
                 </div>
-{#                <span class="checkbox__title checkbox__title-active">Бессрочно</span>#}
               </label>
 
               <label class="contact-form__label-checkbox">
-                <span class="contact-form__text contact-form__text-active">Дата заполнения </span>
+                <span class="contact-form__text contact-form__text-active">Дата заполнения</span>
                 <input type="date" class="contact__input" value="{% if LOCAL_STORAGE %}{{ LOCAL_STORAGE.6}}{% endif %}" name="d_form" id="contact__input__date" placeholder="21.01.2020" min="2020-01-01" max="2040-01-01" required>
                 <span class="validity"></span>
             </label>
@@ -113,7 +115,6 @@
                 {% endif %}
                 </script>
               {% endif %}
-
           </div>
           <div class="form-row__footer">
           <div class="contact-form__submit">
@@ -148,4 +149,140 @@
 </script>
 </form>
 </div>
+
+{% else%}
+
+ <div class="col-12">
+    {% if '/new/' in request.path %}
+        <form method="post" action="{% url 'aclcreate_urls' acl_id=acl_id %}" name="acl-form-contacts">
+    {% else %}
+        <form method="post" action="{% url 'aclcreate_urls'%}{{ acl_id }}/" name="acl-form-contacts">
+    {% endif %}
+    {% csrf_token %}
+<div class="pl-3 pr-3 pt-3">
+           <div class="main-block">
+           <div class="main-title-block d-inline-flex w-100 mb-3">
+                   <div class="justify-content-start">
+                       <h4 class="main-title">1. Контактная информация <span class="badge badge-danger">Required</span></h4>
+                   </div>
+                    <div class="col align-self-end">
+                         {% if messages %}
+                                  {% for message in messages %}
+                                      {% if message.tags == 'error' %}
+                                          <div class="alert alert-danger" style="max-width: 510px">
+                                      {% else %}
+                                          <div class="alert alert-warning" style="max-width: 510px">
+                                      {% endif %}
+                                        {{ message }}
+                                      </div>
+                                  {% endfor %}
+                        {% endif %}
+                    </div>
+                    {%  if 'new' not in request.path %}
+                    <div class="justify-content-end">
+                         <button class="btn btn-danger btn-remove m-1">Удалить</button>
+                  </div>
+                  {% endif %}
+          </div>
+          <div class="main-form">
+            <div class="contact-form">
+              <label class="contact-form__label">
+                <span class="contact-form__text">ФИО</span>
+                <input type="text" class="contact__input" value="{{ user.last_name}} {{user.first_name }}" placeholder="Иванов Иван" name="name" pattern="[А-Яа-яЁё\s]{3,32}" autofocus required>
+                <span class="validity"></span>
+
+              </label>
+              <label class="contact-form__label">
+                <span class="contact-form__text">Отдел/Управление</span>
+                <input type="text" name="department" value="{{ user.department }}" class="contact__input" placeholder="УИБ" pattern="[А-Яа-яЁёA-Za-z\s]{2,32}" required>
+                <span class="validity"></span>
+              </label>
+
+              <label class="contact-form__label">
+                <span class="contact-form__text">Email</span>
+                <input type="email" name="email" value="{{ user.email }}" class="contact__input" placeholder="Norepl@Alfastrah.ru" pattern=".+@alfastrah.ru" required>
+                <span class="validity"></span>
+              </label>
+
+              <label class="contact-form__label">
+                <span class="contact-form__text">Проект/ИС</span>
+                <input type="text" name="project" value="" class="contact__input" placeholder="Легкий Вход" pattern=".{3,}" required>
+                <span class="validity"></span>
+              </label>
+
+              <label class="contact-form__label">
+                <span class="contact-form__text">Телефон</span>
+                <input type="tel" name="tel"value="{{ user.mphone }}"  class="contact__input" placeholder="89096971821" pattern="(\+)?[0-9]{4,}">
+                   <span class="validity"></span>
+              </label>
+
+
+             <label class="contact-form__label">
+                <span class="contact-form__text" style="max-width: 140px">Описание
+                    проекта*</span>
+                <input type="url" name="link" value="" class="contact__input" placeholder="https://wiki.alfastrah.ru/pages/viewpage.action?pageId=133435707" pattern=".+(wiki.alfastrah.ru)+(.){5,}" required>
+                <span class="validity"></span>
+              </label>
+</div>
+
+          </div>
+          <div class="form-row__bottom form-check-inline">
+ <div class="contact-form__dates">
+
+              <label class="contact-form__label-checkbox">
+                <span class="contact-form__text">Дата ввода в эсплуатацию </span>
+                 <input type="date" class="contact__input" name="d_start" id="contact__input__start" min="2020-01-01" max="2040-01-01" placeholder="21.01.2020" value="" required>
+                <span class="validity"></span>
+              </label>
+
+              <label class="contact-form__label-checkbox">
+                <span class="contact-form__text">Дата вывода из эксплуатации</span>
+                <input type="date" class="contact__input" id="contact__input__term" value="" name="d_complate" placeholder="30.12.2030" min="2020-01-01" max="2040-01-01" required>
+                <span class="validity"></span>
+                <div style="white-space:nowrap;padding-top:5px;">
+                    <input type="checkbox" class="checkbox__real" id="checkbox__real__term" name="d_complete">
+                    <label for="checkbox__real__term" style="vertical-align: bottom;">Бессрочно</label>
+                </div>
+              </label>
+
+              <label class="contact-form__label-checkbox">
+                <span class="contact-form__text contact-form__text-active">Дата заполнения </span>
+                <input type="date" class="contact__input" value="" name="d_form" id="contact__input__date" placeholder="21.01.2020" min="2020-01-01" max="2040-01-01" required>
+                <span class="validity"></span>
+            </label>
+            </div>
+          </div>
+          <div class="form-row__footer">
+          <div class="contact-form__submit">
+          <label class="label-form__submit">
+          <input type="checkbox" class="checkbox__real-submit" name="action_make_docx" checked>
+          <span class="checkbox__fake"></span>
+          <span class="checkbox__title-footer">Создать docx файл</span>
+          </label>
+         <label class="label-form__submit">
+          <input type="checkbox" class="checkbox__real-submit" name="action_make_omni" onclick="ShowNotify(1, message[10]); return false;">
+          <span class="checkbox__fake"></span>
+          <span class="checkbox__title-footer">Отправить обращение в OmniTracker</span>
+          </label>
+
+          <label class="label-form__submit">
+          <input type="checkbox" class="checkbox__real-submit" name="action_make_git" onclick="ShowNotify(1, message[10]); return false;">
+          <span class="checkbox__fake"></span>
+          <span class="checkbox__title-footer">Создать обращение через Gitlab</span>
+          </label>
+          </div>
+              <input type="submit" class="btn btn-success" value="Сохранить И Продолжить">
+          </div>
+
+</div>
+
+<script>
+    $(".post-sidebar").removeClass("d-none");
+    $("#contact__input__date, #contact__input__start").val(GetCurrentDate());
+</script>
+</form>
+</div>
+
+{% endif%}
+
 {% endblock %}

@@ -14,8 +14,9 @@ from .models import Iplist, Tags, Owners
 from django.core.paginator import Paginator
 from django.views.decorators.csrf import csrf_exempt
 import socket
+from django.contrib.auth.mixins import LoginRequiredMixin
 
-class IpTable(BaseView, View):
+class IpTable(BaseView, LoginRequiredMixin, View):
     def get(self, request):
         context = {}
         if not 'dataset' in request.GET:
