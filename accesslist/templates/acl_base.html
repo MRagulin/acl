@@ -99,6 +99,17 @@
     {% if FULL_STORAGE|length > 1 %}
         $(".descr-list a").last().removeClass('not-active');
     {% endif %}
+
+ {% if '/new/' not in request.path %}
+    $(".main-feed li:last-child > a").click(function () {
+        if  (window.confirm("Данное обращение уже создано, хотите сформировать еще раз?")){
+            return true;
+        } else
+        {
+            return false;
+        }
+    });
+{% endif %}
 </script>
 </div>
 

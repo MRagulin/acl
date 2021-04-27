@@ -50,8 +50,7 @@
 
             </div>
 
-{% if user.is_authenticated %}
-{% endif %}
+
 
 <script>
     $(".post-sidebar").addClass("d-none");
@@ -68,5 +67,10 @@
         };
         window.setTimeout(animatedownload, 3000);
     });
+
+{% if not user.is_authenticated %}
+    $(".modal-auth").modal('show');
+    $("#login-username").focus();
+{% endif %}
 </script>
 {% endblock %}

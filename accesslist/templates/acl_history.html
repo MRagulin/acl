@@ -15,7 +15,7 @@
           <span aria-hidden="true">&times;</span>
         </button>
       </div>
-      <div class="modal-body">
+<div class="modal-body">
 <form action="{% url 'acl_stage_change' %}" method="post" name="stage-data" id="stage-data">
  <div class="form-group">
     <label for="stage-names">Выберите значение</label>
@@ -49,7 +49,9 @@
  {% if acllists %}
     <div class="p-1 mt-1 w-80">
         <div class="p-1 history-activity" style="display: none">
+            {% if user.is_staff %}
             <button class="btn btn-secondary btn-stage m-1" disabled>Изменить статус</button>
+            {% endif %}
             <button class="btn btn-danger btn-remove m-1" disabled>Удалить</button>
         </div>
         <table class="table table-hover table-borderles table-sm table-history" style="border: 1px solid #dee2e6">

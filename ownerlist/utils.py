@@ -223,7 +223,7 @@ def DeepSearch(request, string: str = ''):
                 if '://' in tmp:
                     tmp = tmp.split('://')[1]
 
-                if ('.vesta.ru' in tmp or '.alfastrah.ru' in tmp):
+                if ('.vesta.ru' in tmp or '.alfastrah.ru' in tmp or '.dyn.vesta.ru' in tmp):
                     tmp = tmp.split('.')[0]
 
 
@@ -243,9 +243,9 @@ def DeepSearch(request, string: str = ''):
                             tmp = socket.gethostbyname(tmp)
                         except:
                             pass
-                            if tmp:
+                        if tmp:
                                 result = Iplist.objects.filter(ipv4__contains=tmp)[:5]
-                            if result:
+                        if result:
                                 messages.add_message(request, messages.INFO,
                                                      'По запросу {} ничего не найдено, но мы нашли похожую информацию:'.format(
                                                          string))
