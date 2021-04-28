@@ -149,7 +149,7 @@ LOGGING = {
 
     'handlers': {
         'file': {
-                'level' : 'INFO',
+                'level' : 'WARNING',
                 'class' : 'logging.handlers.RotatingFileHandler',
                 'filename': LOGPATH,
                 'maxBytes': 1024*1024*5, # 5MB
@@ -170,7 +170,7 @@ LOGGING = {
 
         "django_python3_ldap": {
             "handlers": ["file"],
-            "level": "INFO",
+            "level": "WARNING",
         },
     },
 }
@@ -185,7 +185,7 @@ AUTHENTICATION_BACKENDS = (
 
 )
 LDAP_AUTH_URL = "ldap://dc8.vesta.ru:389"
-LDAP_AUTH_USE_TLS = False
+LDAP_AUTH_USE_TLS = True
 LDAP_AUTH_SEARCH_BASE = "ou=Back1,dc=vesta,dc=ru"
 
 LDAP_AUTH_OBJECT_CLASS = "organizationalPerson"

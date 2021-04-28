@@ -20,7 +20,8 @@ from docx import Document
 from docx.shared import RGBColor
 from docx.shared import Pt
 import socket
-
+import codecs
+import json
 
 FUN_SPEED = 0
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -33,6 +34,14 @@ POST_FORM_EMPTY = ['on', '', None]
 JSON_DUMPS_PARAMS = {
     'ensure_ascii': False
 }
+left_rule = {'<': ':', '^': ':', '>': '-'}
+right_rule = {'<': '-', '^': ':', '>': ':'}
+
+contact_column = ["Параметр", "Значение"]
+contact_table = ["ФИО", "E-mail", "Телефон", "Отдел/Управление", "Информационная система", "Описание/архитектура проекта", "Дата заполнения", "Дата ввода в эксплуатацию", "Дата вывода из эксплуатации"]
+standart_column = ["IP-адрес", "Маска подсети/Префикс", "Описание"]
+traffic_column = ["Hostname (Источник)", "IP Address (Источник)	", "Hostname (Назначение)", "IP Address (Назначение)", "Protocol/Port (Назначение)", "Описание (цель)"]
+
 
 logger = logging.getLogger(__name__)
 
@@ -120,6 +129,9 @@ def request_handler(request, namespace=''):
                    # return False
             if request.POST.get('action_make_docx') == 'on':
                 request.session['action_make_docx'] = True
+
+            if request.POST.get('action_make_git') == 'on':
+                request.session['action_make_git'] = True
 
     else:
         if namespace == FORM_APPLICATION_KEYS[-1]: #last
@@ -804,3 +816,146 @@ def is_valid_uuid(uuid_to_test, version=4):
     except ValueError:
         return False
     return str(uuid_obj) == uuid_to_test
+
+
+def evalute_field(record, field_spec):
+    """
+    Evalute a field of a record using the type of the field_spec as a guide.
+    """
+    if type(field_spec) is int:
+        return str(record[field_spec])
+    elif type(field_spec) is str:
+        return str(getattr(record, field_spec))
+    else:
+        return str(field_spec(record))
+
+
+def table(records, fields, headings=None, alignment=None, file=None):
+    """
+    https[:]//stackoverflow[.]com/questions/13394140/generate-markdown-tables
+    Generate a Doxygen-flavor Markdown table from records.
+
+    file -- Any object with a 'write' method that takes a single string
+        parameter.
+    records -- Iterable.  Rows will be generated from this.
+    fields -- List of fields for each row.  Each entry may be an integer,
+        string or a function.  If the entry is an integer, it is assumed to be
+        an index of each record.  If the entry is a string, it is assumed to be
+        a field of each record.  If the entry is a function, it is called with
+        the record and its return value is taken as the value of the field.
+    headings -- List of column headings.
+    alignment - List of pairs alignment characters.  The first of the pair
+        specifies the alignment of the header, (Doxygen won't respect this, but
+        it might look good, the second specifies the alignment of the cells in
+        the column.
+
+        Possible alignment characters are:
+            '<' = Left align (default for cells)
+            '>' = Right align
+            '^' = Center (default for column headings)
+    """
+
+    num_columns = len(fields)
+    if headings:
+        assert len(headings) == num_columns
+
+    # Compute the table cell data
+    columns = [[] for i in range(num_columns)]
+    for record in records:
+        for i, field in enumerate(fields):
+            columns[i].append(evalute_field(record, field))
+
+    # Fill out any missing alignment characters.
+    extended_align = alignment if alignment != None else []
+    if len(extended_align) > num_columns:
+        extended_align = extended_align[0:num_columns]
+    elif len(extended_align) < num_columns:
+        extended_align += [('^', '<')
+                           for i in range[num_columns - len(extended_align)]]
+
+    heading_align, cell_align = [x for x in zip(*extended_align)]
+
+    field_widths = [len(max(column, key=len)) if len(column) > 0 else 0
+                    for column in columns]
+    if headings:
+        heading_widths = [max(len(head), 2) for head in headings]
+
+    else:
+        heading_widths = field_widths
+
+    column_widths = [max(x) for x in zip(field_widths, heading_widths)]
+
+    _ = ' | '.join(['{:' + a + str(w) + '}'
+                    for a, w in zip(heading_align, column_widths)])
+    heading_template = '| ' + _ + ' |'
+    _ = ' | '.join(['{:' + a + str(w) + '}'
+                    for a, w in zip(cell_align, column_widths)])
+
+    row_template = '| ' + _ + ' |'
+
+    _ = ' | '.join([left_rule[a] + '-' * (w - 2) + right_rule[a]
+                    for a, w in zip(cell_align, column_widths)])
+    ruling = '| ' + _ + ' |'
+
+    if file is not None:
+        if headings:
+            file.write(heading_template.format(*headings).rstrip() + '\n')
+        file.write(ruling.rstrip() + '\n')
+        for row in zip(*columns):
+            file.write(row_template.format(*row).rstrip() + '\n')
+        file.write('\n')
+        file.write('\n')
+
+
+def MakeMarkDown(json_data, filename):
+    """Функция записывает JSON как md файл"""
+
+    file = codecs.open('static/md/' + filename + '.md', "w", encoding="utf-8")
+    data = json_data #json.loads(json_data)
+    for key in data:
+        if key == 'acl_create_info.html':
+            file.write('## {}'.format(data[key][4]))
+            file.write('\n')
+            file.write('##### Описание доступа к ресурсам')
+            file.write('\n')
+            tmp = zip(contact_table, data[key])
+            fields = [0, 1]
+            table(records=tmp, fields=fields, headings=contact_column, alignment=[('<', '<'), ('<', '<')], file=file)
+
+        elif key == 'acl_internal_resources.html':
+            file.write('\n')
+            file.write('##### Список внутренних ресурсов (СГ АльфаСтрахование)')
+            file.write('\n')
+            fields = [0, 1, 2]
+            table(records=data[key], fields=fields, headings=standart_column,
+                  alignment=[('<', '<'), ('^', '^'), ('<', '<')], file=file)
+
+
+        elif key == 'acl_dmz_resources.html':
+            file.write('\n')
+            file.write('##### Список DMZ ресурсов (СГ АльфаСтрахование)')
+            file.write('\n')
+            fields = [0, 1, 2]
+            table(records=data[key], fields=fields, headings=standart_column,
+                  alignment=[('<', '<'), ('^', '^'), ('<', '<')], file=file)
+
+        elif key == 'acl_external_resources.html':
+            file.write('\n')
+            file.write('##### Список внешних ресурсов (Internet)')
+            file.write('\n')
+            fields = [0, 1, 2]
+            table(records=data[key], fields=fields, headings=standart_column,
+                  alignment=[('<', '<'), ('^', '^'), ('<', '<')], file=file)
+
+        elif key == 'acl_traffic.html':
+            file.write('\n')
+            file.write('##### Потоки трафика')
+            file.write('\n')
+            fields = [0, 1, 2, 3, 4, 5]
+            table(records=data[key], fields=fields, headings=traffic_column,
+                  alignment=[('<', '<'), ('<', '<'), ('<', '<'), ('<', '<'), ('<', '<'), ('<', '<'), ], file=file)
+    if file:
+        file.close()
+
+    return '../../../static/md/' + filename + '.md'
+

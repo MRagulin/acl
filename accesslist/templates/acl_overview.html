@@ -13,8 +13,11 @@
                             <li class="list-group-item border-0"><p class="card-text">Скоро сотрудники ОТБ займутся вашим обращением. </p></li>
                             {% endif %}
                             {% if file_download and file_download != 'None' %}
-                                <li class="list-group-item d-none border-0"><a href="{{file_download}}" class="card-link card-download-file text-success"><i class="fas fa-file-word pr-1"></i> Скачать файл</a></li>
-                                <li class="list-group-item border-0">
+                                <li class="list-group-item d-none border-0"><a href="{{file_download}}" class="card-link card-download-file text-success"><i class="fas fa-file-word pr-1"></i> Скачать docx файл</a></li>
+                                {% if file_md and file_md != 'None' %}
+                                <li class="list-group-item d-none border-0"><a href="{{file_md}}" style="font-size: 18px" class="card-link card-download-file text-primary"><i class="fab fa-github pr-1"></i> Скачать md-файл</a></li>
+                                {% endif %}
+                                 <li class="list-group-item border-0">
                                  <div class="d-flex justify-content-center">
                                       <div class="spinner-border text-success" role="status">
                                           <span class="sr-only">Loading...</span>

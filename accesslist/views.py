@@ -7,7 +7,7 @@ from django.http import HttpResponse
 from .models import ACL
 from ownerlist.models import Owners, Iplist
 import os
-from ownerlist.utils import make_doc, request_handler, is_valid_uuid, ip_status, logger, get_client_ip
+from ownerlist.utils import make_doc, MakeMarkDown, request_handler, is_valid_uuid, ip_status, logger, get_client_ip
 from ownerlist.utils import FORM_APPLICATION_KEYS, FORM_URLS, BaseView
 import json
 import uuid
@@ -168,14 +168,30 @@ class AclDemo(BaseView, View):
         if 'file_download' in request.session:
             try:
                 BASE = os.path.basename(request.session['file_download'])
-                BASE = os.path.join(settings.BASE_DIR, 'static//docx//' + BASE)
-                if os.path.exists(BASE):
-                    os.remove(BASE)
-            except:
-                pass
+                if BASE:
+                    BASE = os.path.join(settings.BASE_DIR, 'static//docx//' + BASE)
+                    if os.path.exists(BASE):
+                        os.remove(BASE)
             finally:
                 del request.session['file_download']
                 BASE = None
+
+        if 'file_download_md' in request.session:
+            try:
+                BASE = os.path.basename(request.session['file_download_md'])
+                if BASE:
+                    BASE = os.path.join(settings.BASE_DIR, 'static//md//' + BASE)
+                    if os.path.exists(BASE):
+                        os.remove(BASE)
+            finally:
+                del request.session['file_download_md']
+                BASE = None
+
+
+
+
+
+
         return render(request, 'acl_demo.html')
 
 
@@ -223,7 +239,7 @@ class AclOver(BaseView, LoginRequiredMixin, View):
             return HttpResponseRedirect(reverse('acldemo_urls'))
         obj = None
         file_download = None
-
+        file_md = None
         if 'uuid' in request.session is not None:
                     if '/new/' in request.path:
                         if str(acl_id) != request.session['uuid']:
@@ -246,6 +262,12 @@ class AclOver(BaseView, LoginRequiredMixin, View):
                             except Exception as e:
                                 messages.error(request, 'К сожалению, при создании файла, что-то пошло не так. '
                                                         'Мы уже занимаемся устранением. {}'.format(e))
+
+                if 'action_make_git' in request.session:
+                    file_md = MakeMarkDown(request.session['LOCAL_STORAGE'], 'acl_{}'.format(str(acl_id))) or 'None'
+                    request.session['file_download_md'] = file_md
+                    del request.session['action_make_git']
+
                 owner_form = request.session['LOCAL_STORAGE'][FORM_APPLICATION_KEYS[0]]
                 obj = save__form(request, owner_form, acl_id)
 
@@ -254,9 +276,13 @@ class AclOver(BaseView, LoginRequiredMixin, View):
                 del request.session['taskid']
 
         if obj:
-            return render(request, 'acl_overview.html', context={'file_download': file_download, 'obj': obj.id})
+            return render(request, 'acl_overview.html', context={'file_download': file_download,
+                                                                 'file_md': file_md,
+                                                                 obj: obj.id})
         else:
-            return render(request, 'acl_overview.html', context={'file_download': file_download, 'acl_id': acl_id})
+            return render(request, 'acl_overview.html', context={'file_download': file_download,
+                                                                 'file_md': file_md,
+                                                                 'acl_id': acl_id})
 
 @csrf_exempt
 def AclStageChange(request,  *args, **kwargs):
