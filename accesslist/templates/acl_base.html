@@ -101,7 +101,7 @@
     {% endif %}
 
  {% if '/new/' not in request.path %}
-    $(".main-feed li:last-child > a").click(function () {
+    $(".main-feed > .post li:last-child > a").click(function () {
         if  (window.confirm("Данное обращение уже создано, хотите сформировать еще раз?")){
             return true;
         } else
