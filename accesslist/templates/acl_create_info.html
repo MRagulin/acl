@@ -63,7 +63,7 @@
 
               <label class="contact-form__label">
                 <span class="contact-form__text">Телефон</span>
-                <input type="tel" name="tel"value="{% if LOCAL_STORAGE %}{{ LOCAL_STORAGE.2 }}{% endif %}"  class="contact__input" placeholder="89096971821" pattern="(\+)?[0-9]{4,}">
+                <input type="tel" name="tel"value="{% if LOCAL_STORAGE %}{{ LOCAL_STORAGE.2 }}{% endif %}"  class="contact__input" placeholder="89096971821" pattern="(\+)?[0-9]{4,}|(Нет)?">
                    <span class="validity"></span>
               </label>
 
@@ -212,7 +212,7 @@
 
               <label class="contact-form__label">
                 <span class="contact-form__text">Телефон</span>
-                <input type="tel" name="tel"value="{{ user.mphone }}"  class="contact__input" placeholder="89096971821" pattern="(\+)?[0-9]{4,}">
+                <input type="tel" name="tel"value="{{ user.mphone }}"  class="contact__input" placeholder="89096971821" pattern="(\+)?[0-9]{4,}|(Нет)?">
                    <span class="validity"></span>
               </label>
 

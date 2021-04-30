@@ -909,8 +909,8 @@ def table(records, fields, headings=None, alignment=None, file=None):
 
 def MakeMarkDown(json_data, filename):
     """Функция записывает JSON как md файл"""
-
-    file = codecs.open('static/md/' + filename + '.md', "w", encoding="utf-8")
+    tmp = os.path.join(BASE_DIR, 'static/md/' + filename + '.md')
+    file = codecs.open(tmp, "w", encoding="utf-8")
     data = json_data #json.loads(json_data)
     for key in data:
         if key == 'acl_create_info.html':
