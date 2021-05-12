@@ -25,7 +25,12 @@
 </head>
 <body>
   <header class="header">
-    <div class="center-block">
+      {% if user.is_staff %}
+      <div class="ml-5" style="max-height: 25px;">
+          <p class="badge badge-danger">Администратор</p>
+      </div>
+      {% endif %}
+    <div class="center-block" style="width: 90%;margin: 0 auto;">
       <div class="header-block col-lg-6 col-md-8 col-sm-12">
         <form action="{%  url 'search' %}" method="GET" autocomplete="off" name="search-text" class="w-100" role="search" onsubmit="search_from_page(this);">
             <input type="text" class="search-input" id="search-input-text" placeholder="Поиск IP, домена, uuid обращения">
