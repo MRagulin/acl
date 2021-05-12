@@ -15,7 +15,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.core.paginator import Paginator
 from django.conf import settings
 from django.contrib.auth.mixins import LoginRequiredMixin
-
+import re
 
 
 class ObjectMixin:
@@ -165,6 +165,9 @@ class AclDemo(BaseView, View):
         request.session['LOCAL_STORAGE'] = {}
         request.session['uuid'] = 0
         request.session['taskid'] = None
+        if 'GIT_URL' in request.session:
+           del request.session['GIT_URL']
+
         if 'file_download' in request.session:
             try:
                 BASE = os.path.basename(request.session['file_download'])
@@ -220,17 +223,18 @@ def save__form(request, owner_form:None, acl_id)->None:
             obj.acltext = json.dumps(request.session['LOCAL_STORAGE'])
             obj.is_executed = False
             obj.owner = user
-            if created:
-                if len(request.session['LOCAL_STORAGE']) <= 1:
+            #if created:
+            if len(request.session['LOCAL_STORAGE']) <= 1:
                     obj.status = 'NOTFL'
-                else:
+            else:
                     obj.status = 'FL'
             obj.project = owner_form[4]
             obj.save()
 
     except Exception as e:
         messages.error(request, 'Ошибка, мы не смогли записать данные в БД. {}'.format(e))
-    return obj or None
+    finally:
+        return obj or None
 
 class AclOver(BaseView, LoginRequiredMixin, View):
     """Страница формирования ACL файла и других активностей"""
@@ -274,11 +278,12 @@ class AclOver(BaseView, LoginRequiredMixin, View):
                 del request.session['uuid']
                 del request.session['LOCAL_STORAGE']
                 del request.session['taskid']
-
+                if 'GIT_URL' in request.session:
+                    del request.session['GIT_URL']
         if obj:
             return render(request, 'acl_overview.html', context={'file_download': file_download,
                                                                  'file_md': file_md,
-                                                                 obj: obj.id})
+                                                                 'obj': str(obj.id)})
         else:
             return render(request, 'acl_overview.html', context={'file_download': file_download,
                                                                  'file_md': file_md,
@@ -307,6 +312,22 @@ def AclStageChange(request,  *args, **kwargs):
 
                 return HttpResponse(json.dumps(result), content_type="application/json")
         return HttpResponse(json.dumps('Ошибка данных'), content_type="application/json")
+    return HttpResponse(status=405)
+
+@csrf_exempt
+def Gitcheck(request):
+    """Функция сохранения и проверки git проекта"""
+    if request.method == 'POST':
+        result = {'status': 'Данные сохранены'}
+        if 'git_url' in request.POST:
+                if request.POST.get('git_url', '') == '':
+                    del request.session['GIT_URL']
+                elif not re.match('^(https:\/\/git)?(.)+(.git)$',request.POST.get('git_url', '')):
+                   result = {'error': 'Не валидные данные'}
+                else:
+                    request.session['GIT_URL'] = request.POST.get('git_url')
+
+        return HttpResponse(json.dumps(result), content_type="application/json")
     return HttpResponse(status=405)
 
 

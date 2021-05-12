@@ -130,15 +130,16 @@
           </label>
 
           <label class="label-form__submit">
-          <input type="checkbox" class="checkbox__real-submit" name="action_make_git">
+          <div class="d-inline-flex">
+          <input type="checkbox" class="checkbox__real-submit" name="action_make_git" {% if 'GIT_URL' in request.session %} checked {% endif %} }}>
           <span class="checkbox__fake"></span>
-          <span class="checkbox__title-footer">Создать обращение через Gitlab</span>
+          <span class="checkbox__title-footer">Создать md файл для Gitlab</span>
+          <p class="git__label ml-2 text-muted text-lowercase text-danger">{{request.session.GIT_URL}}</p>
+          </div>
           </label>
           </div>
-              <input type="submit" class="btn btn-success" value="Сохранить И Продолжить">
+          <input type="submit" class="btn btn-success" value="Сохранить И Продолжить">
           </div>
-
-
 </div>
 
 <script>
@@ -148,6 +149,8 @@
     {% endif %}
 </script>
 </form>
+</div>
+</div>
 </div>
 
 {% else%}
@@ -266,23 +269,97 @@
           </label>
 
           <label class="label-form__submit">
+          <div class="d-inline-flex">
           <input type="checkbox" class="checkbox__real-submit" name="action_make_git">
           <span class="checkbox__fake"></span>
-          <span class="checkbox__title-footer">Создать обращение через Gitlab</span>
+          <span class="checkbox__title-footer">Создать md файл для Gitlab</span>
+          <p class="git__label ml-2 text-muted text-lowercase text-danger"></p>
+          </div>
           </label>
           </div>
               <input type="submit" class="btn btn-success" value="Сохранить И Продолжить">
           </div>
-
 </div>
-
 <script>
     $(".post-sidebar").removeClass("d-none");
     $("#contact__input__date, #contact__input__start").val(GetCurrentDate());
 </script>
 </form>
 </div>
+ </div>
+ </div>
+ {% endif%}
+ <div class="modal modal-git" tabindex="-1" role="dialog">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Интерграция с git</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+          <label for="git_url" class="col-form-label">Укажите ссылку на ваш git проект: </label>
+           <form method="post" action="{% url 'aclgit_urls' %}" name="acl-form-git">
+             {% csrf_token %}
+             <input type="text" class="form-control" value=" " placeholder="https://github.com/MRagulin/ACL.git" name="git_url" pattern="^.+(.git)" title="Введите имя внутреннего проекта .git" autofocus required>
+             <div class="modal-footer">
 
-{% endif%}
+        <button type="button" class="btn btn-secondary btn-reset" type="reset" data-dismiss="modal" value="Очистить">Очистить</button>
+        <button type="submit" class="btn btn-success btn-submit" type="submit" value="Сохранить">Сохранить и закрыть</button>
+
+      </div>
+           </form>
+       </div>
+    </div>
+  </div>
+ </div>
+<script>
+    $("input:checkbox[name='action_make_git']").click(function () {
+        if ($(this).prop('checked'))
+        {
+           $(".modal-git").modal('show');
+           $("input:text[name='git_url']").focus();
+        } else
+        {
+            $("input:text[name='git_url']").val("");
+            $.post("{% url 'aclgit_urls' %}", {git_url: ""}).done(function(data){});
+            $('.git__label').text('');
+        }
+    });
+
+    $("form[name='acl-form-git']").submit(function(e){
+       e.preventDefault();
+       let git_url = $("input:text[name='git_url']").val();
+       git_url = $.trim(git_url);
+
+        $.post("{% url 'aclgit_urls' %}", {git_url}).done(function(data){
+                try{
+                    let status = JSON.parse(JSON.stringify(data));
+
+                    if (status.hasOwnProperty('status') )
+                    {
+                        ShowNotify(idx=2, text=status['status']);
+                        $('.git__label').text(git_url);
+                        $(".modal-git").modal('hide');
+                    } else
+                    {
+                        ShowNotify(idx=0, text=status['error']);
+                    }
+
+                } catch (e) {
+                    console.error(status);
+                }
+            }).fail(function(){
+                ShowNotify(idx=0, text='Произошла ошибка при отправке данных');
+                return false;
+            });
+    });
+
+    $(".btn-reset").click(function(){
+        $("input:checkbox[name='action_make_git']").prop('checked', false);
+    });
+</script>
+
 
 {% endblock %}

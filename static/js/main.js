@@ -481,6 +481,24 @@ $(".modal-stage").submit(function (e) {
     window.location.href = '/acl/history/';
 });
 
+// $("form[class='form-inline']").change(function(){
+//     let is_empty = true;
+//
+//     $("form[class='form-inline'] input, form[class='form-inline'] textarea").each(function(idx, el)
+//     {
+//         if (!$(el).empty()) //($(el).is(":empty"))
+//         {
+//             is_empty = false;
+//         }
+//     });
+//
+//     if (is_empty == true)
+//     {
+//          $("input[type='submit']").val("Пропустить");
+//     }
+//
+// });
+
 $("#flexAgreementCheck").click(function(){
         if ($("#flexAgreementCheck:checked").length > 0) {
             $(".btn-start").removeClass('not-active');

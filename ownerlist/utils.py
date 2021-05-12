@@ -444,7 +444,7 @@ class ExtractDataXls:
                         finally:
                             tags.clear()
 
-        if settings.DEBUG == True:
+        if settings.DEBUG:
             print("Добавленно {} новых записей в БД.".format(self.count_total))
 
         return self.count_total
@@ -663,7 +663,7 @@ class ExtractDataXls:
                                 continue
                             if (re.match(r"^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$", str(col)) or
                                 re.match(r"^(\d+.\d)|(\d)$", str(col))):
-                                    if skip_ip == False:
+                                    if not skip_ip:
                                         col_stat['is_ip'] += 1
                                         continue
                                     else:
@@ -704,7 +704,7 @@ class ExtractDataXls:
                                         #         pass
                                             # in ['vlan', 'vlan name', 'location', ]
                                         else:
-                                            if skip_commnet == False:
+                                            if not skip_commnet:
                                                 col_stat['is_comment'] += 1
                                             else:
                                                 if idx_col not in Tags:

@@ -47,6 +47,7 @@ urlpatterns = [
     path("checkip/<str:ip>/", CheckIp, name='check_ip_urls'),
     path("remove/", AclRemove, name="acl_remove"),
     path("change/", AclStageChange, name="acl_stage_change"),
+    path("gitcheck/", Gitcheck, name="aclgit_urls"),
     url("$^", ACldefault, name="acldefault_urls")
 ]
 
