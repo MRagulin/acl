@@ -957,5 +957,5 @@ def MakeMarkDown(json_data, filename):
     if file:
         file.close()
 
-    return '../../../static/md/' + filename + '.md'
+    return '/../../../static/md/' + filename + '.md'
 
