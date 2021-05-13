@@ -67,14 +67,23 @@ class ObjectMixin:
     def post(self, request, acl_id=None):
         if acl_id is not None:
             tmp = request_handler(request, self.template)
+            current_page = FORM_URLS.index(self.url)
             if tmp:
-                if self.template in request.session['LOCAL_STORAGE']:
-                    request.session['LOCAL_STORAGE'].update({self.template: tmp[self.template]})
-                else:
+                try:
+                    if len(tmp[self.template]) == 0 or len(tmp[self.template][0]) == 0 or len(tmp[self.template][0][0]) == 0:
+                        if self.template in request.session['LOCAL_STORAGE']:
+                            del request.session['LOCAL_STORAGE'][self.template]
+                    else:
+
+                        if self.template in request.session['LOCAL_STORAGE']:
+                            request.session['LOCAL_STORAGE'].update({self.template: tmp[self.template]})
+                        else:
+                            request.session['LOCAL_STORAGE'][self.template] = tmp[self.template]
+                except:
                     request.session['LOCAL_STORAGE'][self.template] = tmp[self.template]
 
-                current_page = FORM_URLS.index(self.url)
                 request.session.modified = True
+
                 if '/new/' in request.path:
                     if 'uuid' not in request.session or request.session['uuid'] != str(acl_id):
                         logger.warning('Попытка записи в чужой uuid')

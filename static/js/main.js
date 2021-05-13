@@ -481,23 +481,71 @@ $(".modal-stage").submit(function (e) {
     window.location.href = '/acl/history/';
 });
 
-// $("form[class='form-inline']").change(function(){
-//     let is_empty = true;
-//
-//     $("form[class='form-inline'] input, form[class='form-inline'] textarea").each(function(idx, el)
-//     {
-//         if (!$(el).empty()) //($(el).is(":empty"))
-//         {
-//             is_empty = false;
-//         }
-//     });
-//
-//     if (is_empty == true)
-//     {
-//          $("input[type='submit']").val("Пропустить");
-//     }
-//
-// });
+function if_form_empty(form)
+{
+    let result = true;
+    $(form).find("input[type='text'],input[type='number'], textarea").each(function(idx, val){
+    if ($(val).val() !== '')
+        {
+            result = false;
+            return false;
+        }
+    });
+    return result;
+}
+
+let form  = $("form[class='form-inline']");
+
+$(function(){
+      if (form)
+      {   let el = $(form).find("input[type='text'],input[type='number'], textarea");
+          let r = if_form_empty($(form));
+
+          if (r && window.location.href.indexOf('info') == -1)
+          {
+               $("input[type='submit']").val("Пропустить");
+                $(el).each(function(idx, val) {
+                    $(val).removeAttr('required');
+                });
+
+          } else
+          {
+              $("input[type='submit']").val("Сохранить И Продолжить");
+              $(el).each(function(idx, val) {
+                $(val).attr('required', 'required');
+             });
+          }
+      }
+
+
+});
+
+
+$(form).find("input[type='text'],input[type='number'], textarea").on('change.skip',function(){
+
+    let el = $(form).find("input[type='text'],input[type='number'], textarea");
+    let r = if_form_empty($(form));
+
+    if (r && $(this).val() == '')
+    {
+        $("input[type='submit']").val("Пропустить");
+
+        $(el).each(function(idx, val) {
+
+            $(val).removeAttr('required');
+         });
+    }
+    else
+    {
+        $("input[type='submit']").val("Сохранить И Продолжить");
+
+        $(el).each(function(idx, val) {
+            $(val).attr('required', 'required');
+
+         });
+    }
+
+});
 
 $("#flexAgreementCheck").click(function(){
         if ($("#flexAgreementCheck:checked").length > 0) {

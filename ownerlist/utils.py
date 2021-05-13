@@ -114,6 +114,7 @@ def request_handler(request, namespace=''):
     INFINITY = 'Нет'
     LOCAL_STORAGE = {}
     cnt_key = 0
+    empty_key = 0
     if namespace == FORM_APPLICATION_KEYS[0]: #first
             LOCAL_STORAGE[namespace] = []
             for idx, post_key in enumerate(POST_FORM_KEYS):
@@ -151,7 +152,13 @@ def request_handler(request, namespace=''):
                             if v != '':
                                 LOCAL_STORAGE[namespace][cnt_key].append(v)
                             else:
-                                LOCAL_STORAGE[namespace][cnt_key].append(INFINITY)
+                                if k == 'd_complate':
+                                    LOCAL_STORAGE[namespace][cnt_key].append(INFINITY)
+                                else:
+                                    empty_key += 1
+
+        # if empty_key >= 2:
+        #         del LOCAL_STORAGE[namespace]
                                 #return False
     return LOCAL_STORAGE
 
