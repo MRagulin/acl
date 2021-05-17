@@ -330,7 +330,9 @@ def Gitcheck(request):
         result = {'status': 'Данные сохранены'}
         if 'git_url' in request.POST:
                 if request.POST.get('git_url', '') == '':
-                    del request.session['GIT_URL']
+                    if 'GIT_URL' in request.session:
+                        del request.session['GIT_URL']
+                    result = {'error': 'Git проект не может быть пустым'}
                 elif not re.match('^(https:\/\/git)?(.)+(.git)$',request.POST.get('git_url', '')):
                    result = {'error': 'Не валидные данные'}
                 else:
