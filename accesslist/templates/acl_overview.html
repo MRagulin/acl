@@ -8,35 +8,72 @@
                 <div class="card text-center border-0">
                       <div class="card-body">
                           <ul class="list-group list-group-flush border-0">
-                            {% if obj %}
-                            <li class="list-group-item"><h5 class="card-title">Обращение сформировано.</h5></li>
-                            <li class="list-group-item border-0"><p class="card-text">Скоро сотрудники ОТБ займутся вашим обращением. </p></li>
-                            {% endif %}
-                            {% if file_download and file_download != 'None' %}
-                                <li class="list-group-item d-none border-0"><a href="{{file_download}}" class="card-link card-download-file text-success" target="_blank" download><i class="fas fa-file-word pr-1"></i> Скачать docx файл</a></li>
-                                {% if file_md and file_md != 'None' %}
-                                <li class="list-group-item d-none border-0"><a href="{{file_md}}" style="font-size: 18px" class="card-link card-download-file text-primary" target="_blank" download><i class="fab fa-github pr-1"></i> Скачать md-файл</a></li>
-                                {% endif %}
-                                 <li class="list-group-item border-0">
+
+                                {% if file_download %}
+                                <li class="list-group-item list-group-item-file border-0">
+                                   <p class="card-text">Формирование docx обращения</p>
                                  <div class="d-flex justify-content-center">
                                       <div class="spinner-border text-success" role="status">
                                           <span class="sr-only">Loading...</span>
                                         </div>
                                     </div>
                                 </li>
-                              {% elif not obj or file_download == 'None' %}
-                                    <li class="list-group-item border-0"><h5 class="card-title">Ошибка 204</h5></li>
-                                    <li class="list-group-item border-0"><div class="alert alert-warning" role="alert">
-                                     Что-то пошло не так :( Вероятно, не хватает данных для формирования обращения, либо истекла сессия.
-                                        Вернитесь на шаг назад, убедитесь в правильности заполнения формы и повторите операцию.
-                                    </div>
-                                    </li>
-                                {% if acl_id %}
-                                    <li class="list-group-item border-0"> <a class="btn btn-danger btn-lg" href="{% url 'acltraffic_urls' acl_id=acl_id %}" class="card-link">Вернутся к ACL</a></li>
-                                {% else %}
-                                    <li class="list-group-item border-0"> <a class="btn btn-danger btn-lg" href="{% url 'acltraffic_urls' %}{{ acl_id }}/" class="card-link">Вернутся к ACL</a></li>
                                 {% endif %}
-                              {% endif %}
+
+                                {% if gitproc %}
+                                <li class="list-group-item list-group-item-git border-0"><p class="card-text status">Отправка запроса в Git: </p>
+                                <div class="d-flex justify-content-center">
+                                      <div class="spinner-border text-success" role="status">
+                                          <span class="sr-only">Loading...</span>
+                                        </div>
+                                    </div>
+                                </li>
+                                {% endif %}
+
+                                 {% if not gitproc and not file_download  %}
+                                    <li class="list-group-item list-group-item-git border-0">
+                                    <p class="card-text">Ваше обращение сохранено.</p>
+                                     <a href="{% url 'aclhistory_urls' %}{{obj}}/" style="font-size: 18px" class="text-primary">Посмотреть можно тут</a>
+                                  {% endif %}
+
+
+
+{#                            {% if obj %}#}
+{#                            <li class="list-group-item"><h5 class="card-title">Обращение сформировано.</h5></li>#}
+{#                            <li class="list-group-item border-0"><p class="card-text">Скоро сотрудники ОТБ займутся вашим обращением. </p></li>#}
+{#                            {% endif %}#}
+{#                            {% if file_download and file_download != 'None' %}#}
+{#                                <li class="list-group-item d-none border-0"><a href="{{file_download}}" class="card-link card-download-file text-success" target="_blank" download><i class="fas fa-file-word pr-1"></i> Скачать docx файл</a></li>#}
+{##}
+{##}
+{#                                {% if file_md and file_md != 'None' %}#}
+{#                                <li class="list-group-item d-none border-0"><a href="{{file_md}}" style="font-size: 18px" class="card-link card-download-file text-primary" target="_blank" download><i class="fab fa-github pr-1"></i> Скачать md-файл</a></li>#}
+{#                                {% endif %}#}
+{##}
+{#                                {% if gitproc %}#}
+{#                                    <li class="list-group-item d-none border-0"><p class="text-secondary">Стутус GIT: {{ gitproc }}</p></li>#}
+{#                                {% endif %}#}
+{##}
+{#                                 <li class="list-group-item border-0">#}
+{#                                 <div class="d-flex justify-content-center">#}
+{#                                      <div class="spinner-border text-success" role="status">#}
+{#                                          <span class="sr-only">Loading...</span>#}
+{#                                        </div>#}
+{#                                    </div>#}
+{#                                </li>#}
+{#                              {% elif not obj or file_download == 'None' %}#}
+{#                                    <li class="list-group-item border-0"><h5 class="card-title">Ошибка 204</h5></li>#}
+{#                                    <li class="list-group-item border-0"><div class="alert alert-warning" role="alert">#}
+{#                                     Что-то пошло не так :( Вероятно, не хватает данных для формирования обращения, либо истекла сессия.#}
+{#                                        Вернитесь на шаг назад, убедитесь в правильности заполнения формы и повторите операцию.#}
+{#                                    </div>#}
+{#                                    </li>#}
+{#                                {% if acl_id %}#}
+{#                                    <li class="list-group-item border-0"> <a class="btn btn-danger btn-lg" href="{% url 'acltraffic_urls' acl_id=acl_id %}" class="card-link">Вернутся к ACL</a></li>#}
+{#                                {% else %}#}
+{#                                    <li class="list-group-item border-0"> <a class="btn btn-danger btn-lg" href="{% url 'acltraffic_urls' %}{{ acl_id }}/" class="card-link">Вернутся к ACL</a></li>#}
+{#                                {% endif %}#}
+{#                              {% endif %}#}
 
                           {% if messages %}
                           {% for message in messages %}
@@ -60,18 +97,192 @@
 <script>
     {% if obj %}
         $(".descr-list a").addClass("not-active");
-
     {% endif %}
 
     $(".post-sidebar").addClass("d-none");
-    $(function(){
-        function animatedownload(){
-                $(".spinner-border").hide();
-                $(".card-download-file").parent().removeClass("d-none");
 
-        };
-        window.setTimeout(animatedownload, 3000);
-    });
+    let counter = 0;
+    let uuid = "{{ obj }}";
+    let int_status = setInterval(function(){
+        counter += 1;
+        $.post('/acl/overviewstatus/', {uuid}).done(function(data){
+            console.log(data);
+            if (data)
+            {
+                let status = JSON.parse(JSON.stringify(data));
+//----------------------------------------------------------------------------------------------------------------------
+                if (status.hasOwnProperty('docx_download_status'))
+                    {
+                        let downlod_link = status['docx_download_status'];
 
+                        if (downlod_link.error !== undefined)
+                            {
+                                if ($(".list-group-item-file").find(".d-flex").length >0)
+                                     {
+                                         $('.list-group-item-file').children(".d-flex").remove();
+
+                                     };
+                                $(".list-group-item-file .text-danger").remove();
+                                $(".list-group-item-file").append('<p class="text-danger">'+downlod_link.error+'</p>');
+                             }
+                        else
+                        {
+                            if (downlod_link.status !== undefined)
+                            {
+                               downlod_link =  downlod_link['status'];
+                               if (downlod_link.indexOf('docx') != -1 && $(".list-group-item-file > div > .spinner-border").length > 0)
+                                    {
+                                        $(".list-group-item-file").empty();
+                                        $(".card-download-file").parent().removeClass("d-none");
+
+                                        $(".list-group-item-file").append("<a href='"+downlod_link+"' class='card-link card-download-file text-success' target='_blank' download><i class='fas fa-file-word pr-1'></i> Скачать docx файл</a>")
+                                    }
+
+                            }
+                        }
+
+                    }
+//----------------------------------------------------------------------------------------------------------------------
+                     if (status.hasOwnProperty('git_upload_status'))
+                     {
+                          let git_status = status['git_upload_status'];
+                          if (git_status.error !== undefined)
+                          {
+                               $(".list-group-item-git").empty();
+                                  if ($(".list-group-item-git").find(".d-flex").length >0)
+                                         {
+                                             $('.list-group-item-git').children(".d-flex").remove();
+
+                                      };
+                                    $(".list-group-item-git .status").remove();
+                                    $(".list-group-item-git").append('Отправка запроса в Git: <span class="text-danger">'+git_status.error+'</span>');
+
+
+                           if (status.hasOwnProperty('git_upload_file') && (status['git_upload_file'].indexOf('md')))
+                                  {
+                                      $(".list-group-item-git").append('<p class="text-secondary">Но вы можете вручную разместить файл в проект</p>');
+                                      $(".list-group-item-git").append("<a href='"+status['git_upload_file']+"' " +
+                                                "style='font-size: 18px' class='card-link card-download-file text-primary' " +
+                                                "target='_blank' download><i class='fab fa-github pr-1'></i> Скачать md-файл</a>");
+                                  }
+                                  return false;
+                          }
+                          else
+                               if (git_status.status !== undefined)
+                               {
+                                  if ($(".list-group-item-git").find(".d-flex").length >0)
+                                     {
+                                         $('.list-group-item-git').children(".d-flex").remove();
+                                  };
+
+                                        $(".list-group-item-git .status").remove();
+                                        $(".list-group-item-git").append("<p class='status'>Отправка запроса в Git: <span class='status text-success'>"+git_status.status+"</span></p>");
+
+                                    if (git_status.status.indexOf('static'))
+                                    {   //$(".list-group-item-git").empty();
+                                        $(".list-group-item-git").append("<a href='"+git_status.status+"' " +
+                                            "style='font-size: 16px' class='card-link card-download-file text-primary' " +
+                                            "target='_blank' download><i class='fab fa-github pr-1'></i> Скачать md-файл</a>");
+
+                                        return true;
+
+                                    }
+//----------------------------------------------------------------------------------------------------------------------
+
+                               if (status.hasOwnProperty('git_upload_file') && (status['git_upload_file'].indexOf('md')))
+                                  {
+                                      $(".list-group-item-git").append("<a href='"+status['git_upload_file']+"' " +
+                                                "style='font-size: 14px' class='card-link card-download-file text-primary' " +
+                                                "target='_blank' download><i class='fab fa-github pr-1'></i> Скачать md-файл</a>");
+
+                                  }
+                               }
+                               else
+                               {
+                                   setErrorStatus();
+                                   clearInterval(int_status);
+                               }
+                     }
+
+                      {#if (git_status.status.indexOf('static'))#}
+                      {#              {   $(".list-group-item-git").empty();#}
+                      {#                  $(".list-group-item-git").append("<a href='"+git_status.status+"' " +#}
+                      {#                      "style='font-size: 18px' class='card-link card-download-file text-primary' " +#}
+                      {#                      "target='_blank' download><i class='fab fa-github pr-1'></i> Скачать md-файл</a>");#}
+                      {##}
+                      {#              }#}
+
+                     if (status.hasOwnProperty('status'))
+                     {
+                         let st_json = status['status'];
+                         if ((typeof st_json) == 'string' && st_json == 'complete')
+                         {
+                             setErrorStatus();
+                             clearInterval(int_status);
+                         } else
+                         {
+                             console.error('Возникла ошибка '+st_json);
+                         }
+
+                     }
+                }
+
+        }).fail(function(){
+        setErrorStatus();
+        clearInterval(int_status);
+        });
+
+    clearInterval(int_status);
+
+
+    if (counter >= 10)
+    {
+        setErrorStatus();
+        clearInterval(int_status);
+    }
+    }, 2000);
+
+        {#   $.post('/acl/overviewstatus/', '{{ obj }}').done(function(data){#}
+        {#    console.log(data);#}
+        {#    if (data)#}
+        {#    {#}
+        {#        let status = JSON.parse(JSON.stringify(data));#}
+        {#        if (status.hasOwnProperty('file_download'))#}
+        {#            {#}
+        {#                let downlod_link = status['file_download'];#}
+        {#                if (downlod_link.indexOf('docx') != -1 && $(".list-group-item-file > div > .spinner-border").length > 0)#}
+        {#                {#}
+        {#                    $(".list-group-item-file").empty();#}
+        {#                    $(".card-download-file").parent().removeClass("d-none");#}
+        {#                    $(".list-group-item-file").append("<a href='"+downlod_link+"' class='card-link card-download-file text-success' target='_blank' download><i class='fas fa-file-word pr-1'></i> Скачать docx файл</a>")#}
+        {#                }#}
+        {#            } else {#}
+        {#             if (status.hasOwnProperty('status'))#}
+        {#             {#}
+        {#                 let st_json = status['status'];#}
+        {#                 if ((typeof st_json) == 'string' && st_json == 'complete')#}
+        {#                 {#}
+        {#                     setErrorStatus();#}
+        {#                 } else#}
+        {#                 {#}
+        {#                     console.error('Возникла ошибка '+st_json);#}
+        {#                 }#}
+        {##}
+        {#             }#}
+        {#        }#}
+        {#    }#}
+        {#}).fail(function(){#}
+        {#setErrorStatus();#}
+        {#});#}
+
+
+    {#$(function(){#}
+    {#    function animatedownload(){#}
+    {#            $(".spinner-border").hide();#}
+    {#            $(".card-download-file").parent().removeClass("d-none");#}
+    {##}
+    {#    };#}
+    {#    window.setTimeout(animatedownload, 3000);#}
+    {# });#}
 </script>
 {% endblock %}

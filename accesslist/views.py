@@ -8,7 +8,7 @@ from .models import ACL
 from ownerlist.models import Owners, Iplist
 import os
 from ownerlist.utils import make_doc, MakeMarkDown, request_handler, is_valid_uuid, ip_status, logger, get_client_ip
-from ownerlist.utils import FORM_APPLICATION_KEYS, FORM_URLS, BaseView
+from ownerlist.utils import FORM_APPLICATION_KEYS, FORM_URLS, BaseView, GitWorker, BASE_DIR
 import json
 import uuid
 from django.views.decorators.csrf import csrf_exempt
@@ -16,7 +16,8 @@ from django.core.paginator import Paginator
 from django.conf import settings
 from django.contrib.auth.mixins import LoginRequiredMixin
 import re
-
+import threading
+import sys
 
 class ObjectMixin:
     """Миксин обработки запросов и отобращение страниц"""
@@ -47,7 +48,6 @@ class ObjectMixin:
                 tmp = get_object_or_404(ACL, id=str(acl_id))
                 request.session['LOCAL_STORAGE'] = json.loads(tmp.acltext)
                 request.session['taskid'] = tmp.taskid or ''
-                request.session['action_make_docx'] = True
 
             context = {'acl_id': str(acl_id),
                        'FULL_STORAGE': request.session['LOCAL_STORAGE'],
@@ -214,7 +214,11 @@ def ACldefault(request):
 
 def save__form(request, owner_form:None, acl_id)->None:
     """Сохранение данныех из сесии в БД"""
-    user, created = Owners.objects.get_or_create(email=owner_form[1])
+    if owner_form[1] != request.user.email:
+        email = request.user.email
+    else:
+        email = owner_form[1]
+    user, created = Owners.objects.get_or_create(email=email)
     if created:
         user.username = owner_form[0]
         user.phone = owner_form[2]
@@ -250,9 +254,16 @@ class AclOver(BaseView, LoginRequiredMixin, View):
     def get(self, request, acl_id=None):
         if acl_id is None or 'LOCAL_STORAGE' not in request.session or 'uuid' not in request.session:
             return HttpResponseRedirect(reverse('acldemo_urls'))
-        obj = None
-        file_download = None
-        file_md = None
+
+        context = {'obj': acl_id,
+                   'file_download': None,
+                   'file_md': None,
+                   'gitproc': None
+                   }
+        # obj = None
+        # file_download = None
+        # file_md = None
+        # gitproc = None
         if 'uuid' in request.session is not None:
                     if '/new/' in request.path:
                         if str(acl_id) != request.session['uuid']:
@@ -262,41 +273,70 @@ class AclOver(BaseView, LoginRequiredMixin, View):
 
         """Проверяем состояние массива с данными"""
         if len(request.session['LOCAL_STORAGE']) >= 1: #and all(KEY in request.session['LOCAL_STORAGE'] for KEY in FORM_APPLICATION_KEYS):
-                if 'action_make_docx' in request.session:
-                            file_download = 'None'
-                            try:
-                                file_download = make_doc(request, request.session['LOCAL_STORAGE'], str(acl_id))
-                                request.session['file_download'] = file_download
-                                del request.session['action_make_docx']
+                # if 'action_make_docx' in request.session:
+                #             file_download = 'None'
+                #             try:
+                #                 file_download = make_doc(request, request.session['LOCAL_STORAGE'], str(acl_id))
+                #                 request.session['file_download'] = file_download
+                #                 del request.session['action_make_docx']
+                #
+                #             except PermissionError:
+                #                 messages.error(request, 'К сожалению, мы не смогли создать файл, так как нехватает прав.')
+                #                 logger.warning('Ошибка при создании файла')
+                #             except Exception as e:
+                #                 messages.error(request, 'К сожалению, при создании файла, что-то пошло не так. '
+                #                                         'Мы уже занимаемся устранением. {}'.format(e))
+                #
+                # if 'action_make_git' in request.session:
+                #     file_md = MakeMarkDown(request.session['LOCAL_STORAGE'], 'acl_{}'.format(str(acl_id))) or 'None'
+                #     file_md_abs = os.path.join(BASE_DIR, 'static/md/' + 'acl_{}'.format(str(acl_id)) + '.md')
+                #     request.session['file_download_md'] = file_md
+                #     del request.session['action_make_git']
+                #
+                #     if 'GIT_URL' in request.session:
+                #             if 'GIT_USERNAME' in request.session and 'GIT_PASSWORD' in request.session:
+                #                 GitWorketAsync(request,
+                #                 request.session['GIT_URL'], request.session['GIT_USERNAME'],
+                #                 request.session['GIT_PASSWORD'], None, file_md_abs)
+                #
+                #                 gitproc = list(self.request.session['GIT_STATUS'])[-1]
+                #
+                # owner_form = request.session['LOCAL_STORAGE'][FORM_APPLICATION_KEYS[0]]
+                # obj = save__form(request, owner_form, acl_id)
+                #
+                # del request.session['uuid']
+                # del request.session['LOCAL_STORAGE']
+                # del request.session['taskid']
+                # if 'GIT_URL' in request.session:
+                #     del request.session['GIT_URL']
 
-                            except PermissionError:
-                                messages.error(request, 'К сожалению, мы не смогли создать файл, так как нехватает прав.')
-                                logger.warning('Ошибка при создании файла')
-                            except Exception as e:
-                                messages.error(request, 'К сожалению, при создании файла, что-то пошло не так. '
-                                                        'Мы уже занимаемся устранением. {}'.format(e))
+                #-------------------------------------------------------------------------------------------------------
 
-                if 'action_make_git' in request.session:
-                    file_md = MakeMarkDown(request.session['LOCAL_STORAGE'], 'acl_{}'.format(str(acl_id))) or 'None'
-                    request.session['file_download_md'] = file_md
-                    del request.session['action_make_git']
+                if 'ACT_MAKE_DOCX' in request.session:
+                    request.session['docx_download_status'] = True
+                    context['file_download'] = True
+
+                    #t = threading.Thread(target=make_doc, args=[request, request.session['LOCAL_STORAGE'], str(acl_id)])
+                    #t.setDaemon(True)
+                    #t.start()
+                if 'ACT_MAKE_GIT' in request.session:
+                    request.session['git_upload_status'] = True
+                    context['gitproc'] = True
 
                 owner_form = request.session['LOCAL_STORAGE'][FORM_APPLICATION_KEYS[0]]
                 obj = save__form(request, owner_form, acl_id)
 
-                del request.session['uuid']
-                del request.session['LOCAL_STORAGE']
-                del request.session['taskid']
-                if 'GIT_URL' in request.session:
-                    del request.session['GIT_URL']
-        if obj:
-            return render(request, 'acl_overview.html', context={'file_download': file_download,
-                                                                 'file_md': file_md,
-                                                                 'obj': str(obj.id)})
-        else:
-            return render(request, 'acl_overview.html', context={'file_download': file_download,
-                                                                 'file_md': file_md,
-                                                                 'acl_id': acl_id})
+
+                #-------------------------------------------------------------------------------------------------------
+                #ExemineTask()
+        #if obj:
+
+        return render(request, 'acl_overview.html', context=context)
+        # else:
+        #     return render(request, 'acl_overview.html', context={'file_download': file_download,
+        #                                                          'file_md': file_md,
+        #                                                          'gitproc': gitproc,
+        #                                                          'acl_id': acl_id})
 
 @csrf_exempt
 def AclStageChange(request,  *args, **kwargs):
@@ -342,7 +382,6 @@ def Gitcheck(request):
     return HttpResponse(status=405)
 
 
-
 def CheckIp(request, ip=None):
     """Функция возвращает данные по IP"""
     return HttpResponse(json.dumps(ip_status(ip)), content_type="application/json")
@@ -361,3 +400,93 @@ def AclRemove(request, *args, **kwargs):
                             result = {'error': 'Не всё записи удалены'}
         return HttpResponse(json.dumps(result), content_type="application/json")
     return HttpResponse(status=405)
+
+
+@csrf_exempt
+def OverViewStatus(request)->bool:
+    """Функция обработки запросов на создание активностей из станицы с информацией"""
+
+    result = {}
+    # if settings.DEBUG:
+    #     print("{} {}".format(request.POST['uuid'], request.session['LOCAL_STORAGE']))
+    if 'uuid' not in request.POST or not is_valid_uuid(request.POST['uuid']) or not 'LOCAL_STORAGE' in request.session:
+        result = {'status': 'error'}
+        return HttpResponse(json.dumps(result), content_type="application/json")
+
+    uid = request.POST['uuid']
+
+    if 'ACT_MAKE_DOCX' in request.session:
+        if 'docx_download_status' in request.session:
+            if request.session['docx_download_status'] == True:
+                    try:
+                        make_doc(request, request.session['LOCAL_STORAGE'], uid)
+                    except Exception as e:
+                        result['docx_download_status'] = {'error': 'Произошла ошибка при создании docx файла: {}'.format(e)}
+                        del request.session['ACT_MAKE_DOCX']
+                        del request.session['docx_download_status']
+                    result["docx_download_status"] = {'status': request.session['docx_download_status']}
+
+                    del request.session['docx_download_status']
+                    del request.session['ACT_MAKE_DOCX']
+            else:
+                result["docx_download_status"] = {'status': request.session['docx_download_status']}
+
+    if 'ACT_MAKE_GIT' in request.session:
+        if 'git_upload_status' in request.session:
+            if settings.DEBUG:
+                print('Текущий статус git: {}'.format(request.session['git_upload_status']))
+            if request.session['git_upload_status'] == True:
+                    try:
+                        file_md = MakeMarkDown(request, request.session['LOCAL_STORAGE'], 'acl_{}'.format(uid)) or 'None'
+                    except Exception as e:
+                        result['git_upload_status'] = {'error': 'Ошибка при создании md файла {}'.format(e)}
+                        del request.session['ACT_MAKE_GIT']
+                        del request.session['git_upload_status']
+                        return HttpResponse(json.dumps(result), content_type="application/json")
+
+                    #result['git_upload_status'] = {'status': file_md}
+            else:
+                if isinstance(['git_upload_status'], list):
+                    result['git_upload_status'] = request.session['git_upload_status'].pop()
+                else:
+                    result['git_upload_status'] = {'status': request.session['git_upload_status']}
+
+            file_md_abs = os.path.join(BASE_DIR, 'static/md/' + 'acl_{}'.format(str(request.session['uuid'])) + '.md')
+            if '/' in file_md_abs:
+                if 'linux' not in sys.platform:
+                        file_md_abs = file_md_abs.replace('/', '\\')
+            result['git_upload_file'] = file_md
+
+            if 'GIT_URL' in request.session:
+                  if 'GIT_USERNAME' in request.session and 'GIT_PASSWORD' in request.session:
+                      request.session['git_upload_status'] = list()
+                      g = GitWorker(request, request.session['GIT_URL'], request.session['GIT_USERNAME'],
+                                    request.session['GIT_PASSWORD'], None, file_md_abs)
+                      if g:
+                          if g.clone():
+                              f = g.activity()
+                              if f:
+                                  if g.addindex(f):
+                                      if g.push():
+                                          request.session['git_upload_status'] = {'status': 'Файл загружен'}
+
+                      if isinstance(request.session['git_upload_status'], list):
+                          result['git_upload_status'] = request.session['git_upload_status'].pop()
+                      else:
+                        result['git_upload_status'] = request.session['git_upload_status']
+            else:
+                result['git_upload_status'] = {'error': 'Нет url для загрузки md файла'}
+
+            del request.session['ACT_MAKE_GIT']
+            if 'GIT_URL' in request.session:
+                del request.session['GIT_URL']
+            if 'git_upload_status' in request.session:
+                del request.session['git_upload_status']
+            if 'file_download_md' in request.session:
+                del request.session['file_download_md']
+
+    #del request.session['LOCAL_STORAGE']
+    if len(result) == 0:
+        result = {'status': 'complete'}
+
+    return HttpResponse(json.dumps(result), content_type="application/json")

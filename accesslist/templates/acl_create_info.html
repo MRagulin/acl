@@ -302,7 +302,7 @@
           <label for="git_url" class="col-form-label">Укажите ссылку на ваш git проект: </label>
            <form method="post" action="{% url 'aclgit_urls' %}" name="acl-form-git">
              {% csrf_token %}
-             <input type="text" class="form-control" value=" " placeholder="https://github.com/MRagulin/ACL.git" name="git_url" pattern="^.+(.git)" title="Введите имя внутреннего проекта .git" autofocus required>
+             <input type="text" class="form-control" value=" " placeholder="https://github.com/MRagulin/ACL.git" name="git_url" pattern="^.+(.git)?" title="Введите имя внутреннего проекта .git" autofocus required>
              <div class="modal-footer">
 
         <button type="button" class="btn btn-secondary btn-reset" type="reset" data-dismiss="modal" value="Очистить">Очистить</button>

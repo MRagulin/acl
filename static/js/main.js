@@ -497,7 +497,7 @@ function if_form_empty(form)
 let form  = $("form[class='form-inline']");
 
 $(function(){
-      if (form)
+      if (form && window.location.href.indexOf('welcome') == -1)
       {   let el = $(form).find("input[type='text'],input[type='number'], textarea");
           let r = if_form_empty($(form));
 
@@ -559,3 +559,14 @@ $("#flexAgreementCheck").click(function(){
 
 
 });
+
+function setErrorStatus()
+{
+$(".list-group").find(".list-group-item").each(function (idx, val) {
+if ($(val).find(".d-flex").length >0)
+                                 {
+                                     $(val).children(".d-flex").remove();
+                                     $(val).append('<p class="text-danger">Произошла ошибка</p>');
+                                 }
+                             });
+}

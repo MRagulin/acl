@@ -23,6 +23,11 @@ import socket
 import codecs
 import json
 
+import git
+from shutil import copyfile
+COMMIT_MESSAGE = '[ACL PORTAL] Add acl-MD file'
+
+
 FUN_SPEED = 0
 BASE_DIR = Path(__file__).resolve().parent.parent
 LOCAL_UID = None
@@ -128,11 +133,19 @@ def request_handler(request, namespace=''):
                 else:
                     LOCAL_STORAGE[namespace].append(INFINITY)
                    # return False
-            if request.POST.get('action_make_docx') == 'on':
-                request.session['action_make_docx'] = True
+            if namespace == FORM_APPLICATION_KEYS[0]:
+                    if request.POST.get('action_make_docx') == 'on':
+                        request.session['ACT_MAKE_DOCX'] = True
+                    else:
+                        if 'ACT_MAKE_DOCX' in request.session:
+                            del request.session['ACT_MAKE_DOCX']
 
-            if request.POST.get('action_make_git') == 'on':
-                request.session['action_make_git'] = True
+                    if request.POST.get('action_make_git') == 'on':
+                        request.session['ACT_MAKE_GIT'] = True
+                    else:
+                        if 'ACT_MAKE_GIT' in request.session:
+                            del request.session['ACT_MAKE_GIT']
+                    request.session.modified = True
 
     else:
         if namespace == FORM_APPLICATION_KEYS[-1]: #last
@@ -779,11 +792,13 @@ class ExtractDataXls:
 
 def make_doc(request=None, data_set={}, fileuuid='')->str:
     """Функция для генерации docx файла"""
+    request.session['docx_download_status'] = 'Создаем файл...'
     TEMPLATE_FILE = os.path.join(BASE_DIR, 'templates//ACL.docx')
     if fileuuid == '':
         fileuuid = str(uuid.uuid4())
     APP_FILE = 'static/docx/Application_' + fileuuid + '.docx'
     doc = Document(TEMPLATE_FILE)
+    request.session['docx_download_status'] = 'Записываем изменения'
     doc.styles['Normal'].font.name = 'Verdana'
     doc.styles['Normal'].font.size = Pt(10)
     for data_inx, data in enumerate(FORM_APPLICATION_KEYS):
@@ -814,6 +829,8 @@ def make_doc(request=None, data_set={}, fileuuid='')->str:
             table._element.addnext(p._p)
 
     doc.save(os.path.join(BASE_DIR, APP_FILE))
+    request.session['docx_download_status'] = "{}".format('\\' + APP_FILE)
+    request.session.modified = True
     return '\\' + APP_FILE
 
 
@@ -914,8 +931,9 @@ def table(records, fields, headings=None, alignment=None, file=None):
         file.write('\n')
 
 
-def MakeMarkDown(json_data, filename):
+def MakeMarkDown(request, json_data, filename):
     """Функция записывает JSON как md файл"""
+    request.session['git_upload_status'] = 'Создание md-файла'
     tmp = os.path.join(BASE_DIR, 'static/md/' + filename + '.md')
     file = codecs.open(tmp, "w", encoding="utf-8")
     data = json_data #json.loads(json_data)
@@ -963,6 +981,120 @@ def MakeMarkDown(json_data, filename):
                   alignment=[('<', '<'), ('<', '<'), ('<', '<'), ('<', '<'), ('<', '<'), ('<', '<'), ], file=file)
     if file:
         file.close()
+    request.session['git_upload_status'] = '/static/md/' + filename + '.md'
+    request.session.modified = True
+    return '/static/md/' + filename + '.md'
 
-    return '/../../../static/md/' + filename + '.md'
 
+
+class GitWorker:
+    def __init__(self, request, GITPRO: None, USERNAME: None, PASSWORD: None,  PATH_OF_GIT_REPO, MDFILE: None):
+        self.repo = git.Repo.init()  # uid, bare=True
+        self.request = request
+        self.request.session['git_upload_status'].append({'status': "Инициализация Git проекта"})
+
+        if PASSWORD is not None and USERNAME is not None:
+             self.USERNAME = USERNAME
+
+             if '@' in self.USERNAME:
+                self.USERNAME = self.USERNAME.replace('@', '%40')
+
+             if PASSWORD:
+                 self.PASSWORD = PASSWORD
+
+             self.GITURL = GITPRO
+             self.GITPRO = GITPRO.split('://')[1]
+             self.GITPRO = f"https://{self.USERNAME}:{self.PASSWORD}@{self.GITPRO}"
+
+        if PATH_OF_GIT_REPO is not None:
+            self.PATH_OF_GIT_REPO = PATH_OF_GIT_REPO
+        else:
+             if settings.DEBUG:
+                 self.PATH_OF_GIT_REPO = os.path.join(os.path.abspath(os.getcwd()), str(uuid.uuid4()))
+             else:
+                self.PATH_OF_GIT_REPO = os.path.join(tempfile.gettempdir(), str(uuid.uuid4()))
+
+        if not os.path.exists(self.PATH_OF_GIT_REPO):
+                 os.makedirs(self.PATH_OF_GIT_REPO)
+                 self.request.session['git_upload_status'].append({'status': "Создание временой папки: {}".format(self.PATH_OF_GIT_REPO)})
+        #else:
+              # os.path.join(BASE_DIR, 'upload')
+        if not os.path.exists(MDFILE):
+            self.MDFILE = os.path.join(os.path.abspath(os.getcwd()), MDFILE)
+        else:
+            self.MDFILE = MDFILE
+
+
+    def clone(self):
+        try:
+            self.repo = self.repo.clone_from(self.GITPRO, self.PATH_OF_GIT_REPO)
+        except Exception as e:
+            if e.status == 128:
+                self.request.session['git_upload_status'].append({'error': "Нет доступа к GIT репозиторию"})
+            else:
+                self.request.session['git_upload_status'].append({'error': "[Ошибка] {}".format(e)})
+            return 0
+        if len(self.repo.index.entries) == 0:
+           self.request.session['git_upload_status'].append({'error': "Не удалось скачать файлы проекта, папка пустая"})
+           return 0
+        self.request.session['git_upload_status'].append({'status': "Скачано: {} файлов".format(len(self.repo.index.entries))})
+        return True
+
+    def activity(self):
+        dfile = ''
+        try:
+            sfile = self.MDFILE
+            dfile = os.path.join(self.PATH_OF_GIT_REPO, 'acl.md')
+            if not copyfile(sfile, dfile):
+                self.request.session['git_upload_status'].append({'error': "Ошибка при копировании файла в проект: {}".format(dfile)})
+                return 0
+            self.request.session['git_upload_status'].append({'status': "Копирование файла в проект: {}".format(dfile)})
+        except:
+            self.request.session['git_upload_status'].append({'error': "Возникла ошибка при копировании md файла в папку проекта"})
+        finally:
+            return dfile #str(PurePosixPath(dfile)).replace('/', '//')
+
+    def addindex(self, filename):
+        try:
+            index = self.repo.index
+            index.add([filename])
+            index.commit(COMMIT_MESSAGE)
+            self.request.session['git_upload_status'].append({'status': "Локальный коммит изменений"})
+        except Exception as e:
+            self.request.session['git_upload_status'].append({'error': "Ошибка при коммите: {}".format(e)})
+            return False
+        return True
+
+    def push(self):
+        #remote = self.repo.create_remote('origin', self.repo.remotes.origin.url)
+        try:
+            result = self.repo.remotes.origin.push(refspec='master:master')
+            if result:
+                self.request.session['git_upload_status'].append({'status': "Отправка изменений на сервер"})
+                return True
+        except Exception as e:
+            if e.status == 128:
+                self.request.session['git_upload_status'].append({'error': "Ошибка аутентификации для данного репозитория"})
+            else:
+                self.request.session['git_upload_status'].append({'error': "Ошибка при отправки файла в проект: {}".format(e)})
+            return False
+        return True
+
+
+# def GitWorketAsync(request, GITURL, GITUSER, GITPASS, PROJDIR, MDFILE):
+#     request.session['GIT_STATUS'] = list()
+#     g = GitWorker(request, GITURL, GITUSER, GITPASS, PROJDIR, MDFILE)
+#     if g:
+#         if g.clone():
+#             f = g.activity()
+#             if f:
+#                 if g.addindex(f):
+#                     if g.push():
+#                         request.session['GIT_STATUS'].append("Готово")
+#
+#     return True
+#
+# async def ExemineTask(t = 5):
+#     import time
+#     time.sleep(t)
+#     return t

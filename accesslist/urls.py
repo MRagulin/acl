@@ -48,6 +48,7 @@ urlpatterns = [
     path("remove/", AclRemove, name="acl_remove"),
     path("change/", AclStageChange, name="acl_stage_change"),
     path("gitcheck/", Gitcheck, name="aclgit_urls"),
+    path("overviewstatus/", OverViewStatus, name="aclcheck_status_urls"),
     url("$^", ACldefault, name="acldefault_urls")
 ]
 

@@ -22,7 +22,7 @@ SECRET_KEY = '#8g9jc-u$r!z83lc1bi!e+wif&n^u+*0yy3otebb19lbu)2@dy'
 DEBUG = True
 
 ALLOWED_HOSTS = ['*']
-
+SESSION_SAVE_EVERY_REQUEST = True
 
 # Application definition
 
@@ -179,6 +179,7 @@ LOGGING = {
 LOGIN_REDIRECT_URL = '/acl/welcome/'
 
 AUTHENTICATION_BACKENDS = (
+    "accesslist.auth.MyAuthBackend",
     "django.contrib.auth.backends.ModelBackend",
     "django_python3_ldap.auth.LDAPBackend",
 
