@@ -426,8 +426,10 @@ def OverViewStatus(request)->bool:
                         del request.session['docx_download_status']
                     result["docx_download_status"] = {'status': request.session['docx_download_status']}
 
-                    del request.session['docx_download_status']
-                    del request.session['ACT_MAKE_DOCX']
+                    if 'docx_download_status' in request.session:
+                        del request.session['docx_download_status']
+                    if 'ACT_MAKE_DOCX' in request.session:
+                        del request.session['ACT_MAKE_DOCX']
             else:
                 result["docx_download_status"] = {'status': request.session['docx_download_status']}
 
@@ -477,7 +479,8 @@ def OverViewStatus(request)->bool:
             else:
                 result['git_upload_status'] = {'error': 'Нет url для загрузки md файла'}
 
-            del request.session['ACT_MAKE_GIT']
+            if 'ACT_MAKE_GIT' in request.session:
+                del request.session['ACT_MAKE_GIT']
             if 'GIT_URL' in request.session:
                 del request.session['GIT_URL']
             if 'git_upload_status' in request.session:
