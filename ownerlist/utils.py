@@ -989,7 +989,10 @@ def MakeMarkDown(request, json_data, filename):
 
 class GitWorker:
     def __init__(self, request, GITPRO: None, USERNAME: None, PASSWORD: None,  PATH_OF_GIT_REPO, MDFILE: None):
-        self.repo = git.Repo.init()  # uid, bare=True
+        if PATH_OF_GIT_REPO is not None:
+            self.repo = git.Repo.init(PATH_OF_GIT_REPO)
+        else:
+            self.repo = git.Repo.init(os.path.join(tempfile.gettempdir(), str(uuid.uuid4())))  # uid, bare=True
         self.request = request
         self.request.session['git_upload_status'].append({'status': "Инициализация Git проекта"})
 
@@ -1009,9 +1012,9 @@ class GitWorker:
         if PATH_OF_GIT_REPO is not None:
             self.PATH_OF_GIT_REPO = PATH_OF_GIT_REPO
         else:
-             if settings.DEBUG:
-                 self.PATH_OF_GIT_REPO = os.path.join(os.path.abspath(os.getcwd()), str(uuid.uuid4()))
-             else:
+             #if settings.DEBUG:
+                 #self.PATH_OF_GIT_REPO = os.path.join(os.path.abspath(os.getcwd()), str(uuid.uuid4()))
+            # else:
                 self.PATH_OF_GIT_REPO = os.path.join(tempfile.gettempdir(), str(uuid.uuid4()))
 
         if not os.path.exists(self.PATH_OF_GIT_REPO):

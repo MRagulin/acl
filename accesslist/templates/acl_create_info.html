@@ -133,7 +133,7 @@
           <div class="d-inline-flex">
           <input type="checkbox" class="checkbox__real-submit" name="action_make_git" {% if 'GIT_URL' in request.session %} checked {% endif %} }}>
           <span class="checkbox__fake"></span>
-          <span class="checkbox__title-footer">Создать md файл для Gitlab</span>
+          <span class="checkbox__title-footer">Отправить md файл в Gitlab проект</span>
           <p class="git__label ml-2 text-muted text-lowercase text-danger">{{request.session.GIT_URL}}</p>
           </div>
           </label>
@@ -272,7 +272,7 @@
           <div class="d-inline-flex">
           <input type="checkbox" class="checkbox__real-submit" name="action_make_git">
           <span class="checkbox__fake"></span>
-          <span class="checkbox__title-footer">Создать md файл для Gitlab</span>
+          <span class="checkbox__title-footer">Отправить md файл в Gitlab проект</span>
           <p class="git__label ml-2 text-muted text-lowercase text-danger"></p>
           </div>
           </label>
