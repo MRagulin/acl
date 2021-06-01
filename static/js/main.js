@@ -510,7 +510,7 @@ $(function(){
 
           } else
           {
-              $("input[type='submit']").val("Сохранить И Продолжить");
+              $("input[type='submit']").val("Сохранить и продолжить");
               $(el).each(function(idx, val) {
                 $(val).attr('required', 'required');
              });
@@ -537,7 +537,7 @@ $(form).find("input[type='text'],input[type='number'], textarea").on('change.ski
     }
     else
     {
-        $("input[type='submit']").val("Сохранить И Продолжить");
+        $("input[type='submit']").val("Сохранить и продолжить");
 
         $(el).each(function(idx, val) {
             $(val).attr('required', 'required');
