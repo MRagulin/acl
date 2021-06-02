@@ -149,8 +149,8 @@ LOGGING = {
 
     'handlers': {
         'file': {
-                'level' : 'WARNING',
-                'class' : 'logging.handlers.RotatingFileHandler',
+                'level': 'DEBUG', #WARNING
+                'class': 'logging.handlers.RotatingFileHandler',
                 'filename': LOGPATH,
                 'maxBytes': 1024*1024*5, # 5MB
                 'backupCount': 0,
@@ -164,7 +164,7 @@ LOGGING = {
     'loggers': {
         '': {
             'handlers': ['file'],
-            'level': 'WARNING',
+            'level': 'DEBUG', #WARNING
             'propagate': True,
         },
 

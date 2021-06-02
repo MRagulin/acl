@@ -1,4 +1,4 @@
-import os
+import os, shutil
 from pathlib import Path
 from django.core.files.storage import FileSystemStorage
 from django.apps import apps
@@ -989,10 +989,16 @@ def MakeMarkDown(request, json_data, filename):
 
 class GitWorker:
     def __init__(self, request, GITPRO: None, USERNAME: None, PASSWORD: None,  PATH_OF_GIT_REPO, MDFILE: None):
+        uid = str(uuid.uuid4())
         if PATH_OF_GIT_REPO is not None:
-            self.repo = git.Repo.init(PATH_OF_GIT_REPO)
+            self.repo = git.Repo.init(bare=True) #PATH_OF_GIT_REPO
+            if settings.DEBUG:
+                logger.debug('Инициализация GIT репозитория {}'.format(PATH_OF_GIT_REPO))
         else:
-            self.repo = git.Repo.init(os.path.join(tempfile.gettempdir(), str(uuid.uuid4())))  # uid, bare=True
+            self.repo = git.Repo.init(bare=True)  # uid, bare=True os.path.join(tempfile.gettempdir(), uid)
+            if settings.DEBUG:
+                logger.debug('Инициализация GIT репозитория {}'.format(os.path.join(tempfile.gettempdir(), uid)))
+
         self.request = request
         self.request.session['git_upload_status'].append({'status': "Инициализация Git проекта"})
 
@@ -1001,6 +1007,8 @@ class GitWorker:
 
              if '@' in self.USERNAME:
                 self.USERNAME = self.USERNAME.replace('@', '%40')
+             else:
+                 self.USERNAME = self.USERNAME + '%40' + 'alf'+'ast' + 'rah'+'.ru'
 
              if PASSWORD:
                  self.PASSWORD = PASSWORD
@@ -1009,38 +1017,57 @@ class GitWorker:
              self.GITPRO = GITPRO.split('://')[1]
              self.GITPRO = f"https://{self.USERNAME}:{self.PASSWORD}@{self.GITPRO}"
 
+        if settings.DEBUG:
+            logger.debug('Проверка логина и пароля: {}'.format(self.GITPRO))
+
+
         if PATH_OF_GIT_REPO is not None:
             self.PATH_OF_GIT_REPO = PATH_OF_GIT_REPO
         else:
              #if settings.DEBUG:
                  #self.PATH_OF_GIT_REPO = os.path.join(os.path.abspath(os.getcwd()), str(uuid.uuid4()))
             # else:
-                self.PATH_OF_GIT_REPO = os.path.join(tempfile.gettempdir(), str(uuid.uuid4()))
+                self.PATH_OF_GIT_REPO = os.path.join(tempfile.gettempdir(), uid)
 
         if not os.path.exists(self.PATH_OF_GIT_REPO):
                  os.makedirs(self.PATH_OF_GIT_REPO)
                  self.request.session['git_upload_status'].append({'status': "Создание временой папки: {}".format(self.PATH_OF_GIT_REPO)})
+                 if settings.DEBUG:
+                     logger.debug("Создание временой папки: {}".format(self.PATH_OF_GIT_REPO))
         #else:
               # os.path.join(BASE_DIR, 'upload')
         if not os.path.exists(MDFILE):
             self.MDFILE = os.path.join(os.path.abspath(os.getcwd()), MDFILE)
         else:
             self.MDFILE = MDFILE
-
+        if settings.DEBUG:
+            logger.debug("Путь к md файлу: {}".format(self.MDFILE))
 
     def clone(self):
         try:
+            if settings.DEBUG:
+                logger.debug('Копируем репозиторий: {} ->{} '.format(self.GITPRO, self.PATH_OF_GIT_REPO))
             self.repo = self.repo.clone_from(self.GITPRO, self.PATH_OF_GIT_REPO)
         except Exception as e:
             if e.status == 128:
-                self.request.session['git_upload_status'].append({'error': "Нет доступа к GIT репозиторию"})
+                self.request.session['git_upload_status'].append({'error': "Нет доступа к GIT репозиторию: {}".format(e)})
             else:
                 self.request.session['git_upload_status'].append({'error': "[Ошибка] {}".format(e)})
+
+            if settings.DEBUG:
+                logger.debug('Ошибка при копировании')
+
             return 0
         if len(self.repo.index.entries) == 0:
            self.request.session['git_upload_status'].append({'error': "Не удалось скачать файлы проекта, папка пустая"})
+
+           if settings.DEBUG:
+               logger.debug("Не удалось скачать файлы проекта, папка пустая")
            return 0
         self.request.session['git_upload_status'].append({'status': "Скачано: {} файлов".format(len(self.repo.index.entries))})
+
+        if settings.DEBUG:
+            logger.debug("Скачано: {} файлов".format(len(self.repo.index.entries)))
         return True
 
     def activity(self):
@@ -1050,12 +1077,19 @@ class GitWorker:
             dfile = os.path.join(self.PATH_OF_GIT_REPO, 'acl.md')
             if not copyfile(sfile, dfile):
                 self.request.session['git_upload_status'].append({'error': "Ошибка при копировании файла в проект: {}".format(dfile)})
+                if settings.DEBUG:
+                    logger.debug("Ошибка при копировании файла в проект: {}".format(dfile))
                 return 0
             self.request.session['git_upload_status'].append({'status': "Копирование файла в проект: {}".format(dfile)})
+            if settings.DEBUG:
+                logger.debug("Копирование файла в проект: {}".format(dfile))
         except:
             self.request.session['git_upload_status'].append({'error': "Возникла ошибка при копировании md файла в папку проекта"})
-        finally:
-            return dfile #str(PurePosixPath(dfile)).replace('/', '//')
+            if settings.DEBUG:
+                logger.debug("Возникла ошибка при копировании md файла в папку проекта")
+            return 0
+        #finally:
+        return dfile #str(PurePosixPath(dfile)).replace('/', '//')
 
     def addindex(self, filename):
         try:
@@ -1063,13 +1097,19 @@ class GitWorker:
             index.add([filename])
             index.commit(COMMIT_MESSAGE)
             self.request.session['git_upload_status'].append({'status': "Локальный коммит изменений"})
+            if settings.DEBUG:
+                logger.debug("Локальный коммит изменений")
         except Exception as e:
             self.request.session['git_upload_status'].append({'error': "Ошибка при коммите: {}".format(e)})
+            if settings.DEBUG:
+                logger.debug("Ошибка при коммите: {}".format(e))
             return False
         return True
 
     def push(self):
         #remote = self.repo.create_remote('origin', self.repo.remotes.origin.url)
+        if settings.DEBUG:
+            logger.debug("Отправка изменений на сервер")
         try:
             result = self.repo.remotes.origin.push(refspec='master:master')
             if result:
@@ -1078,9 +1118,21 @@ class GitWorker:
         except Exception as e:
             if e.status == 128:
                 self.request.session['git_upload_status'].append({'error': "Ошибка аутентификации для данного репозитория"})
+                if settings.DEBUG:
+                    logger.debug("Ошибка аутентификации для данного репозитория")
             else:
                 self.request.session['git_upload_status'].append({'error': "Ошибка при отправки файла в проект: {}".format(e)})
+                if settings.DEBUG:
+                    logger.debug("Ошибка при отправки файла в проект: {}".format(e))
             return False
+
+        finally:
+            self.repo.close()
+            self.repo.__del__()
+            time.sleep(3)
+            shutil.rmtree(self.PATH_OF_GIT_REPO, ignore_errors=True)
+            if settings.DEBUG:
+                logger.debug("Очистка временной папки")
         return True
 
 

@@ -453,10 +453,16 @@ def OverViewStatus(request)->bool:
                 else:
                     result['git_upload_status'] = {'status': request.session['git_upload_status']}
 
-            file_md_abs = os.path.join(BASE_DIR, 'static/md/' + 'acl_{}'.format(str(request.session['uuid'])) + '.md')
+            file_md_abs = os.path.join(BASE_DIR, 'static/md/' + 'acl_{}'.format(str(uid)) + '.md')
             if '/' in file_md_abs:
                 if 'linux' not in sys.platform:
                         file_md_abs = file_md_abs.replace('/', '\\')
+            if os.path.exists(file_md_abs):
+                if settings.DEBUG:
+                    logger.debug('Путь к файлу md: {}'.format(file_md_abs))
+            else:
+                logger.warning('Ошибка к пути файла md: {}'.format(file_md_abs))
+
             result['git_upload_file'] = file_md
 
             if 'GIT_URL' in request.session:
@@ -471,6 +477,8 @@ def OverViewStatus(request)->bool:
                                   if g.addindex(f):
                                       if g.push():
                                           request.session['git_upload_status'] = {'status': 'Файл загружен'}
+                                          if settings.DEBUG:
+                                              logger.debug('Файл загружен')
 
                       if isinstance(request.session['git_upload_status'], list):
                           result['git_upload_status'] = request.session['git_upload_status'].pop()
@@ -478,6 +486,8 @@ def OverViewStatus(request)->bool:
                         result['git_upload_status'] = request.session['git_upload_status']
             else:
                 result['git_upload_status'] = {'error': 'Нет url для загрузки md файла'}
+                if settings.DEBUG:
+                    logger.debug('Нет url для загрузки md файла')
 
             if 'ACT_MAKE_GIT' in request.session:
                 del request.session['ACT_MAKE_GIT']
@@ -487,6 +497,9 @@ def OverViewStatus(request)->bool:
                 del request.session['git_upload_status']
             if 'file_download_md' in request.session:
                 del request.session['file_download_md']
+
+            if settings.DEBUG:
+                logger.debug('Очистка переменных GIT')
 
     #del request.session['LOCAL_STORAGE']
     if len(result) == 0:
