@@ -991,11 +991,11 @@ class GitWorker:
     def __init__(self, request, GITPRO: None, USERNAME: None, PASSWORD: None,  PATH_OF_GIT_REPO, MDFILE: None):
         uid = str(uuid.uuid4())
         if PATH_OF_GIT_REPO is not None:
-            self.repo = git.Repo.init(bare=True) #PATH_OF_GIT_REPO
+            self.repo = git.Repo.init(PATH_OF_GIT_REPO, bare=True) #PATH_OF_GIT_REPO
             if settings.DEBUG:
                 logger.debug('Инициализация GIT репозитория {}'.format(PATH_OF_GIT_REPO))
         else:
-            self.repo = git.Repo.init(bare=True)  # uid, bare=True os.path.join(tempfile.gettempdir(), uid)
+            self.repo = git.Repo.init(os.path.join(tempfile.gettempdir(), uid), bare=True)  # uid, bare=True os.path.join(tempfile.gettempdir(), uid)
             if settings.DEBUG:
                 logger.debug('Инициализация GIT репозитория {}'.format(os.path.join(tempfile.gettempdir(), uid)))
 
@@ -1029,6 +1029,8 @@ class GitWorker:
             # else:
                 self.PATH_OF_GIT_REPO = os.path.join(tempfile.gettempdir(), uid)
 
+        self.PATH_OF_GIT_REPO = os.path.join(self.PATH_OF_GIT_REPO, 'REPO')
+
         if not os.path.exists(self.PATH_OF_GIT_REPO):
                  os.makedirs(self.PATH_OF_GIT_REPO)
                  self.request.session['git_upload_status'].append({'status': "Создание временой папки: {}".format(self.PATH_OF_GIT_REPO)})
@@ -1042,6 +1044,16 @@ class GitWorker:
             self.MDFILE = MDFILE
         if settings.DEBUG:
             logger.debug("Путь к md файлу: {}".format(self.MDFILE))
+
+
+    def free(self):
+        for i in range(1, 3):
+            self.repo.close()
+            self.repo.__del__()
+            if shutil.rmtree(Path(self.PATH_OF_GIT_REPO).parent, ignore_errors=True):
+                break
+            else:
+                time.sleep(i)
 
     def clone(self):
         try:
@@ -1128,9 +1140,6 @@ class GitWorker:
 
         finally:
             self.repo.close()
-            self.repo.__del__()
-            time.sleep(3)
-            shutil.rmtree(self.PATH_OF_GIT_REPO, ignore_errors=True)
             if settings.DEBUG:
                 logger.debug("Очистка временной папки")
         return True

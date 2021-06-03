@@ -479,6 +479,7 @@ def OverViewStatus(request)->bool:
                                           request.session['git_upload_status'] = {'status': 'Файл загружен'}
                                           if settings.DEBUG:
                                               logger.debug('Файл загружен')
+                          g.free()
 
                       if isinstance(request.session['git_upload_status'], list):
                           result['git_upload_status'] = request.session['git_upload_status'].pop()
@@ -500,6 +501,7 @@ def OverViewStatus(request)->bool:
 
             if settings.DEBUG:
                 logger.debug('Очистка переменных GIT')
+
 
     #del request.session['LOCAL_STORAGE']
     if len(result) == 0:

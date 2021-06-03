@@ -1,6 +1,5 @@
 from django.db import models
 from ownerlist.models import Owners
-from django.shortcuts import reverse
 
 class ACL(models.Model):
     pkid = models.BigAutoField(primary_key=True, editable=False)
