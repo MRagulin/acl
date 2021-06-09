@@ -74,6 +74,16 @@ class BaseView(View):
             json_dumps_params=JSON_DUMPS_PARAMS
         )
 
+def isvalidip(ip)-> bool:
+        l = len(str(ip))
+        if (l == 0) or (l > 15): return False
+        s = str(ip).split('.')
+        if len(s) >= 3:
+            return True
+        else:
+            return False
+
+
 def get_client_ip(request)->str:
     """Получение IP адреса клиента"""
     x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
@@ -199,19 +209,26 @@ def upload_file_handler(request, functionhandler = None):
     if uploaded_file_url == '':
        return {'error': 'There is error upload file'}
 
+    if 'ext.' in uploaded_file_url or \
+       'aktur' in uploaded_file_url or \
+        'alfatrah.ru' in uploaded_file_url:
+        functionhandler = ExtractDataDns
+
     if functionhandler is not None:
-        return {'ok': functionhandler(uploaded_file_url)}
+        result = functionhandler(uploaded_file_url)
     else:
         result = ExtractDataXls(request, uploaded_file_url).execute_file_parsing()
         # race condition
-        time.sleep(1)
-        try:
+    time.sleep(1)
+    try:
             os.remove(uploaded_file_url)
-        finally:
+            if settings.DEBUG:
+                print('Удаление файла: {}'.format(uploaded_file_url))
+    finally:
             uploaded_file_url = None
-        if result > 0:
+    if result > 0:
             return {'ok': 'Добавлено новых значений: {}'.format(result)}
-        return {'error': 'Данных для добавления - нету'}
+    return {'error': 'Данных для добавления - нету'}
 
 
 def count_perf(f):
@@ -386,14 +403,6 @@ class ExtractDataXls:
             return ""
 
 
-    def isvalidip(self, ip)-> bool:
-        l = len(str(ip))
-        if (l == 0) or (l > 15): return False
-        s = str(ip).split('.')
-        if len(s) >= 3:
-            return True
-        else:
-            return False
 
     def ExtractVlanInfo(self, name_idx=1, location_idx=2, vlan_idx=3, subnet_idx=4, mask_idx=5, tag1_idx=6, tag2_idx=7)->int:
         """Парсер страницы с описанием VLAN"""
@@ -499,7 +508,7 @@ class ExtractDataXls:
                         if row[row_idx] in self.page_headers: #Пропускаем заголовки
                             Header_POS = row_idx
                             continue
-                if self.isvalidip(row[ip_idx]):
+                if isvalidip(row[ip_idx]):
                     ip_addr = row[ip_idx]
                 elif len(str(row[ip_idx])) <= 5: #15.0
                             try:
@@ -1145,20 +1154,126 @@ class GitWorker:
         return True
 
 
-# def GitWorketAsync(request, GITURL, GITUSER, GITPASS, PROJDIR, MDFILE):
-#     request.session['GIT_STATUS'] = list()
-#     g = GitWorker(request, GITURL, GITUSER, GITPASS, PROJDIR, MDFILE)
-#     if g:
-#         if g.clone():
-#             f = g.activity()
-#             if f:
-#                 if g.addindex(f):
-#                     if g.push():
-#                         request.session['GIT_STATUS'].append("Готово")
-#
-#     return True
-#
-# async def ExemineTask(t = 5):
-#     import time
-#     time.sleep(t)
-#     return t
+def dns_fileHandler(fname, full_buf)->int:
+    """Функция парсинга DNS Aktus"""
+    count = 0
+    EMAIL = '(\w|\.|\_|\-)+[@](\w|\_|\-|\.)+[.]\w{2,3}'
+    DEFAULT = 'Default'
+    with open(fname, 'r') as f: #encoding='utf-8'
+        owner = ''
+        for line in f:
+            try:
+                if len(line) > 1:
+                    if line[0] not in ['@', ';', ' ', '_']:
+                        if 'IN' in line:
+                            if owner != '':
+                                if owner not in full_buf:
+                                    full_buf[owner] = []
+                                full_buf[owner].append(line.strip())
+                                count += 1
+                            else:
+                                if DEFAULT not in full_buf:
+                                    full_buf[DEFAULT] = []
+                                full_buf[DEFAULT].append(line.strip())
+                                count += 1
+                    else:
+                        if ('<<' in line) or \
+                             (';<' in line and not ('/' in line or '\\' in line)) or \
+                             ('<' in line and re.search(EMAIL, line)) or \
+                             ('OT' in line and (':' in line or '#' in line)):
+                                owner = line.strip()
+                        elif ('>>' in line and owner != '') or  (';<' in line and ('/' in line or '\\' in line)):
+                            if owner not in full_buf:
+                                full_buf[owner] = []
+                            owner = ''
+                        else:
+                            if DEFAULT not in full_buf:
+                                full_buf[DEFAULT] = []
+                            if line[0] not in ['@', ';', ' ', '_']:
+                                full_buf[DEFAULT].append(line.strip())
+                                count += 1
+            except:
+                pass
+
+    return count
+
+
+def ExtractDataDns(uploaded_file_url)->int:
+    """Функция записи из буфера DNS файла"""
+    buff = {}
+    Tags = apps.get_model('ownerlist', 'Tags')
+    Iplist = apps.get_model('ownerlist', 'Iplist')
+    Owners = apps.get_model('ownerlist', 'Owners')
+    count = 0
+    result = dns_fileHandler(uploaded_file_url, buff)
+    if buff:
+           for owner in buff:
+               for value in buff[owner]:
+                       line = value.split()
+                       if len(line) < 4:
+                           continue
+                       elif len(line) >= 5:
+                           del line[1]
+                       if line[2] == 'CNAME':
+                            for cname in buff:
+                                for tmp in buff[cname]:
+                                    s = tmp.split()
+                                    if line[3] == s[0]:
+                                        owner = "{} CNAME {}".format(owner, line[3])
+                                        if len(s) >= 5:
+                                            line[3] = s[4]
+                                        else:
+                                             line[3] = s[3]
+                                        break
+                            if not isvalidip(line[3]):
+                                try:
+                                    r = socket.gethostbyname(line[3])
+                                    if r:
+                                        owner = "{} CNAME {}".format(owner, line[3])
+                                        line[3] = r
+                                except:
+                                    pass
+
+                       if settings.DEBUG:
+                            print(line)
+
+                       try:
+                              owner_info, created1 = Owners.objects.get_or_create(username='Макаренко А.Б')
+
+                       except:
+                               owner_info = Owners.get_default_owner()
+                       try:
+                           tag_info, created2 = Tags.objects.get_or_create(name='Aktur DNS')
+                       except:
+                            pass
+
+                       try:
+                            ip_info, created3 = Iplist.objects.get_or_create(
+                                ipv4=line[3],
+                                hostname=line[0],
+                                owner=owner_info,
+                                comment=owner,
+                                )
+                            if created3:
+                                count += 1
+                       except IntegrityError:
+                            ip_info = Iplist.objects.get(ipv4=line[3])
+                            ip_info.ipv4 = line[3]
+                            ip_info.hostname = line[0]
+                            ip_info.owner = owner_info
+                            ip_info.comment = owner
+
+                            ip_info.save()
+
+                       except DataError as e:
+                            if settings.DEBUG:
+                                print("- Ошибка данных: {}".format(e))
+
+                       if created3:
+                           ip_info.tags.add(tag_info)
+                           ip_info.save()
+
+
+    return count
+    # except:
+    #     pass

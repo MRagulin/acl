@@ -176,6 +176,16 @@
                       </span>
                     </a>
                   </nav>
+                {% if request.user.is_superuser %}
+                <nav class="nav-group">
+                    <a href="{% url 'panel_adm' %}" class="nav-link">
+                      <span class="nav-text">
+                         <i class="fas fa-user-cog pr-1"></i> Администрирование
+                      </span>
+                    </a>
+                  </nav>
+                {% endif %}
+
                </div>
         </div>
     <div class="content">

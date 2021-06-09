@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     'acladmin',
     'django_python3_ldap',
     'django.contrib.admin',
+    'panel'
 ]
 
 MIDDLEWARE = [

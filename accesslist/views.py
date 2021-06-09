@@ -116,6 +116,7 @@ class Aclhistory(BaseView, LoginRequiredMixin, View):
                     acllist = ACL.objects.order_by("-created", "-pkid")
                 else:
                     acllist = ACL.objects.filter(owner__email__iexact=request.user.email).order_by("-created", "-pkid")
+
             paginator = Paginator(acllist, 10)
             page_number = request.GET.get('page', 1)
             page = paginator.get_page(page_number)
@@ -235,7 +236,7 @@ def save__form(request, owner_form:None, acl_id)->None:
         if obj:
             obj.acltext = json.dumps(request.session['LOCAL_STORAGE'])
             obj.is_executed = False
-            obj.owner = user
+            obj.owner = request.user
             #if created:
             if len(request.session['LOCAL_STORAGE']) <= 1:
                     obj.status = 'NOTFL'

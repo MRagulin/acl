@@ -23,6 +23,8 @@ urlpatterns = [
     path('acl/', include('accesslist.urls')),
     path('login/', login.as_view(), name="login_urls"),
     path('accounts/', include('django.contrib.auth.urls'), name='login'),
-    path('', include('ownerlist.urls'))
+    path('panel/', include('panel.urls')),
+    path('', include('ownerlist.urls')),
+
 
 ]

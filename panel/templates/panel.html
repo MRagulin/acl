@@ -1,0 +1,114 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="row">
+                        <div class="col-xl-3 col-md-6 mb-4">
+                            <div class="card border-left-primary shadow h-100 py-2">
+                                <div class="card-body">
+                                    <div class="row no-gutters align-items-center">
+                                        <div class="col mr-2">
+                                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                                CPU</div>
+                                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ cpu }}</div>
+                                        </div>
+                                        <div class="col-auto">
+                                            <i class="fas fa-microchip fa-2x text-gray-300"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Earnings (Monthly) Card Example -->
+                        <div class="col-xl-3 col-md-6 mb-4">
+                            <div class="card border-left-success shadow h-100 py-2">
+                                <div class="card-body">
+                                    <div class="row no-gutters align-items-center">
+                                        <div class="col mr-2">
+                                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                                                RAM</div>
+                                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ ram}}</div>
+                                        </div>
+                                        <div class="col-auto">
+                                            <i class="fas fa-memory fa-2x text-gray-300"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Earnings (Monthly) Card Example -->
+                        <div class="col-xl-3 col-md-6 mb-4">
+                            <div class="card border-left-info shadow h-100 py-2">
+                                <div class="card-body">
+                                    <div class="row no-gutters align-items-center">
+                                        <div class="col mr-2">
+                                            <div class="text-xs font-weight-bold text-info text-uppercase mb-1">HDD Free
+                                            </div>
+                                            <div class="row no-gutters align-items-center">
+                                                <div class="col-auto">
+                                                    <div class="h5 mb-0 mr-3 font-weight-bold text-gray-800">{{ hdd_free }} %</div>
+                                                </div>
+                                                <div class="col">
+                                                    <div class="progress progress-sm mr-2">
+                                                        {% if hdd_free < 30 %}
+                                                            <div class="progress-bar bg-danger" role="progressbar" style="width: {{ hdd_total }}%" aria-valuenow="{{ hdd_total }}" aria-valuemin="0" aria-valuemax="100"></div>
+                                                        {% elif hdd_free < 70 %}
+                                                            <div class="progress-bar bg-info" role="progressbar" style="width: {{ hdd_total }}%" aria-valuenow="{{ hdd_total }}" aria-valuemin="0" aria-valuemax="100"></div>
+                                                        {% elif  hdd_free > 70%}
+                                                            <div class="progress-bar bg-success" role="progressbar" style="width: {{ hdd_total }}%" aria-valuenow="{{ hdd_total }}" aria-valuemin="0" aria-valuemax="100"></div>
+                                                        {% endif %}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-auto">
+                                            <i class="fas fa-hdd fa-2x text-gray-300"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Pending Requests Card Example -->
+                        <div class="col-xl-3 col-md-6 mb-4">
+                            <div class="card border-left-warning shadow h-100 py-2">
+                                <div class="card-body">
+                                    <div class="row no-gutters align-items-center">
+                                        <div class="col mr-2">
+                                            <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                                                Active connections</div>
+                                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ net_con }}</div>
+                                        </div>
+                                        <div class="col-auto">
+                                            <i class="fas fa-comments fa-2x text-gray-300"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+</div>
+<div class="row">
+<div class="col-xl-8 col-lg-7">
+    <div class="card shadow mb-4">
+    <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+        Конфигурация
+    </div>
+    <form class="m-3 ml-5">
+       <input class="form-check-input" type="checkbox" value="" id="check_debug" {% if debug %}checked{% endif %}/>
+      <label class="form-check-label" for="check_debug">
+        Отладочный режим
+      </label>
+     </form>
+        <div class="card-body" style="min-height: 300px">
+            <textarea class="form-control" rows="18">
+            {{ log }}
+            </textarea>
+        </div>
+    </div>
+</div>
+</div>
+
+
+
+{% endblock %}
