@@ -1071,7 +1071,7 @@ class GitWorker:
             self.repo = self.repo.clone_from(self.GITPRO, self.PATH_OF_GIT_REPO)
         except Exception as e:
             if e.status == 128:
-                self.request.session['git_upload_status'].append({'error': "Нет доступа к GIT репозиторию: {}".format(e)})
+                self.request.session['git_upload_status'].append({'error': "Нет доступа к GIT репозиторию"})
             else:
                 self.request.session['git_upload_status'].append({'error': "[Ошибка] {}".format(e)})
 

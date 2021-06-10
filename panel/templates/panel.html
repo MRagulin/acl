@@ -100,10 +100,57 @@
         Отладочный режим
       </label>
      </form>
-        <div class="card-body" style="min-height: 300px">
-            <textarea class="form-control" rows="18">
-            {{ log }}
-            </textarea>
+        <div class="card-body" style="max-height: 550px; overflow: scroll">
+{#            <textarea class="form-control" rows="18">#}
+{#            {{ log }}#}
+{#            </textarea>#}
+
+       <table class="table table-hover table-borderles table-sm table-history" style="border: 1px solid #dee2e6">
+          <thead style="background:#efefef;">
+            <tr>
+              <th scope="col">Статус</th>
+              <th scope="col" class="text-center">Дата</th>
+              <th scope="col">Источник</th>
+              <th scope="col">Файл</th>
+              <th scope="col">Строка</th>
+              <th scope="col">Событие</th>
+            </tr>
+          </thead>
+          <tbody style="cursor: pointer">
+              {% for value in log %}
+            <tr>
+             <td class="bs">
+                    <p class="badge
+                  {% if value.0 == 'WARNING' %}badge-warning
+                  {% elif value.0 == 'INFO'%}badge-info
+                  {% elif value.0 == 'ERROR'%}badge-danger
+                  {% elif value.0 == 'DEBUG'%}badge-secondary
+                  {% else %}badge-success
+                  {% endif %}
+                    ">
+                      {{ value.0 }}
+                  </p>
+             </td>
+             <td class="bs">
+                    {{ value.1 }}
+              </td>
+              <td style="max-width: 100px;!important;">
+                {{ value.2 }}
+              </td>
+              <td>
+                {{ value.4}}
+              </td>
+              <td>
+                {{ value.5}}
+              </td>
+              <td class="text-secondary">
+                  {{ value.6}}
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+
         </div>
     </div>
 </div>
