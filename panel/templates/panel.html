@@ -98,16 +98,27 @@
      </form>
  </div>
 <div class="col-xl-8 col-lg-7">
-    <div class="card shadow mb-4">
+
+
+
+<div class="accordion col-12 pb-5" id="accordionConfig">
+
+            <div class="card">
+                    <div class="card-header bg-secondary text-white" id="headingOne">
+                        <h2 class="mb-0">
+                        <button class="btn btn-link btn-block text-left text-white collapse_buttom collapsed" type="button" data-toggle="collapse" data-target="#collapseOne" aria-expanded="false" aria-controls="collapseOne">
+                                   Журнал событий
+                        </button>
+                        </h2>
+                    </div>
+
+ <div id="collapseOne" class="collapse" aria-labelledby="headingOne" data-parent="#accordionConfig">
+  <div class="card shadow mb-4">
     <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-        Журнал событий
+
     </div>
 
         <div class="card-body" style="max-height: 550px; overflow: scroll">
-{#            <textarea class="form-control" rows="18">#}
-{#            {{ log }}#}
-{#            </textarea>#}
-
        <table class="table table-hover table-borderles table-sm table-history" style="border: 1px solid #dee2e6">
           <thead style="background:#efefef;">
             <tr>
@@ -163,9 +174,60 @@
 
         </div>
     </div>
+					</div>
+			</div>
+    <!------------------------------------------------------------DB-------------------------------------------------------------->
+			<div class="card">
+				<div class="card-header bg-secondary">
+                    <button class="btn btn-link btn-block text-left text-white collapsed collapse_buttom" type="button" data-toggle="collapse" data-target="#collapseTwo" aria-expanded="false" aria-controls="collapseThree">
+                    История поиска
+                    </button>
+				</div>
+
+
+                <div id="collapseTwo" class="collapse" aria-labelledby="headingThree" data-parent="#accordionConfig">
+					<div class="card-body">
+                     <table class="table table-hover table-borderles table-sm table-history" style="border: 1px solid #dee2e6">
+                              <thead style="background:#efefef;">
+                                <tr>
+                                  <th scope="col">Статус</th>
+                                  <th scope="col" class="text-center w-75">Данные</th>
+                                  <th scope="col">Источник</th>
+                                  <th scope="col">Дата</th>
+                                </tr>
+                              </thead>
+                      <tbody style="cursor: pointer">
+                          {% for value in history %}
+                                <tr>
+                                 <td class="bs">
+
+                                      {% if value.status == False %}
+                                       <p class="badge badge-warning">404</p>
+                                      {% else %}
+                                        <p class="badge badge-success">200</p>
+                                      {% endif %}
+                                 </td>
+                                 <td class="bs">
+                                        {{ value.string }}
+                                  </td>
+                                  <td style="max-width: 100px;!important;">
+                                    {{ value.ipv4.ipv4 }}
+                                  </td>
+
+                                  <td style="max-width: 120px;!important;">
+                                    {{ value.date|date:"M d, Y" }}
+                                  </td>
+                                </tr>
+                           {% endfor %}
+                     </table>
+					</div>
+				</div>
+			</div>
+     <!------------------------------------------------------------Log-------------------------------------------------------------->
+
+
+	</div>
 </div>
 </div>
-
-
-
+</div>
 {% endblock %}

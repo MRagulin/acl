@@ -314,9 +314,10 @@ def write_history(request, string, status) -> None:
     ip = apps.get_model('ownerlist', 'Iplist')
 
     ip_object, obj = ip.objects.get_or_create(ipv4=request.META.get('REMOTE_ADDR')) #IP-адрес пользователя
-    hc_object, obj = hc.objects.get_or_create(string=string,
+    hc_object = hc.objects.create(string=string,
                                          ipv4=ip_object,
                                          status=status)
+    return hc_object
 
 
 def search_text(request=None, string: str = '') -> dict:

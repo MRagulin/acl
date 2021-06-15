@@ -4,6 +4,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from ownerlist.utils import BaseView
 from django.conf import *
 from ownerlist.utils import BASE_DIR
+from django.apps import apps
 import os
 
 def __check_in_buf__(data, value, buff, deep=100, idx=5)->bool:
@@ -44,6 +45,11 @@ class PanelView(BaseView, LoginRequiredMixin, View):
                 pass
             MAX_VIEW = int(request.GET.get('view', 20))
             SEVERITY = int(request.GET.get('severity', 0))
+
+           #Iplist = apps.get_model('ownerlist', 'Iplist') history = apps.
+            history_obj = apps.get_model('ownerlist', 'HistoryCall')
+            history = history_obj.objects.order_by('-id')[:MAX_VIEW]
+            context.update({'history': history})
 
             if PS_ACTIVE:
                 hdd = psutil.disk_usage('/')

@@ -1,6 +1,6 @@
 from django.db import models
 from .utils import IP2Int
-
+from django.contrib.auth.models import User
 
 class Tags(models.Model):
     name = models.CharField(max_length=128, unique=True, verbose_name="Имя тега", default="default")
