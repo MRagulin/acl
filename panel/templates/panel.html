@@ -90,16 +90,19 @@
 </div>
 <div class="row">
 <div class="col-xl-8 col-lg-7">
-    <div class="card shadow mb-4">
-    <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-        Конфигурация
-    </div>
     <form class="m-3 ml-5">
        <input class="form-check-input" type="checkbox" value="" id="check_debug" {% if debug %}checked{% endif %}/>
       <label class="form-check-label" for="check_debug">
         Отладочный режим
       </label>
      </form>
+ </div>
+<div class="col-xl-8 col-lg-7">
+    <div class="card shadow mb-4">
+    <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+        Журнал событий
+    </div>
+
         <div class="card-body" style="max-height: 550px; overflow: scroll">
 {#            <textarea class="form-control" rows="18">#}
 {#            {{ log }}#}
@@ -144,7 +147,14 @@
                 {{ value.5}}
               </td>
               <td class="text-secondary">
-                  {{ value.6}}
+                  {% if value|length >= 9 %}
+                    <span class="badge badge-primary">{{ value.10}}</span> {{ value.7}}
+                  {% elif  value|length >= 8 %}
+                    <span class="badge badge-primary">{{ value.7}}</span> {{ value.6}}
+                  {% elif  value|length >= 7 %}
+                    <span class="badge badge-primary">{{ value.6}}</span> {{ value.7}}
+                  {% endif %}
+
               </td>
             </tr>
             {% endfor %}
