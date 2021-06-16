@@ -316,6 +316,7 @@ def write_history(request, string, status) -> None:
     ip_object, obj = ip.objects.get_or_create(ipv4=request.META.get('REMOTE_ADDR')) #IP-адрес пользователя
     hc_object = hc.objects.create(string=string,
                                          ipv4=ip_object,
+                                         username= request.user,
                                          status=status)
     return hc_object
 

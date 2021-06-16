@@ -89,7 +89,7 @@
                         </div>
 </div>
 <div class="row">
-<div class="col-xl-8 col-lg-7">
+<div class="col-xl-6 col-lg-8 col-md-12">
     <form class="m-3 ml-5">
        <input class="form-check-input" type="checkbox" value="" id="check_debug" {% if debug %}checked{% endif %}/>
       <label class="form-check-label" for="check_debug">
@@ -97,9 +97,7 @@
       </label>
      </form>
  </div>
-<div class="col-xl-8 col-lg-7">
-
-
+<div class="col-xl-8 col-lg-12 col-md-12">
 
 <div class="accordion col-12 pb-5" id="accordionConfig">
 
@@ -191,8 +189,8 @@
                               <thead style="background:#efefef;">
                                 <tr>
                                   <th scope="col">Статус</th>
-                                  <th scope="col" class="text-center w-75">Данные</th>
-                                  <th scope="col">Источник</th>
+                                  <th scope="col" class="text-center w-50">Данные</th>
+                                  <th scope="col">Пользователь</th>
                                   <th scope="col">Дата</th>
                                 </tr>
                               </thead>
@@ -211,7 +209,7 @@
                                         {{ value.string }}
                                   </td>
                                   <td style="max-width: 100px;!important;">
-                                    {{ value.ipv4.ipv4 }}
+                                    {{ value.username.last_name }} {{ value.username.first_name }}
                                   </td>
 
                                   <td style="max-width: 120px;!important;">
@@ -224,8 +222,6 @@
 				</div>
 			</div>
      <!------------------------------------------------------------Log-------------------------------------------------------------->
-
-
 	</div>
 </div>
 </div>

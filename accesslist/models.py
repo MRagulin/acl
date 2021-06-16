@@ -1,6 +1,6 @@
 from django.db import models
 from ownerlist.models import Owners
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, Group
 
 class ACL(models.Model):
     pkid = models.BigAutoField(primary_key=True, editable=False)
