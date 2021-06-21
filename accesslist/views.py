@@ -238,7 +238,9 @@ def save__form(request, owner_form:None, acl_id)->None:
         if obj:
             obj.acltext = json.dumps(request.session['LOCAL_STORAGE'])
             obj.is_executed = False
-            obj.owner = request.user
+            # Не перезаписывать владельца ACL
+            if created:
+                obj.owner = request.user
             #if created:
             if len(request.session['LOCAL_STORAGE']) <= 1:
                     obj.status = 'NOTFL'
@@ -437,9 +439,10 @@ def OverViewStatus(request)->bool:
                     except Exception as e:
                         UpdateCallBackStatus(uid, 'docx_download_status', 'Произошла ошибка при создании docx файла: {}'.format(e), 0)
                     finally:
+                        del request.session['ACT_MAKE_DOCX']
                         if result:
                             UpdateCallBackStatus(uid, 'docx_download_status', result)
-                        del request.session['ACT_MAKE_DOCX']
+
 
     if 'ACT_MAKE_GIT' in request.session:
                     UpdateCallBackStatus(uid, 'git_upload_status', 'Генерация md файла')
