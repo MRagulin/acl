@@ -1180,7 +1180,6 @@ class GitWorker:
         #remote = self.repo.create_remote('origin', self.repo.remotes.origin.url)
         if settings.DEBUG:
             logger.debug("Отправка изменений на сервер")
-        UpdateCallBackStatus(self.taskid, 'git_upload_status', "Отправка изменений на сервер")
         try:
             if refspec == '':
                 refspec = 'master:master'
@@ -1197,7 +1196,7 @@ class GitWorker:
                     logger.debug("Ошибка аутентификации для данного репозитория")
             elif "src refspec master" in e.stderr:
                 if refspec == 'master:master':
-                    UpdateCallBackStatus(self.taskid, 'git_upload_status', "Ошибка при отправке в ветку мастер, пробуем в последний коммит: {}".format(self.repo.active_branch))
+                    UpdateCallBackStatus(self.taskid, 'git_upload_status', "Ошибка при отправке в ветку master, пробуем в последний коммит: {}".format(self.repo.active_branch))
                     time.sleep(3)
                     self.push("{}:{}".format("HEAD", self.repo.active_branch))
                 else:

@@ -470,6 +470,8 @@ def OverViewStatus(request)->bool:
                                           f = g.activity()
                                           if f:
                                               if g.addindex(f):
+                                                  UpdateCallBackStatus(uid, 'git_upload_status',
+                                                                       "Отправка изменений на сервер")
                                                   if g.push():
                                                       UpdateCallBackStatus(uid, 'git_upload_status',
                                                                            "Файл acl.md успешно загружен в репозиторий")
