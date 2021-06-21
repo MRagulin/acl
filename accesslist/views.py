@@ -117,7 +117,7 @@ class Aclhistory(BaseView, LoginRequiredMixin, View):
                 if request.user.is_staff:
                     acllist = ACL.objects.order_by("-created", "-pkid")
                 else:
-                    acllist = ACL.objects.filter(owner__email__iexact=request.user.email).order_by("-created", "-pkid")
+                    acllist = ACL.objects.filter(owner_id=request.user.id).order_by("-created", "-pkid") #owner__email__iexact=request.user.email
 
             paginator = Paginator(acllist, 10)
             page_number = request.GET.get('page', 1)

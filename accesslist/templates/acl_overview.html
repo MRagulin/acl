@@ -241,8 +241,18 @@
         //clearInterval(int_status);
         if (counter >= AJAX_MAX_ATTEMP)
         {
-            setErrorStatus('Запрос занял много времени');
+            setErrorStatus('Запрос занял много времени, попробуйте еще раз');
             clearInterval(int_status);
+            $(".list-group-item-git .status").remove();
+             if (status.hasOwnProperty('git_upload_file') && status['git_upload_file'].hasOwnProperty('status')) {
+                 let file = status['git_upload_file']['status'];
+                 if (file.indexOf('.md') > 0) {
+                     $(".list-group-item-git").append('<p class="text-secondary pt-3">' + message[11] + '</p>');
+                     $(".list-group-item-git").append("<a href='" + file + "' " +
+                         "style='font-size: 18px' class='card-link card-download-file text-primary' " +
+                         "target='_blank' download><i class='fab fa-github pr-1'></i> Скачать md-файл</a>");
+                 }
+             }
         }
     }, 2000);
 </script>

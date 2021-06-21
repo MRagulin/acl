@@ -1079,7 +1079,7 @@ class GitWorker:
 
         if not os.path.exists(self.PATH_OF_GIT_REPO):
                  os.makedirs(self.PATH_OF_GIT_REPO)
-                 UpdateCallBackStatus(taskid, 'git_upload_status', "Создание временой папки: {}".format(self.PATH_OF_GIT_REPO))
+                 UpdateCallBackStatus(taskid, 'git_upload_status', "Создание временой папки")
                  #self.request.session['git_upload_status'].append({'status': "Создание временой папки: {}".format(self.PATH_OF_GIT_REPO)})
                  if settings.DEBUG:
                      logger.debug("Создание временой папки: {}".format(self.PATH_OF_GIT_REPO))
@@ -1176,16 +1176,18 @@ class GitWorker:
                 return False
         return True
 
-    def push(self):
+    def push(self, refspec=''):
         #remote = self.repo.create_remote('origin', self.repo.remotes.origin.url)
         if settings.DEBUG:
             logger.debug("Отправка изменений на сервер")
         UpdateCallBackStatus(self.taskid, 'git_upload_status', "Отправка изменений на сервер")
         try:
-            result = self.repo.remotes.origin.push(refspec='master:master')
+            if refspec == '':
+                refspec = 'master:master'
+            result = self.repo.remotes.origin.push(refspec=refspec)
             if result:
                 #self.request.session['git_upload_status'].append({'status': "Отправка изменений на сервер"})
-                UpdateCallBackStatus(self.taskid, 'git_upload_status', "Локальный коммит успешно отправлен на сервер")
+                UpdateCallBackStatus(self.taskid, 'git_upload_status', "Файл acl.md успешно загружен в репозиторий")
                 return True
         except Exception as e:
             if e.status == 128:
@@ -1193,6 +1195,14 @@ class GitWorker:
                 UpdateCallBackStatus(self.taskid, 'git_upload_status', "Ошибка аутентификации для данного репозитория", 0)
                 if settings.DEBUG:
                     logger.debug("Ошибка аутентификации для данного репозитория")
+            elif "src refspec master" in e.stderr:
+                if refspec == 'master:master':
+                    UpdateCallBackStatus(self.taskid, 'git_upload_status', "Ошибка при отправке в ветку мастер, пробуем в последний коммит: {}".format(self.repo.active_branch))
+                    time.sleep(3)
+                    self.push("{}:{}".format("HEAD", self.repo.active_branch))
+                else:
+                    UpdateCallBackStatus(self.taskid, 'git_upload_status',
+                                         "Ошибка при отправке в ветку {}".format(refspec), 0)
             else:
                 #self.request.session['git_upload_status'].append({'error': "Ошибка при отправки файла в проект: {}".format(e)})
                 UpdateCallBackStatus(self.taskid, 'git_upload_status', "Ошибка при отправке коммита на сервер", 0)
