@@ -22,7 +22,7 @@
                                 {% if gitproc %}
                                 <li class="list-group-item list-group-item-git border-0"><p class="card-text status">Отправка запроса в Git: </p>
                                 <div class="d-flex justify-content-center">
-                                      <div class="spinner-border text-success" role="status">
+                                      <div class="spinner-border text-primary" role="status">
                                           <span class="sr-only">Loading...</span>
                                         </div>
                                     </div>
@@ -141,7 +141,7 @@
                                       let file = status['git_upload_file']['status'];
                                       if (file.indexOf('.md') > 0)
                                       {
-                                      $(".list-group-item-git").append('<p class="text-secondary pt-3">Но вы можете вручную разместить файл в проект</p>');
+                                      $(".list-group-item-git").append('<p class="text-secondary pt-3">'+message[11]+'</p>');
                                       $(".list-group-item-git").append("<a href='"+file+"' " +
                                                 "style='font-size: 18px' class='card-link card-download-file text-primary' " +
                                                 "target='_blank' download><i class='fab fa-github pr-1'></i> Скачать md-файл</a>");
@@ -166,6 +166,8 @@
                                          $("<p class='status'>Отправка запроса в Git: <span class='status text-primary'>"+git_status.status+"...</span></p>").insertBefore('.list-group-item-git .card-download-file');
                                      else
                                        $(".list-group-item-git").append("<p class='status'>Отправка запроса в Git: <span class='status text-primary'>"+git_status.status+"...</span></p>");
+
+                                     return false;
                                    }
 
                                     if (git_status.status.indexOf('static'))
