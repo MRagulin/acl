@@ -1,5 +1,5 @@
-import os, shutil
-from pathlib import Path
+import os, shutil, sys
+from pathlib import Path, PurePosixPath
 from django.core.files.storage import FileSystemStorage
 from django.apps import apps
 from django.contrib import messages
@@ -22,9 +22,10 @@ from docx.shared import Pt
 import socket
 import codecs
 import json
-
+from time import sleep
 import git
 from shutil import copyfile
+from django.core.cache import cache
 COMMIT_MESSAGE = '[ACL PORTAL] Add acl-MD file'
 
 
@@ -801,15 +802,27 @@ class ExtractDataXls:
             return self.ExtractIPInfo(domain_idx=col_index['domain'], ip_idx=col_index['ip'], owner_idx=col_index['owner'],
                                   comment_idx=col_index['comment'], stop_recurse=True, HasTags=Tags)
 
+def UpdateCallBackStatus(taskid, name, value, event = 1):
+    """Функция для создания сообщения callback на запрос статуса потоками"""
+    JOB = cache.get(taskid, {})
+    if event == 1:
+        JOB.update({name: {'status': value}})
+    else:
+        JOB.update({name: {'error': value}})
+    cache.set(taskid, JOB)
+
+
 def make_doc(request=None, data_set={}, fileuuid='')->str:
     """Функция для генерации docx файла"""
-    request.session['docx_download_status'] = 'Создаем файл...'
+    #request.session['docx_download_status'] = 'Создаем файл...'
     TEMPLATE_FILE = os.path.join(BASE_DIR, 'templates//ACL.docx')
     if fileuuid == '':
         fileuuid = str(uuid.uuid4())
+    UpdateCallBackStatus(fileuuid, 'docx_download_status', 'Создаем docx файл')
     APP_FILE = 'static/docx/Application_' + fileuuid + '.docx'
     doc = Document(TEMPLATE_FILE)
-    request.session['docx_download_status'] = 'Записываем изменения'
+    UpdateCallBackStatus(fileuuid, 'docx_download_status', 'Записываем изменения')
+
     doc.styles['Normal'].font.name = 'Verdana'
     doc.styles['Normal'].font.size = Pt(10)
     for data_inx, data in enumerate(FORM_APPLICATION_KEYS):
@@ -839,10 +852,13 @@ def make_doc(request=None, data_set={}, fileuuid='')->str:
             table = doc.tables[0]
             table._element.addnext(p._p)
 
+    #request.session['docx_download_status'] = "Сохраняем файл ..."
+    UpdateCallBackStatus(fileuuid, 'docx_download_status', "Сохраняем файл {} ".format("Application_" + fileuuid))
     doc.save(os.path.join(BASE_DIR, APP_FILE))
-    request.session['docx_download_status'] = "{}".format('\\' + APP_FILE)
+    #request.session['docx_download_status'] = "{}".format('\\' + APP_FILE)
+    #UpdateCallBackStatus(fileuuid, 'docx_download_status', "{}".format('\\' + APP_FILE))
     request.session.modified = True
-    return '\\' + APP_FILE
+    return '/' + APP_FILE
 
 
 def is_valid_uuid(uuid_to_test, version=4):
@@ -942,76 +958,93 @@ def table(records, fields, headings=None, alignment=None, file=None):
         file.write('\n')
 
 
-def MakeMarkDown(request, json_data, filename):
+def MakeMarkDown(request, json_data, filename, fileuuid=''):
     """Функция записывает JSON как md файл"""
-    request.session['git_upload_status'] = 'Создание md-файла'
-    tmp = os.path.join(BASE_DIR, 'static/md/' + filename + '.md')
-    file = codecs.open(tmp, "w", encoding="utf-8")
-    data = json_data #json.loads(json_data)
-    for key in data:
-        if key == 'acl_create_info.html':
-            file.write('## {}'.format(data[key][4]))
-            file.write('\n')
-            file.write('##### Описание доступа к ресурсам')
-            file.write('\n')
-            tmp = zip(contact_table, data[key])
-            fields = [0, 1]
-            table(records=tmp, fields=fields, headings=contact_column, alignment=[('<', '<'), ('<', '<')], file=file)
+    #request.session['git_upload_status'] = 'Создание md-файла'
+    UpdateCallBackStatus(fileuuid, 'git_upload_status', 'Создание md-файла')
+    try:
+        tmp = os.path.join(BASE_DIR, 'static/md/' + filename + '.md')
+        file = codecs.open(tmp, "w", encoding="utf-8")
+        data = json_data #json.loads(json_data)
+        for key in data:
+            if key == 'acl_create_info.html':
+                file.write('## {}'.format(data[key][4]))
+                file.write('\n')
+                file.write('##### Описание доступа к ресурсам')
+                file.write('\n')
+                tmp = zip(contact_table, data[key])
+                fields = [0, 1]
+                table(records=tmp, fields=fields, headings=contact_column, alignment=[('<', '<'), ('<', '<')], file=file)
 
-        elif key == 'acl_internal_resources.html':
-            file.write('\n')
-            file.write('##### Список внутренних ресурсов (СГ АльфаСтрахование)')
-            file.write('\n')
-            fields = [0, 1, 2]
-            table(records=data[key], fields=fields, headings=standart_column,
-                  alignment=[('<', '<'), ('^', '^'), ('<', '<')], file=file)
+            elif key == 'acl_internal_resources.html':
+                file.write('\n')
+                file.write('##### Список внутренних ресурсов (СГ АльфаСтрахование)')
+                file.write('\n')
+                fields = [0, 1, 2]
+                table(records=data[key], fields=fields, headings=standart_column,
+                      alignment=[('<', '<'), ('^', '^'), ('<', '<')], file=file)
 
 
-        elif key == 'acl_dmz_resources.html':
-            file.write('\n')
-            file.write('##### Список DMZ ресурсов (СГ АльфаСтрахование)')
-            file.write('\n')
-            fields = [0, 1, 2]
-            table(records=data[key], fields=fields, headings=standart_column,
-                  alignment=[('<', '<'), ('^', '^'), ('<', '<')], file=file)
+            elif key == 'acl_dmz_resources.html':
+                file.write('\n')
+                file.write('##### Список DMZ ресурсов (СГ АльфаСтрахование)')
+                file.write('\n')
+                fields = [0, 1, 2]
+                table(records=data[key], fields=fields, headings=standart_column,
+                      alignment=[('<', '<'), ('^', '^'), ('<', '<')], file=file)
 
-        elif key == 'acl_external_resources.html':
-            file.write('\n')
-            file.write('##### Список внешних ресурсов (Internet)')
-            file.write('\n')
-            fields = [0, 1, 2]
-            table(records=data[key], fields=fields, headings=standart_column,
-                  alignment=[('<', '<'), ('^', '^'), ('<', '<')], file=file)
+            elif key == 'acl_external_resources.html':
+                file.write('\n')
+                file.write('##### Список внешних ресурсов (Internet)')
+                file.write('\n')
+                fields = [0, 1, 2]
+                table(records=data[key], fields=fields, headings=standart_column,
+                      alignment=[('<', '<'), ('^', '^'), ('<', '<')], file=file)
 
-        elif key == 'acl_traffic.html':
-            file.write('\n')
-            file.write('##### Потоки трафика')
-            file.write('\n')
-            fields = [0, 1, 2, 3, 4, 5]
-            table(records=data[key], fields=fields, headings=traffic_column,
-                  alignment=[('<', '<'), ('<', '<'), ('<', '<'), ('<', '<'), ('<', '<'), ('<', '<'), ], file=file)
-    if file:
-        file.close()
-    request.session['git_upload_status'] = '/static/md/' + filename + '.md'
-    request.session.modified = True
+            elif key == 'acl_traffic.html':
+                file.write('\n')
+                file.write('##### Потоки трафика')
+                file.write('\n')
+                fields = [0, 1, 2, 3, 4, 5]
+                table(records=data[key], fields=fields, headings=traffic_column,
+                      alignment=[('<', '<'), ('<', '<'), ('<', '<'), ('<', '<'), ('<', '<'), ('<', '<'), ], file=file)
+        if file:
+            file.close()
+    except Exception as e:
+        logger.error('{}'.format(e))
+        return False
+    UpdateCallBackStatus(fileuuid, 'git_upload_status', 'ACL файл cоздан')
+    #request.session['git_upload_status'] = '/static/md/' + filename + '.md'
+    #request.session.modified = True
     return '/static/md/' + filename + '.md'
 
 
 
 class GitWorker:
-    def __init__(self, request, GITPRO: None, USERNAME: None, PASSWORD: None,  PATH_OF_GIT_REPO, MDFILE: None):
+    def __init__(self, request, GITPRO: None, USERNAME: None, PASSWORD: None,  PATH_OF_GIT_REPO, MDFILE: None, taskid=''):
         uid = str(uuid.uuid4())
         if PATH_OF_GIT_REPO is not None:
-            self.repo = git.Repo.init(PATH_OF_GIT_REPO, bare=True) #PATH_OF_GIT_REPO
+            try:
+                self.repo = git.Repo.init(PATH_OF_GIT_REPO, bare=True) #PATH_OF_GIT_REPO
+            except:
+                UpdateCallBackStatus(taskid, 'git_upload_status', 'Ошибка при инициализации Repo: {}'.format(PATH_OF_GIT_REPO), 0)
+                return False
             if settings.DEBUG:
                 logger.debug('Инициализация GIT репозитория {}'.format(PATH_OF_GIT_REPO))
         else:
-            self.repo = git.Repo.init(os.path.join(tempfile.gettempdir(), uid), bare=True)  # uid, bare=True os.path.join(tempfile.gettempdir(), uid)
+            tmp = os.path.join(tempfile.gettempdir(), uid)
+            try:
+                self.repo = git.Repo.init(tmp, bare=True)  # uid, bare=True os.path.join(tempfile.gettempdir(), uid)
+            except:
+                UpdateCallBackStatus(taskid, 'git_upload_status', 'Ошибка при инициализации Repo: {}'.format(tmp), 0)
+                return False
             if settings.DEBUG:
                 logger.debug('Инициализация GIT репозитория {}'.format(os.path.join(tempfile.gettempdir(), uid)))
 
         self.request = request
-        self.request.session['git_upload_status'].append({'status': "Инициализация Git проекта"})
+        self.taskid = taskid
+        #self.request.session['git_upload_status'].append({'status': "Инициализация Git проекта"})
+        UpdateCallBackStatus(taskid, 'git_upload_status', 'Инициализация Git проекта')
 
         if PASSWORD is not None and USERNAME is not None:
              self.USERNAME = USERNAME
@@ -1023,6 +1056,8 @@ class GitWorker:
 
              if PASSWORD:
                  self.PASSWORD = PASSWORD
+             if '@' in self.PASSWORD:
+                 logger.warning('В пароле пользователя {} имеется запрещенный символ'.format(self.USERNAME))
 
              self.GITURL = GITPRO
              self.GITPRO = GITPRO.split('://')[1]
@@ -1044,7 +1079,8 @@ class GitWorker:
 
         if not os.path.exists(self.PATH_OF_GIT_REPO):
                  os.makedirs(self.PATH_OF_GIT_REPO)
-                 self.request.session['git_upload_status'].append({'status': "Создание временой папки: {}".format(self.PATH_OF_GIT_REPO)})
+                 UpdateCallBackStatus(taskid, 'git_upload_status', "Создание временой папки: {}".format(self.PATH_OF_GIT_REPO))
+                 #self.request.session['git_upload_status'].append({'status': "Создание временой папки: {}".format(self.PATH_OF_GIT_REPO)})
                  if settings.DEBUG:
                      logger.debug("Создание временой папки: {}".format(self.PATH_OF_GIT_REPO))
         #else:
@@ -1070,25 +1106,27 @@ class GitWorker:
         try:
             if settings.DEBUG:
                 logger.debug('Копируем репозиторий: {} ->{} '.format(self.GITPRO, self.PATH_OF_GIT_REPO))
+            UpdateCallBackStatus(self.taskid, 'git_upload_status', "Клонируем удаленный репозиторий")
             self.repo = self.repo.clone_from(self.GITPRO, self.PATH_OF_GIT_REPO)
         except Exception as e:
             if e.status == 128:
-                self.request.session['git_upload_status'].append({'error': "Нет доступа к GIT репозиторию"})
+                #self.request.session['git_upload_status'].append({'error': "Нет доступа к GIT репозиторию"})
+                UpdateCallBackStatus(self.taskid, 'git_upload_status', "Нет доступа к GIT репозиторию", 0)
             else:
-                self.request.session['git_upload_status'].append({'error': "[Ошибка] {}".format(e)})
-
+                #self.request.session['git_upload_status'].append({'error': "[Ошибка] {}".format(e)})
+                UpdateCallBackStatus(self.taskid, 'git_upload_status', "Ошибка при клонировании резозитория", 0)
             if settings.DEBUG:
-                logger.debug('Ошибка при копировании')
-
+                logger.debug('Ошибка при копировании: {}'.format(e))
             return 0
-        if len(self.repo.index.entries) == 0:
-           self.request.session['git_upload_status'].append({'error': "Не удалось скачать файлы проекта, папка пустая"})
 
+        if len(self.repo.index.entries) == 0:
+           #self.request.session['git_upload_status'].append({'error': "Не удалось скачать файлы проекта, папка пустая"})
+           UpdateCallBackStatus(self.taskid, 'git_upload_status', "Не удалось скачать файлы проекта, проект пустой", 0)
            if settings.DEBUG:
                logger.debug("Не удалось скачать файлы проекта, папка пустая")
            return 0
-        self.request.session['git_upload_status'].append({'status': "Скачано: {} файлов".format(len(self.repo.index.entries))})
-
+        #self.request.session['git_upload_status'].append({'status': "Скачано: {} файлов".format(len(self.repo.index.entries))})
+        UpdateCallBackStatus(self.taskid, 'git_upload_status', "Скачано: {} файлов".format(len(self.repo.index.entries)))
         if settings.DEBUG:
             logger.debug("Скачано: {} файлов".format(len(self.repo.index.entries)))
         return True
@@ -1099,19 +1137,24 @@ class GitWorker:
             sfile = self.MDFILE
             dfile = os.path.join(self.PATH_OF_GIT_REPO, 'acl.md')
             if not copyfile(sfile, dfile):
-                self.request.session['git_upload_status'].append({'error': "Ошибка при копировании файла в проект: {}".format(dfile)})
+                UpdateCallBackStatus(self.taskid, 'git_upload_status', "Ошибка при копировании md файла в проект", 0)
+                #self.request.session['git_upload_status'].append({'error': "Ошибка при копировании файла в проект: {}".format(dfile)})
                 if settings.DEBUG:
-                    logger.debug("Ошибка при копировании файла в проект: {}".format(dfile))
+                    logger.debug("Ошибка при копировании файла {} в проект: {}".format(sfile, dfile))
                 return 0
-            self.request.session['git_upload_status'].append({'status': "Копирование файла в проект: {}".format(dfile)})
+            UpdateCallBackStatus(self.taskid, 'git_upload_status', "Копирование md файла в проект")
+            #self.request.session['git_upload_status'].append({'status': "Копирование файла в проект: {}".format(dfile)})
             if settings.DEBUG:
                 logger.debug("Копирование файла в проект: {}".format(dfile))
-        except:
-            self.request.session['git_upload_status'].append({'error': "Возникла ошибка при копировании md файла в папку проекта"})
+        except Exception as e:
+            #self.request.session['git_upload_status'].append({'error': "Возникла ошибка при копировании md файла в папку проекта"})
+            UpdateCallBackStatus(self.taskid, 'git_upload_status', "Возникла ошибка при копировании md файла в папку проекта", 0)
             if settings.DEBUG:
-                logger.debug("Возникла ошибка при копировании md файла в папку проекта")
+                logger.debug("Возникла ошибка при копировании md файла в папку проекта: {}".format(e))
             return 0
         #finally:
+        #if 'linux' in sys.platform:
+            #return str(PurePosixPath(dfile)).replace('/', '//')
         return dfile #str(PurePosixPath(dfile)).replace('/', '//')
 
     def addindex(self, filename):
@@ -1119,38 +1162,47 @@ class GitWorker:
             index = self.repo.index
             index.add([filename])
             index.commit(COMMIT_MESSAGE)
-            self.request.session['git_upload_status'].append({'status': "Локальный коммит изменений"})
+            #self.request.session['git_upload_status'].append({'status': "Локальный коммит изменений"})
+            UpdateCallBackStatus(self.taskid, 'git_upload_status',
+                                 "Локальный коммит изменений")
             if settings.DEBUG:
                 logger.debug("Локальный коммит изменений")
         except Exception as e:
-            self.request.session['git_upload_status'].append({'error': "Ошибка при коммите: {}".format(e)})
-            if settings.DEBUG:
-                logger.debug("Ошибка при коммите: {}".format(e))
-            return False
+                #self.request.session['git_upload_status'].append({'error': "Ошибка при коммите: {}".format(e)})
+                UpdateCallBackStatus(self.taskid, 'git_upload_status',
+                                     "Ошибка при локальном коммите", 0)
+                if settings.DEBUG:
+                    logger.debug("Ошибка при коммите: {}".format(e))
+                return False
         return True
 
     def push(self):
         #remote = self.repo.create_remote('origin', self.repo.remotes.origin.url)
         if settings.DEBUG:
             logger.debug("Отправка изменений на сервер")
+        UpdateCallBackStatus(self.taskid, 'git_upload_status', "Отправка изменений на сервер")
         try:
             result = self.repo.remotes.origin.push(refspec='master:master')
             if result:
-                self.request.session['git_upload_status'].append({'status': "Отправка изменений на сервер"})
+                #self.request.session['git_upload_status'].append({'status': "Отправка изменений на сервер"})
+                UpdateCallBackStatus(self.taskid, 'git_upload_status', "Локальный коммит успешно отправлен на сервер")
                 return True
         except Exception as e:
             if e.status == 128:
-                self.request.session['git_upload_status'].append({'error': "Ошибка аутентификации для данного репозитория"})
+                #self.request.session['git_upload_status'].append({'error': "Ошибка аутентификации для данного репозитория"})
+                UpdateCallBackStatus(self.taskid, 'git_upload_status', "Ошибка аутентификации для данного репозитория", 0)
                 if settings.DEBUG:
                     logger.debug("Ошибка аутентификации для данного репозитория")
             else:
-                self.request.session['git_upload_status'].append({'error': "Ошибка при отправки файла в проект: {}".format(e)})
+                #self.request.session['git_upload_status'].append({'error': "Ошибка при отправки файла в проект: {}".format(e)})
+                UpdateCallBackStatus(self.taskid, 'git_upload_status', "Ошибка при отправке коммита на сервер", 0)
                 if settings.DEBUG:
                     logger.debug("Ошибка при отправки файла в проект: {}".format(e))
             return False
 
         finally:
             self.repo.close()
+            #UpdateCallBackStatus(self.taskid, 'git_upload_status', "Ошибка при отправке коммита на сервер", 0)
             if settings.DEBUG:
                 logger.debug("Очистка временной папки")
         return True

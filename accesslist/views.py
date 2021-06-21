@@ -8,16 +8,18 @@ from .models import ACL
 from ownerlist.models import Owners, Iplist
 import os
 from ownerlist.utils import make_doc, MakeMarkDown, request_handler, is_valid_uuid, ip_status, logger, get_client_ip
-from ownerlist.utils import FORM_APPLICATION_KEYS, FORM_URLS, BaseView, GitWorker, BASE_DIR
+from ownerlist.utils import FORM_APPLICATION_KEYS, FORM_URLS, BaseView, GitWorker, BASE_DIR, UpdateCallBackStatus
 import json
 import uuid
 from django.views.decorators.csrf import csrf_exempt
 from django.core.paginator import Paginator
 from django.conf import settings
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.core.cache import cache
 import re
 import threading
 import sys
+from time import sleep
 
 class ObjectMixin:
     """Миксин обработки запросов и отобращение страниц"""
@@ -314,14 +316,14 @@ class AclOver(BaseView, LoginRequiredMixin, View):
                 #-------------------------------------------------------------------------------------------------------
 
                 if 'ACT_MAKE_DOCX' in request.session:
-                    request.session['docx_download_status'] = True
+                    #request.session['docx_download_status'] = True
                     context['file_download'] = True
 
                     #t = threading.Thread(target=make_doc, args=[request, request.session['LOCAL_STORAGE'], str(acl_id)])
                     #t.setDaemon(True)
                     #t.start()
                 if 'ACT_MAKE_GIT' in request.session:
-                    request.session['git_upload_status'] = True
+                    #request.session['git_upload_status'] = True
                     context['gitproc'] = True
 
                 owner_form = request.session['LOCAL_STORAGE'][FORM_APPLICATION_KEYS[0]]
@@ -405,107 +407,81 @@ def AclRemove(request, *args, **kwargs):
 
 @csrf_exempt
 def OverViewStatus(request)->bool:
-    """Функция обработки запросов на создание активностей из станицы с информацией"""
+    """Функция обработки запросов на выполнение активностей для выполнения обращения"""
 
     result = {}
-    # if settings.DEBUG:
-    #     print("{} {}".format(request.POST['uuid'], request.session['LOCAL_STORAGE']))
     if 'uuid' not in request.POST or not is_valid_uuid(request.POST['uuid']) or not 'LOCAL_STORAGE' in request.session:
         result = {'status': 'error'}
         return HttpResponse(json.dumps(result), content_type="application/json")
 
     uid = request.POST['uuid']
+    JOB = cache.get(uid, {})
+
+    if JOB == {}:
+        if 'ACT_MAKE_DOCX' in request.session or 'ACT_MAKE_GIT' in request.session:
+            cache.set(uid, {}) #create cache for job activity
+        else:
+            return HttpResponse(json.dumps({'status': 'complete'}), content_type="application/json")
+
+    else:
+        if 'ACT_MAKE_DOCX' in request.session or 'ACT_MAKE_GIT' in request.session:
+            return HttpResponse(json.dumps({'status': JOB}), content_type="application/json")
+        else:
+            cache.delete(uid)
+            return HttpResponse(json.dumps({'status': JOB}), content_type="application/json")
 
     if 'ACT_MAKE_DOCX' in request.session:
-        if 'docx_download_status' in request.session:
-            if request.session['docx_download_status'] == True:
+                    UpdateCallBackStatus(uid, 'docx_download_status', 'Генерация docx файла')
                     try:
-                        make_doc(request, request.session['LOCAL_STORAGE'], uid)
+                        result = make_doc(request, request.session['LOCAL_STORAGE'], uid)
                     except Exception as e:
-                        result['docx_download_status'] = {'error': 'Произошла ошибка при создании docx файла: {}'.format(e)}
+                        UpdateCallBackStatus(uid, 'docx_download_status', 'Произошла ошибка при создании docx файла: {}'.format(e), 0)
+                    finally:
+                        if result:
+                            UpdateCallBackStatus(uid, 'docx_download_status', result)
                         del request.session['ACT_MAKE_DOCX']
-                        del request.session['docx_download_status']
-                    result["docx_download_status"] = {'status': request.session['docx_download_status']}
-
-                    if 'docx_download_status' in request.session:
-                        del request.session['docx_download_status']
-                    if 'ACT_MAKE_DOCX' in request.session:
-                        del request.session['ACT_MAKE_DOCX']
-            else:
-                result["docx_download_status"] = {'status': request.session['docx_download_status']}
 
     if 'ACT_MAKE_GIT' in request.session:
-        if 'git_upload_status' in request.session:
-            if settings.DEBUG:
-                print('Текущий статус git: {}'.format(request.session['git_upload_status']))
-            if request.session['git_upload_status'] == True:
+                    UpdateCallBackStatus(uid, 'git_upload_status', 'Генерация md файла')
                     try:
-                        file_md = MakeMarkDown(request, request.session['LOCAL_STORAGE'], 'acl_{}'.format(uid)) or 'None'
+                        file_md = MakeMarkDown(request, request.session['LOCAL_STORAGE'], 'acl_{}'.format(uid), uid) or 'None'
+                        if not file_md:
+                            raise Exception('Ошибка при создании md файла')
+
+                        UpdateCallBackStatus(uid, 'git_upload_file', file_md)
+                        file_md_abs = os.path.join(BASE_DIR, 'static/md/' + 'acl_{}'.format(str(uid)) + '.md')
+                        if '/' in file_md_abs:
+                            if 'linux' not in sys.platform:
+                                    file_md_abs = file_md_abs.replace('/', '\\')
+                        if not os.path.exists(file_md_abs):
+                                file_md_abs = os.path.join(BASE_DIR, 'static/md/' + 'acl_{}'.format(str(uid)) + '.md')
+                                UpdateCallBackStatus(uid, 'git_upload_status', 'Ошибка при формировании пути md файла', 0)
+                                return HttpResponse(json.dumps({'status': cache.get(uid, {})}), content_type="application/json")
+                        if 'GIT_URL' not in request.session:
+                            raise Exception('Неправильный url для git репозитория {}'.format(request.session['GIT_URL']))
+
+                        if 'GIT_USERNAME' not in request.session or 'GIT_PASSWORD' not in request.session:
+                            raise Exception('Невалидные учетные данные для аутентификации')
+                        UpdateCallBackStatus(uid, 'git_upload_status', 'Отправка запроса в gitlab')
+                        g = GitWorker(request, request.session['GIT_URL'], request.session['GIT_USERNAME'],
+                                                request.session['GIT_PASSWORD'], None, file_md_abs, taskid=uid)
+                        if g:
+                                      if g.clone():
+                                          f = g.activity()
+                                          if f:
+                                              if g.addindex(f):
+                                                  if g.push():
+                                                      UpdateCallBackStatus(uid, 'git_upload_status',
+                                                                           "Файл acl.md успешно загружен в репозиторий")
+                                                      if settings.DEBUG:
+                                                          logger.debug('Файл загружен в проект')
+                                      g.free()
                     except Exception as e:
-                        result['git_upload_status'] = {'error': 'Ошибка при создании md файла {}'.format(e)}
-                        del request.session['ACT_MAKE_GIT']
-                        del request.session['git_upload_status']
-                        return HttpResponse(json.dumps(result), content_type="application/json")
+                        UpdateCallBackStatus(uid, 'git_upload_status', '{}'.format(e), 0)
+                    finally:
+                                  del request.session['ACT_MAKE_GIT']
+                                  del request.session['GIT_URL']
+                                  if settings.DEBUG:
+                                      logger.debug('Очистка переменных GIT')
 
-                    #result['git_upload_status'] = {'status': file_md}
-            else:
-                if isinstance(['git_upload_status'], list):
-                    result['git_upload_status'] = request.session['git_upload_status'].pop()
-                else:
-                    result['git_upload_status'] = {'status': request.session['git_upload_status']}
-
-            file_md_abs = os.path.join(BASE_DIR, 'static/md/' + 'acl_{}'.format(str(uid)) + '.md')
-            if '/' in file_md_abs:
-                if 'linux' not in sys.platform:
-                        file_md_abs = file_md_abs.replace('/', '\\')
-            if os.path.exists(file_md_abs):
-                if settings.DEBUG:
-                    logger.debug('Путь к файлу md: {}'.format(file_md_abs))
-            else:
-                logger.warning('Ошибка к пути файла md: {}'.format(file_md_abs))
-
-            result['git_upload_file'] = file_md
-
-            if 'GIT_URL' in request.session:
-                  if 'GIT_USERNAME' in request.session and 'GIT_PASSWORD' in request.session:
-                      request.session['git_upload_status'] = list()
-                      g = GitWorker(request, request.session['GIT_URL'], request.session['GIT_USERNAME'],
-                                    request.session['GIT_PASSWORD'], None, file_md_abs)
-                      if g:
-                          if g.clone():
-                              f = g.activity()
-                              if f:
-                                  if g.addindex(f):
-                                      if g.push():
-                                          request.session['git_upload_status'] = {'status': 'Файл загружен'}
-                                          if settings.DEBUG:
-                                              logger.debug('Файл загружен')
-                          g.free()
-
-                      if isinstance(request.session['git_upload_status'], list):
-                          result['git_upload_status'] = request.session['git_upload_status'].pop()
-                      else:
-                        result['git_upload_status'] = request.session['git_upload_status']
-            else:
-                result['git_upload_status'] = {'error': 'Нет url для загрузки md файла'}
-                if settings.DEBUG:
-                    logger.debug('Нет url для загрузки md файла')
-
-            if 'ACT_MAKE_GIT' in request.session:
-                del request.session['ACT_MAKE_GIT']
-            if 'GIT_URL' in request.session:
-                del request.session['GIT_URL']
-            if 'git_upload_status' in request.session:
-                del request.session['git_upload_status']
-            if 'file_download_md' in request.session:
-                del request.session['file_download_md']
-
-            if settings.DEBUG:
-                logger.debug('Очистка переменных GIT')
-
-
-    #del request.session['LOCAL_STORAGE']
-    if len(result) == 0:
-        result = {'status': 'complete'}
-
-    return HttpResponse(json.dumps(result), content_type="application/json")
+    return HttpResponse(json.dumps({'status': cache.get(uid, {})}), content_type="application/json")

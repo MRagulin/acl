@@ -144,16 +144,16 @@ function ShowNotify(idx = 0, text='Error')
     {
         if (idx == 0) //Error
         {
-            $("body").append("<div id='notifyMessage' class='alert alert-danger shadow rounded' style='text-align:center;vertical-align:middle;width:400px;position:absolute;top:60px;right:30px;margin:20px;display:none;border:1px solid #fd1414;opacity: 0.8;box-shadow: 0 0 10px;z-index:2000;'><i class='fas fa-radiation mr-3'></i>" + text + "</i></div>");
+            $("body").append("<div id='notifyMessage' class='alert alert-danger shadow rounded' style='text-align:center;vertical-align:middle;width:400px;position:fixed;top:60px;right:30px;margin:20px;display:none;border:1px solid #fd1414;opacity: 0.8;box-shadow: 0 0 10px;z-index:2000;'><i class='fas fa-radiation mr-3'></i>" + text + "</i></div>");
         }
         else if (idx == 1) //Warning
         {
-           $("body").append("<div id='notifyMessage' class='alert alert-warning shadow rounded' style='text-align:center;vertical-align:middle;width:400px;position:absolute;top:60px;right:30px;margin:20px;display:none;border:1px solid rgba(198,108,26,0.99);opacity: 0.8;box-shadow: 0 0 10px;z-index:2000;'><i class='fas fa-warning mr-3'></i>" +text + "</i></div>");
+           $("body").append("<div id='notifyMessage' class='alert alert-warning shadow rounded' style='text-align:center;vertical-align:middle;width:400px;position:fixed;top:60px;right:30px;margin:20px;display:none;border:1px solid rgba(198,108,26,0.99);opacity: 0.8;box-shadow: 0 0 10px;z-index:2000;'><i class='fas fa-warning mr-3'></i>" +text + "</i></div>");
         }
 
         else //Success
         {
-             $("body").append("<div id='notifyMessage' class='alert alert-success shadow rounded' style='text-align:center;vertical-align:middle;width:400px;position:absolute;top:60px;right:30px;margin:20px;display:none;border:1px solid rgba(31,151,15,0.99);opacity: 0.8;box-shadow: 0 0 10px;z-index:2000;'><i class='fas fa-anchor mr-3'></i>" +text + "</i></div>");
+             $("body").append("<div id='notifyMessage' class='alert alert-success shadow rounded' style='text-align:center;vertical-align:middle;width:400px;position:fixed;top:60px;right:30px;margin:20px;display:none;border:1px solid rgba(31,151,15,0.99);opacity: 0.8;box-shadow: 0 0 10px;z-index:2000;'><i class='fas fa-anchor mr-3'></i>" +text + "</i></div>");
         }
 
     }
@@ -560,13 +560,13 @@ $("#flexAgreementCheck").click(function(){
 
 });
 
-function setErrorStatus()
+function setErrorStatus(e = '')
 {
 $(".list-group").find(".list-group-item").each(function (idx, val) {
 if ($(val).find(".d-flex").length >0)
                                  {
                                      $(val).children(".d-flex").remove();
-                                     $(val).append('<p class="text-danger">Произошла ошибка</p>');
+                                     $(val).append('<p class="text-danger">[Произошла ошибка] '+e+'</p>');
                                  }
                              });
 }
