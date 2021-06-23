@@ -62,6 +62,7 @@ body {
   padding: 20px;
   min-height: 90vh;
   transition: all 0.3s;
+  margin-left: 240px;
 }
 
 /*Описание левого блока меню*/
@@ -83,6 +84,8 @@ body {
   border-right: 1px solid #ccc;
   border-bottom: 1px solid #ccc;
   max-height: 778px;
+  position: fixed;
+  height: 100%;
 }
 
 .menu-sidebar > .menu-sidebar-text {
@@ -840,4 +843,29 @@ input:not([type='checkbox']):valid+span:after, textarea:valid+span:after {
 }
 .text-gray-300 {
     color: #dddfeb!important;
+}
+.user__icon{
+    width: 35px;
+    height: 35px;
+    background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAAI6gAACOoBxNcq+QAAABl0RVh0U29mdHdhcmUAd3d3Lmlua3NjYXBlLm9yZ5vuPBoAAAQ2SURBVFiFvZd/TJR1HMdf3+c5DjjgkKPgNPOYprCJziBt6tqwllsB1XSsH9rGNGm5stlW1kq7iU7Xmm39keXE2vxJ12jRH5Rhm60MsJxEBQ4WSChHyYEeF3jcc9/+uTMCn3u+muv9330/78/n/X7ueT7f7+crUMSaNV5nOIkyCSUCFgEeJC4EEhgGeoSkNSo4IewpDb59r15WqSusCBXrqvNl1HhFwJNAqqLfvyQcEzq7fDXerpsy8NAL7yZnjAR2SskmIElR+N+QRBC8Q8j5ps/30qiygSfWeWcYkk+QLL0p4aloNWyU1e339lkaqKjcvgCiXwLTLYpe1TQxCBCNymwg2YLfq+mU1tZ4fzY1sGrtzum6bbwZuNOkSHh+vuf70tKlM2fOuH3OxEBf36Wuzxu+u9B+rncZ5q+s34gkFdcder1/ioHyKq8jJcw3QLFJ8tjGqkc6C+Z5FpjEAejoON/23v76uUCKCeUUIVb4fN4wgBZfTR1newJxFhbOabISBygo8CxYWDi7KQFlmUxje/yHBrC6snqujPJiosIPriiy+iau4YGSIneiuIDNFeu9d10zoEvjNQS2REnOjLQMVQPTnOlOC4qdKC8DaBVVuzOl4HHV4rcMkrUVG73pGuGxUsDxvxsAhwjxsAbcr0CWmk1P+IomIsaVlkWhRAMWWhFdWc6WTKcjR9VAptOR48rKOG1JFNytAXlWvKzMtKuq4v/kpI8p0GZrQOaNFr+FcGpA1Io1ODxitquZYigYsjobAIQGBK1Yw8PBxc0/dLSoih+pbTwZGLyyWIEa0IDfFIji+Fcthor48HDwj6aW9uVM2ObNq9KjSfhJpfCfg5eLhgLBi1a8o76v26121TikpFXTJI0qZCD5gwP13YkIF/ovdbef61UeYjQpGrWkCF8AIZWEi/7A8u6e/g6z+N59nwUAu6J+aExPOa4dPuy9IuGIYhLB4Khpf4cjhnK3SDhYf2BLUAMQhr4LCKskpqenmraXENYtHcNVYehvQexL9R3c2g3sscpKTbb/kudxzzOLL7t3/pCKupDsiWmixxc996361h4eLQemDBNCMFK8KP/UpudXF9psuuk/UDBvlsed4zpzrrN3MBIxzM6OsyNO19NdLQ0GTB5K1+/w6EakGciNLY17ZuU2PVNZln8jhxHArx09bYeONhojodFFE5b7Dd22tK7mjfPXHm5yYnwsd2U5e5/d8Gju9JxpeTciPBlnznb+eOzjE46x8HgWaCt9H21rmxi/7sVk74cNeY+VL6kFlvwX8TgMQza9v+/Tp3Zs3TBlHzG9mkkpbf5LgW0ItqDe25MRRrLbfZurWggRuR7B8nI6MDCQG9VszyHYDFgNm3GEJNRIwdt3ZGf/nohoaSAOv9+fJnV7iRRyJXCPQOaCiHWM9EvEAHBaRMVxEQ2fdLvdSrvr3+mDYfxk6sqxAAAAAElFTkSuQmCC);
+    /*url("/static/img/user.png");*/
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: contain;
+    margin-right: 5px;
+}
+
+.user{
+margin-top: 50px;
+  border-bottom: 1px solid #ccc;
+  width: 100%;
+  min-height: 110px;
+  align-items: center
+}
+.info{
+  max-width: 170px;
+  line-height: 5px;
+  padding-top: 15px;
+  word-break:break-word;
+  line-height: 16px;
 }

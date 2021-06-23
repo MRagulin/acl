@@ -110,15 +110,18 @@
 
 {% endif %}
            <div class="menu-sidebar">
-            <div class="user p-3 d-inline-flex" style="margin-top: 50px;border-bottom: 1px solid #ccc;width: 100%;min-height: 110px;">
+            <div class="user p-3 d-inline-flex">
                 {% if user.id is not None %}
-                    <div class="photo rounded pr-2" style="width: 60px; height: 60px; color: #6c757d;border-radius: 50%!important;border:1px solid #ccc;text-align: center">
-                        <div class="w-80" style="margin-top: 10px;margin-left: 10px;">
-                            <i class="fas fa-user fa-2x"></i>
-                        </div>
-
-                    </div>
-                    <div class="info rounded align-bottom pl-3" style="max-width: 170px; line-height: 5px; padding-top: 15px;word-break:break-word;line-height: 16px;">
+                    <div class="user__icon"></div>
+{#                    <div class="photo rounded pr-2" style="width: 60px; height: 60px; color: #6c757d;border-radius: 50%!important;border:1px solid #ccc;text-align: center">#}
+{#                        <div class="w-80" style="margin-top: 10px;margin-left: 10px;">#}
+{#                            <i class="fas fa-user fa-2x"></i>#}
+{#                        </div>#}
+{#                    <div class="user__icon"></div>#}
+{##}
+{##}
+{#                    </div>#}
+                    <div class="info rounded align-bottom pl-3">
                        <span style="display: inline-block; vertical-align: middle;"> <p style="font-weight:600;font-size:14px;color:#545b62">{{ user.first_name }}</p></span> <br>
 {#                        {% if user.is_staff %}#}
 {#                            <p class="badge badge-success">adm</p><br>#}
@@ -193,6 +196,7 @@
                 Добро пожаловать
             {% endblock %}
     </div>
+git
 </div>
 
  </body>

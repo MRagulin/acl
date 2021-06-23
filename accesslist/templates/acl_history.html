@@ -61,7 +61,7 @@
               <th></th>
               <th scope="col">Проект</th>
               <th scope="col">Статус</th>
-              <th scope="col" class="text-center">Пользователь</th>
+              <th scope="col">Пользователь</th>
               <th scope="col">Дата создания</th>
               <th scope="col">UUID</th>
               <th scope="col"></th>
@@ -93,9 +93,10 @@
                       {{ acllist.get_status_display }}
                   </p>
               </td>
-              <td>
+              <td style="text-align: start">
 
-                  <div class="font-weight-bold text-secondary text-center">
+                  <div class="font-weight-bold text-secondary text-center d-inline-flex">
+                      <div class="user__icon"></div>
                       {{ acllist.owner.last_name}} {{ acllist.owner.first_name}}
                   </div>
                   <div class="font-weight-light text-secondary text-center">
