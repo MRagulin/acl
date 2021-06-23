@@ -869,3 +869,26 @@ margin-top: 50px;
   word-break:break-word;
   line-height: 16px;
 }
+
+.big__check, .big__check__label::before, .big__check__label::after{
+width: 1.55rem;
+height: 1.55rem;
+top: .8rem;
+}
+
+/*.big__check__label{*/
+/*width: 1.55rem;*/
+/*height: 1.55rem;*/
+/*top: .8rem;*/
+
+/*}*/
+
+.big__check, .big__check__label{
+ padding-top: 16px;
+ padding-left: 10px;
+}
+.git__label{
+      display: inline;
+    border-bottom: 1px solid #ccc;
+    padding: 4px;
+}

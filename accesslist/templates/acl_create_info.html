@@ -116,29 +116,34 @@
                 </script>
               {% endif %}
           </div>
-          <div class="form-row__footer">
-          <div class="contact-form__submit">
-          <label class="label-form__submit">
-          <input type="checkbox" class="checkbox__real-submit" name="action_make_docx">
-          <span class="checkbox__fake"></span>
-          <span class="checkbox__title-footer">Создать docx файл</span>
-          </label>
-         <label class="label-form__submit">
-          <input type="checkbox" class="checkbox__real-submit" name="action_make_omni" onclick="ShowNotify(1, message[10]); return false;">
-          <span class="checkbox__fake"></span>
-          <span class="checkbox__title-footer">Отправить обращение в OmniTracker</span>
-          </label>
+          <div class="form-row__footer__ col-6 col-md-8 col-sm-12">
+              <div class="m-3">
+                    <h4 class="main-title">Выполнение обращения <span class="badge badge-warning">Опционно</span></h4>
+              </div>
 
-          <label class="label-form__submit">
-          <div class="d-inline-flex">
-          <input type="checkbox" class="checkbox__real-submit" name="action_make_git" {% if 'GIT_URL' in request.session %} checked {% endif %} }}>
-          <span class="checkbox__fake"></span>
-          <span class="checkbox__title-footer">Отправить md файл в Gitlab проект</span>
-          <p class="git__label ml-2 text-muted text-lowercase text-danger">{{request.session.GIT_URL}}</p>
-          </div>
-          </label>
-          </div>
-          <input type="submit" class="btn btn-success" value="Сохранить и продолжить">
+              <div class="contact-form__submit" style="margin: 15px">
+                    <div class="form-check form-switch">
+                      <input class="form-check-input big__check" type="checkbox" name="action_make_docx" id="action_make_docx" {% if 'ACT_MAKE_DOCX' in request.session %} checked {% endif %}>
+                      <label class="form-check-label big__check__label" for="action_make_docx">Создать docx файл</label>
+                    </div>
+
+                     <div class="form-check form-switch">
+                      <input class="form-check-input big__check" type="checkbox" id="action_make_git" name="action_make_git" {% if 'GIT_URL' in request.session %} checked {% endif %}>
+                      <label class="form-check-label big__check__label" for="action_make_git">Отправить md файл в Gitlab проект</label>
+                      <p class="git__label ml-2 text-muted text-lowercase text-danger">{{request.session.GIT_URL}}</p>
+                    </div>
+
+
+                    <div class="form-check form-switch">
+                      <input class="form-check-input big__check" type="checkbox" id="action_make_omni" name="action_make_omni" onclick="ShowNotify(1, message[10]); return false;">
+                      <label class="form-check-label big__check__label" for="action_make_omni">Отправить обращение в OmniTracker</label>
+                    </div>
+              </div>
+
+              <div class="m-2 float-right">
+                   <input type="submit" class="btn btn-success" value="Сохранить и продолжить">
+              </div>
+
           </div>
 </div>
 
@@ -229,7 +234,7 @@
 </div>
 
           </div>
-          <div class="form-row__bottom form-check-inline">
+<div class="form-row__bottom form-check-inline">
  <div class="contact-form__dates">
 
               <label class="contact-form__label-checkbox">
@@ -253,30 +258,35 @@
                 <input type="date" class="contact__input" value="" name="d_form" id="contact__input__date" placeholder="21.01.2020" min="2020-01-01" max="2040-01-01" required>
                 <span class="validity"></span>
             </label>
-            </div>
-          </div>
-          <div class="form-row__footer">
-          <div class="contact-form__submit">
-          <label class="label-form__submit">
-          <input type="checkbox" class="checkbox__real-submit" name="action_make_docx">
-          <span class="checkbox__fake"></span>
-          <span class="checkbox__title-footer">Создать docx файл</span>
-          </label>Создать docx файл
-          <input type="checkbox" class="checkbox__real-submit" name="action_make_omni" onclick="ShowNotify(1, message[10]); return false;">
-          <span class="checkbox__fake"></span>
-          <span class="checkbox__title-footer">Отправить обращение в OmniTracker</span>
-          </label>
+</div>
+</div>
+          <div class="form-row__footer__ col-6 col-md-8 col-sm-12">
+              <div class="m-3">
+                    <h4 class="main-title">Выполнение обращения <span class="badge badge-warning">Опционно</span></h4>
+              </div>
 
-          <label class="label-form__submit">
-          <div class="d-inline-flex">
-          <input type="checkbox" class="checkbox__real-submit" name="action_make_git">
-          <span class="checkbox__fake"></span>
-          <span class="checkbox__title-footer">Отправить md файл в Gitlab проект</span>
-          <p class="git__label ml-2 text-muted text-lowercase text-danger"></p>
-          </div>
-          </label>
-          </div>
-              <input type="submit" class="btn btn-success" value="Сохранить и продолжить">
+              <div class="contact-form__submit" style="margin: 15px">
+                    <div class="form-check form-switch">
+                      <input class="form-check-input big__check" type="checkbox" name="action_make_docx" id="action_make_docx">
+                      <label class="form-check-label big__check__label" for="action_make_docx">Создать docx файл</label>
+                    </div>
+
+                     <div class="form-check form-switch">
+                      <input class="form-check-input big__check" type="checkbox" id="action_make_git" name="action_make_git">
+                      <label class="form-check-label big__check__label" for="action_make_git">Отправить md файл в Gitlab проект</label>
+                    </div>
+
+
+                    <div class="form-check form-switch">
+                      <input class="form-check-input big__check" type="checkbox" id="action_make_omni" name="action_make_omni" onclick="ShowNotify(1, message[10]); return false;">
+                      <label class="form-check-label big__check__label" for="action_make_omni">Отправить обращение в OmniTracker</label>
+                    </div>
+              </div>
+
+              <div class="m-2 float-right">
+                   <input type="submit" class="btn btn-success" value="Сохранить и продолжить">
+              </div>
+
           </div>
 </div>
 <script>
@@ -301,7 +311,7 @@
           <label for="git_url" class="col-form-label">Укажите ссылку на ваш git проект: </label>
            <form method="post" action="{% url 'aclgit_urls' %}" name="acl-form-git">
              {% csrf_token %}
-             <input type="text" class="form-control" value=" " placeholder="https://github.com/MRagulin/ACL.git" name="git_url" pattern="^.+(.git)?" title="Введите имя внутреннего проекта .git" autofocus required>
+             <input type="text" class="form-control" value="{{request.session.GIT_URL}}" placeholder="https://github.com/MRagulin/ACL.git" name="git_url" pattern="^.+(.git)?" title="Введите имя внутреннего проекта .git" autofocus required>
              <div class="modal-footer">
 
         <button type="button" class="btn btn-secondary btn-reset" type="reset" data-dismiss="modal" value="Очистить">Очистить</button>
@@ -314,6 +324,9 @@
   </div>
  </div>
 <script>
+    $(".modal-git .close").click(function(){
+        $("#action_make_git").prop('checked', false);
+    });
     $("input:checkbox[name='action_make_git']").click(function () {
         if ($(this).prop('checked'))
         {
