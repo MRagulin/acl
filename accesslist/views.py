@@ -395,12 +395,14 @@ def CheckIp(request, ip=None):
 def AclRemove(request, *args, **kwargs):
     """Функция удалеяет данные по uuid"""
     if request.method == 'POST':
-        result = {'status': 'Запись удалена'}
-        if 'data' in request.POST:
-                if is_valid_uuid(request.POST.get('data')):
+        result = {'error': 'Ошибка при удалении acl'}
+        if 'uuid' in request.POST:
+                if is_valid_uuid(request.POST.get('uuid', 0)):
                        try:
-                            obj = ACL.objects.get(id=request.POST.get('data'))
-                            obj.delete()
+                            obj = ACL.objects.get(id=request.POST.get('uuid'))
+                            if obj:
+                                obj.delete()
+                                result = {'status': 'Запись acl удалена'}
                        except ACL.DoesNotExist:
                             result = {'error': 'Не всё записи удалены'}
         return HttpResponse(json.dumps(result), content_type="application/json")

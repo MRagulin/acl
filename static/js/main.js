@@ -82,9 +82,9 @@ function extractUuid(myString)
     }
 
 }
-function deletebyuuid(data=toString(), el = null)
+function deletebyuuid(uuid=toString(), el = null)
 {
-    $.post('/acl/remove/', {data}).done(function(data){
+    $.post('/acl/remove/', {uuid}).done(function(data){
                 try{
                     let status = JSON.parse(JSON.stringify(data));
 
@@ -95,15 +95,21 @@ function deletebyuuid(data=toString(), el = null)
                         {
                             try{
                                 $(el).remove();
+                                 return true;
+
                             } catch (e) {
-                                
+                               return false;
                             }
                             
+                        } else
+                        {
+                            window.location.replace("/acl/welcome");
                         }
-                        return true;
+
                     } else
                     {
                         ShowNotify(idx=0, text=status['error']);
+                        return false;
                     }
 
                 } catch (e) {
@@ -111,8 +117,9 @@ function deletebyuuid(data=toString(), el = null)
                 }
             }).fail(function(){
                 ShowNotify(idx=0, text='Произошла ошибка при удалении элементов');
+                return false;
             });
-    return false;
+    //return false;
 }
 function GetCurrentDate()
 {
@@ -180,12 +187,23 @@ $(document).ready(function(){
 
     $(".btn-remove").click(function() {
         if (!confirm(message[8])) return false;
+
         if (window.location.href.indexOf('history') == -1) {
+
              let data = extractUuid(window.location.href);
+
              if (data != '' && data != null)
              {
-                  deletebyuuid(data);
-                  window.location.href = '/';
+
+                  if (deletebyuuid(data))
+                  {
+                      window.location.replace("/acl");
+                      return true;
+                  } else
+                  {
+                      return false;
+                  }
+
              }
               else{
                 alert(message[9]);
