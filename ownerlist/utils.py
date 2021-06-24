@@ -1222,11 +1222,11 @@ def dns_fileHandler(fname, full_buf)->int:
     count = 0
     EMAIL = '(\w|\.|\_|\-)+[@](\w|\_|\-|\.)+[.]\w{2,3}'
     DEFAULT = 'Default'
-    with codecs.open(fname, 'r', encoding='utf-8') as f: #encoding='utf-8'
+    with codecs.open(fname, 'r', encoding='utf-8', errors='ignore') as f: #encoding='utf-8'
         owner = ''
         for line in f:
             try:
-                line = line.decode('cp1252').encode('utf-8')
+                #line = line.decode('cp1252').encode('utf-8')
                 if len(line) > 1:
                     if line[0] not in ['@', ';', ' ', '_']:
                         if 'IN' in line:
