@@ -1312,6 +1312,7 @@ def ExtractDataDns(uploaded_file_url)->int:
                             pass
 
                        try:
+                            created3 = None
                             ip_info, created3 = Iplist.objects.get_or_create(
                                 ipv4=line[3],
                                 hostname=line[0],
