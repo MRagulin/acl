@@ -1,0 +1,163 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+
+    <div class="p-5">
+    <div class="main-block">
+        {% if not LOCAL_STORAGE %}
+            <div class="alert alert-danger">
+                Упс, как вы тут оказались ?
+            </div>
+            <script>
+                window.location.href = "/";
+            </script>
+        {% else %}
+
+             <h4 class="main-title text-left mb-2">Согласование создания ACL <span class="badge badge-primary">approve</span></h4>
+             <div class="col">
+                 <div class="col-sm-2 font-italic pl-2" style="margin-left: -25px;">
+                     <p>Запрос от:</p>
+                 </div>
+                 <div class="row border-bottom">
+                     <div style="display: flex;  justify-content: center;  align-items: center;">
+                          <img src="/static/img/user.png" style="margin-top: -5px; max-width: 32px; max-height: 32px;">
+                     </div>
+
+                     <div class="col-sm-4 col-md-3 col-lg-2">
+                         <p class="text-primary">Бнятов Сергей <br><span class="text-secondary small font-italic">Ведущий инжинер</span></p>
+                     </div>
+
+                     <div class="ml-5">
+                         <button class="btn btn-secondary">Отклонить</button>
+                         <button class="btn btn-success">Согласовать</button>
+                     </div>
+                 </div>
+                    {% for key in  LOCAL_STORAGE.items %}
+                        {% if key.0 == 'acl_create_info.html' %}
+                    <div class="col-12 mt-5">
+                        <div>
+                            <p class="text-success font-weight-bold"><u>Контактная информация</u></p>
+                        </div>
+                         <div class="row">
+                             <dt class="col-sm-3 text-secondary">ФИО</dt><dd class="col-sm-9">{{ key.1.0 }}</dd>
+                             <dt class="col-sm-3 text-secondary">Email</dt><dd class="col-sm-9">{{ key.1.1 }}</dd>
+                             <dt class="col-sm-3 text-secondary">Телефон</dt><dd class="col-sm-9">{{ key.1.2 }}</dd>
+
+                             <dt class="col-sm-3 text-secondary">Отдел/Управление</dt><dd class="col-sm-9">AMR</dd>
+                             <dt class="col-sm-3 text-secondary">Проект/ИС</dt><dd class="col-sm-9">pki портал</dd>
+                             <dt class="col-sm-3 text-secondary">Описание проекта*</dt><dd class="col-sm-9">https://wiki.alfastrah.ru/pages/viewpage.action?pageId=133435707</dd>
+
+                             <dt class="col-sm-3 text-secondary">Дата ввода в эсплуатацию</dt><dd class="col-sm-9">21.04.1992</dd>
+                             <dt class="col-sm-3 text-secondary">Дата вывода из эксплуатации</dt><dd class="col-sm-9">Бессрочно</dd>
+                             <dt class="col-sm-3 text-secondary">Дата заполнения</dt><dd class="col-sm-9">29.06.2021</dd>
+                         </div>
+                    </div>
+                  {% elif key.0 == 'acl_internal_resources.html' %}
+                 <div class="col-12 mt-5">
+                    <div>
+                        <p class="text-success font-weight-bold"><u>Список внутренних ресурсов (СГ АльфаСтрахование)</u></p>
+                    </div>
+                     <div>
+                         <table class="border-0 traffic-table table-hover">
+                             <thead class="text-secondary border-bottom small">
+                             <th>IP-адрес источника</th>
+                             <th>Префикс-сети</th>
+                             <th>Описание (цель)</th>
+                             </thead>
+                             <tbody>
+                             {% for el in key.1 %}
+                             <tr>
+                                 <td>{{ el.0 }}</td>
+                                 <td>{{ el.1 }}</td>
+                                 <td>{{ el.2 }}</td>
+                             </tr>
+                             {% endfor %}
+                             </tbody>
+                         </table>
+                     </div>
+                 </div>
+                 {% elif key.0 == 'acl_dmz_resources.html' %}
+                 <div class="col-12 mt-5">
+                    <div>
+                        <p class="text-success font-weight-bold"><u>Список DMZ ресурсов (СГ АльфаСтрахование)</u></p>
+                    </div>
+                     <div>
+                         <table class="border-0 traffic-table table-hover">
+                             <thead class="text-secondary border-bottom small">
+                             <th>IP-адрес источника</th>
+                             <th>Префикс-сети</th>
+                             <th>Описание (цель)</th>
+                             </thead>
+                             <tbody>
+                             {% for el in key.1 %}
+                             <tr>
+                                 <td>{{ el.0 }}</td>
+                                 <td>{{ el.1 }}</td>
+                                 <td>{{ el.2 }}</td>
+                             </tr>
+                             {% endfor %}
+                             </tbody>
+                         </table>
+                     </div>
+                 </div>
+                {% elif key.0 == 'acl_external_resources.html' %}
+                 <div class="col-12 mt-5">
+                    <div>
+                        <p class="text-success font-weight-bold"><u>Список внешних ресурсов (Internet)</u></p>
+                    </div>
+                     <div>
+                         <table class="border-0 traffic-table table-hover">
+                             <thead class="text-secondary border-bottom small">
+                             <th>IP-адрес источника</th>
+                             <th>Префикс-сети</th>
+                             <th>Описание (цель)</th>
+                             </thead>
+                             <tbody>
+                             {% for el in key.1 %}
+                             <tr>
+                                 <td>{{ el.0 }}</td>
+                                 <td>{{ el.1 }}</td>
+                                 <td>{{ el.2 }}</td>
+                             </tr>
+                             {% endfor %}
+                             </tbody>
+                         </table>
+                     </div>
+                 </div>
+            {% elif key.0 == 'acl_traffic.html' %}
+                 <div class="col-12 mt-5">
+                    <div>
+                        <p class="text-success font-weight-bold"><u>Потоки траффика</u></p>
+                    </div>
+                     <div>
+                         <table class="border-0 traffic-table table-hover">
+                             <thead class="text-secondary border-bottom small">
+                             <th>Имя хоста (Источник)</th>
+                             <th>IP-адрес (Источник траффика)</th>
+                             <th>Имя хоста (Назначение)</th>
+                             <th>IP-адрес (Назначение)</th>
+                             <th>Протокол/Порт (Назначение)</th>
+                             <th>Описание (цель)</th>
+                             </thead>
+                             <tbody>
+                             {% for el in key.1 %}
+                             <tr>
+                                 <td>{{ el.0 }}</td>
+                                 <td>{{ el.1 }}</td>
+                                 <td>{{ el.2 }}</td>
+                                 <td>{{ el.3 }}</td>
+                                 <td>{{ el.4 }}</td>
+                                 <td>{{ el.5 }}</td>
+                             </tr>
+                             {% endfor %}
+                             </tbody>
+                         </table>
+                     </div>
+                 </div>
+               {% endif %}
+            {% endfor %}
+        {% endif %}
+                 </div>
+        </div>
+    </div>
+{% endblock%}

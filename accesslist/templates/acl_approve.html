@@ -1,0 +1,69 @@
+{% extends 'acl_base.html' %}
+{% load static %}
+{% block row %}
+
+<div class="p-5">
+    <div class="main-block">
+             <h4 class="main-title text-center mb-1">Согласование ACL <span class="badge badge-primary">approve</span></h4>
+             <p class="main-description">В данном списке нужно выбрать согласующего (обычно это руководитель проекта) и нажать на кнопку «Отправить»</p>
+        </div>
+
+<form class="p-1">
+    <div class="form-group row">
+        <div class="col-sm-3 pl-0">
+            <label for="project_name" class="col-sm-2 text-secondary">Проект:</label>
+        </div>
+        <div class="col">
+            <input type="text" name="project_name" class="text-primary border-0" value="Легкий вход" style="outline: 0">
+        </div>
+    </div>
+
+     <div class="form-group form-row border-0">
+         <div class="col-sm-3">
+             <label for="ae-select" class="col-form-label text-secondary">Ответственное лицо:</label>
+         </div>
+        <div class="col">
+            <div class="dropdown-wrapper">
+                <div class="ae-dropdown dropdown">
+                    <div class="ae-select">
+                        <span class="mr-1">
+                                <img src="/static/img/user.png" style="margin-top: -5px; max-width: 32px; max-height: 32px;">
+                            </span>
+                        <span class="ae-select-content"></span>
+                        <i class="fas fa-chevron-down down-icon"></i>
+                    </div>
+                    <ul class="dropdown-menu ae-hide">
+                        <li class='selected'><a><span class="mr-1"><img src="/static/img/user.png"></span>Бнятов Сергей</a></li>
+                        <li><a><span class="mr-1"><img src="/static/img/user.png"></span>Рагулин Михаил</a></li>
+                        <li><a><span class="mr-1"><img src="/static/img/user.png"></span>Кишило Валерий</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+         <div class="col">
+             <input type="button" class="btn btn-success" value="Отправить">
+         </div>
+     </div>
+</form>
+
+
+<script>
+$(document).ready(function(){
+   $('.ae-select-content').text($('.dropdown-menu > li.selected').text());
+      var newOptions = $('.dropdown-menu > li');
+		newOptions.click(function() {
+      $('.ae-select-content').text($(this).text());
+      $('.dropdown-menu > li').removeClass('selected');
+      $(this).addClass('selected');
+		});
+
+var aeDropdown = $('.ae-dropdown');
+		aeDropdown.click(function() {
+      $('.dropdown-menu').toggleClass('ae-hide');
+      $('.dropdown-menu').hasClass('ae-hide') ? $('.dropdown-menu').show() : $('.dropdown-menu').hide();
+		});
+
+});
+</script>
+</div>
+{% endblock%}

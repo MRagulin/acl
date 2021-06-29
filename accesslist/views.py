@@ -171,6 +171,23 @@ class AclCreate_traffic(ObjectMixin, View):
     url = 'acltraffic_urls'
 
 
+class Acl_approve(ObjectMixin, View):
+    template = 'acl_approve.html'
+    url = 'acl_approve_urls'
+
+class Acl_pending(View):
+    """Функция вывода информации об согласовании объекта"""
+    def get(self, request, acl_id=None):
+        if acl_id is None:
+            return redirect(reverse(FORM_URLS[1]))
+
+        tmp = get_object_or_404(ACL, id=str(acl_id))
+        tmp = json.loads(tmp.acltext)
+        context = {'acl_id': str(acl_id),
+                   'LOCAL_STORAGE': tmp}
+
+        return render(request, 'acl_pending.html', context=context)
+
 class AclDemo(BaseView, View):
     """Страница приветствия"""
     def get(self, request):
