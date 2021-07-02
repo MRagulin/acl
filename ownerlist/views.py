@@ -15,10 +15,12 @@ from django.core.paginator import Paginator
 from django.views.decorators.csrf import csrf_exempt
 import socket
 from django.contrib.auth.mixins import LoginRequiredMixin
+from ownerlist.utils import ClearSessionMeta
 
 class IpTable(BaseView, LoginRequiredMixin, View):
     def get(self, request):
         context = {}
+        ClearSessionMeta(request)
         if not 'dataset' in request.GET:
             response = redirect(reverse('iptable_urls'))
             response['Location'] += '?dataset=1&&page=1'
@@ -93,7 +95,7 @@ class SearchView(BaseView, View):
         search = request.path.split('/')
         result = search[2].strip().lower()
         if result == '':
-                return redirect('ipconfig_urls')
+           return redirect('ipconfig_urls')
         if search is not None:
             if re.match(r"[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}", result):
                 return redirect(reverse('aclhistory_urls', kwargs={'acl_id': result}))

@@ -26,6 +26,7 @@ from time import sleep
 import git
 from shutil import copyfile
 from django.core.cache import cache
+import random, hashlib, datetime
 COMMIT_MESSAGE = '[ACL PORTAL] Add acl-MD file'
 
 
@@ -33,8 +34,8 @@ FUN_SPEED = 0
 BASE_DIR = Path(__file__).resolve().parent.parent
 LOCAL_UID = None
 
-FORM_APPLICATION_KEYS = ['acl_create_info.html', 'acl_internal_resources.html', 'acl_dmz_resources.html', 'acl_external_resources.html', 'acl_traffic.html']
-FORM_URLS = ["acldemo_urls", "aclcreate_urls", "aclinternal_urls", "acldmz_urls", "aclexternal_urls", "acltraffic_urls", "acloverview_urls"]
+FORM_APPLICATION_KEYS = ['acl_create_info.html', 'acl_internal_resources.html', 'acl_dmz_resources.html', 'acl_external_resources.html', 'acl_traffic.html', 'acl_approve.html']
+FORM_URLS = ["acldemo_urls", "aclcreate_urls", "aclinternal_urls", "acldmz_urls", "aclexternal_urls", "acltraffic_urls", "acloverview_urls", 'acl_approve_urls', "acl_pending_urls"]
 POST_FORM_KEYS = ['name', 'email', 'tel', 'department', 'project', 'link', 'd_form', 'd_start', 'd_complate']
 POST_FORM_EMPTY = ['on', '', None]
 JSON_DUMPS_PARAMS = {
@@ -1340,5 +1341,47 @@ def ExtractDataDns(uploaded_file_url)->int:
 
 
     return count
-    # except:
-    #     pass
+
+
+def ClearSessionMeta(request=None):
+    """Функция очистки сессии при переходе на другую страницу"""
+    if request:
+        if 'LOCAL_STORAGE' in request.session:
+            request.session['LOCAL_STORAGE'] = {}
+        if 'uuid' in request.session:
+            del request.session['uuid']
+        if 'taskid' in request.session:
+            del request.session['taskid']
+        if 'GIT_URL' in request.session:
+           del request.session['GIT_URL']
+        if 'ACT_MAKE_GIT' in request.session:
+           del request.session['ACT_MAKE_GIT']
+        if 'ACT_MAKE_DOCX' in request.session:
+           del request.session['ACT_MAKE_DOCX']
+
+        if 'file_download' in request.session:
+            try:
+                BASE = os.path.basename(request.session['file_download'])
+                if BASE:
+                    BASE = os.path.join(settings.BASE_DIR, 'static//docx//' + BASE)
+                    if os.path.exists(BASE):
+                        os.remove(BASE)
+            finally:
+                del request.session['file_download']
+                BASE = None
+
+        if 'file_download_md' in request.session:
+            try:
+                BASE = os.path.basename(request.session['file_download_md'])
+                if BASE:
+                    BASE = os.path.join(settings.BASE_DIR, 'static//md//' + BASE)
+                    if os.path.exists(BASE):
+                        os.remove(BASE)
+            finally:
+                del request.session['file_download_md']
+                BASE = None
+
+
+def MakeTemporaryToken():
+    s = "{} ACL token {}".format(random.randrange(999), datetime.datetime.now())
+    return "{}".format(hashlib.md5(s.encode()).hexdigest()[:10])

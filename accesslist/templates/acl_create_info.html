@@ -29,12 +29,46 @@
                                   {% endfor %}
                         {% endif %}
                     </div>
+                    {% if status == 'WTE' %}
+                        {% if not debtor %}
+                     <div class="justify-content-end approve-dialog">
+                      <div class="d-flex">
+                          <p class="pr-2">Ожидает согласования:</p>
+                          {% if acl_owner %}
+                                <a class="text-danger font-weight-bold" style="cursor: pointer">Отменить</a>
+                           {% endif %}
+                      </div>
+                      <div class="p-1">
+                          <div class="ae-select"><span class="mr-1">
+                              <img src="/static/img/user.png" style="margin-top: -5px; max-width: 32px; max-height: 32px;">
+                          </span>
+                              <span class="ae-select-content font-weight-light" style="color:#0a4e97">{{ app_person.last_name }} {{ app_person.first_name }}</span>
+                          </div>
+                      </div>
+                  </div>
+
+                  {% else %}
+                     <div class="justify-content-end approve-dialog">
+                      <div class="d-flex">
+                          <p class="pr-2">Ожидается Ваше согласование</p>
+                      </div>
+                      <div class="p-2 text-center">
+                         <a class="text-success font-weight-bold" href="{% url 'acl_pending_urls' %}{{ acl_id }}/?token={{ token }}">Согласовать</a>
+                      </div>
+                  </div>
+
+                  {% endif %}
+                  {% endif %}
+
                     {%  if 'new' not in request.path %}
                     <div class="justify-content-end">
                          <button class="btn btn-danger btn-remove m-1">Удалить</button>
                   </div>
                   {% endif %}
+
+
           </div>
+          <div class="col-sm-2">
           <div class="main-form">
             <div class="contact-form">
               <label class="contact-form__label">
@@ -56,8 +90,8 @@
               </label>
 
               <label class="contact-form__label">
-                <span class="contact-form__text">Проект/ИС</span>
-                <input type="text" name="project" value="{% if LOCAL_STORAGE %}{{ LOCAL_STORAGE.4 }}{% endif %}" class="contact__input" placeholder="Легкий Вход" pattern=".{3,}" required>
+                <span class="contact-form__text" style="margin-right: 58px;">Проект/ИС</span>
+                <input type="text" name="project" style="" value="{% if LOCAL_STORAGE %}{{ LOCAL_STORAGE.4 }}{% endif %}" class="contact__input" placeholder="Легкий Вход" pattern=".{3,}" required>
                 <span class="validity"></span>
               </label>
 
@@ -77,6 +111,7 @@
 </div>
 
           </div>
+</div>
           <div class="form-row__bottom form-check-inline">
  <div class="contact-form__dates">
 
@@ -126,7 +161,7 @@
                       <input class="form-check-input big__check" type="checkbox" name="action_make_docx" id="action_make_docx" {% if 'ACT_MAKE_DOCX' in request.session %} checked {% endif %}>
                       <label class="form-check-label big__check__label" for="action_make_docx">Создать docx файл</label>
                     </div>
-
+                    {% if status != 'WTE' %}
                      <div class="form-check form-switch">
                       <input class="form-check-input big__check" type="checkbox" id="action_make_git" name="action_make_git" {% if 'GIT_URL' in request.session %} checked {% endif %}>
                       <label class="form-check-label big__check__label" for="action_make_git">Отправить md файл в Gitlab проект</label>
@@ -138,6 +173,7 @@
                       <input class="form-check-input big__check" type="checkbox" id="action_make_omni" name="action_make_omni" onclick="ShowNotify(1, message[10]); return false;">
                       <label class="form-check-label big__check__label" for="action_make_omni">Отправить обращение в OmniTracker</label>
                     </div>
+                   {% endif %}
               </div>
 
               <div class="m-2 float-right">
@@ -192,6 +228,7 @@
                   </div>
                   {% endif %}
           </div>
+           <div class="col-sm-2">
           <div class="main-form">
             <div class="contact-form">
               <label class="contact-form__label">
@@ -234,6 +271,7 @@
 </div>
 
           </div>
+               </div>
 <div class="form-row__bottom form-check-inline">
  <div class="contact-form__dates">
 
@@ -294,9 +332,9 @@
     $("#contact__input__date, #contact__input__start").val(GetCurrentDate());
 </script>
 </form>
-</div>
- </div>
- </div>
+{#</div>#}
+{# </div>#}
+{# </div>#}
  {% endif%}
  <div class="modal modal-git" tabindex="-1" role="dialog">
   <div class="modal-dialog" role="document">

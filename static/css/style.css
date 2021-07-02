@@ -421,7 +421,7 @@ width: 100%;
 .main-form {
   display: flex;
   justify-content: flex-start;
-  margin-left: -70px;
+  #margin-left: -70px;
 }
 
 .main-block {
@@ -456,6 +456,9 @@ width: 100%;
   align-items: center;
   justify-content: flex-end;
   margin-bottom: 10px;
+}
+.contact-form__label input{
+  max-width: 300px;
 }
 
 .contact-form__dates {
@@ -978,4 +981,38 @@ ul.dropdown-menu li{
 
 .traffic-table thead tr th{
   padding-right: 5px;
+}
+.approve-dialog{
+max-width: 280px;
+  border: 1px solid #007bff;
+  padding: 5px 10px 0px 10px;
+  margin-right: 40px;
+  line-height: 10px;
+}
+.arrowblock{
+  width: 50px;
+}
+
+.arrow-right, .long-arrow-right {
+    transform: rotate(135deg);
+}
+.arrow-right, .arrow-left, .long-arrow-right, .long-arrow-left {
+    display: block;
+    margin-right: 30px;
+    margin-left: 30px;
+    width: 20px;
+    height: 20px;
+    border-top: 2px solid #007bff;
+    border-left: 2px solid #007bff;
+}
+
+.long-arrow-right::after, .long-arrow-left::after {
+    content: "";
+    display: block;
+    width: 2px;
+    height: 45px;
+    background-color: #007bff;
+    transform: rotate(-45deg) translate(15px, 4px);
+    left: 0;
+    top: 0;
 }

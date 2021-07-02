@@ -1,6 +1,7 @@
 from django.db import models
 from ownerlist.models import Owners
 from django.contrib.auth.models import User, Group
+from ownerlist.utils import MakeTemporaryToken
 
 class ACL(models.Model):
     pkid = models.BigAutoField(primary_key=True, editable=False)
@@ -12,6 +13,7 @@ class ACL(models.Model):
     taskid = models.CharField(blank=True, default="", editable=True, max_length=64)
     project = models.CharField(blank=True, max_length=128)
     created = models.DateField(blank=True, auto_now_add=True)
+    token = models.CharField(blank=True, default="", editable=True, max_length=10)
     APL_STATUS = [
         ('NOTFL', 'Не заполнено'),
         ('FL', 'Заполнено'),
@@ -21,4 +23,9 @@ class ACL(models.Model):
         ('CNL', 'Отклонено')
     ]
     status = models.CharField(choices=APL_STATUS, default='NOTFL', blank=True, max_length=20)
+
+    def save(self, *args, **kwargs):
+        if self.token is None or self.token == '':
+            self.token = MakeTemporaryToken()
+        super().save(*args, **kwargs)
 

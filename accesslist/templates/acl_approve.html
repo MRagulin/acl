@@ -5,16 +5,34 @@
 <div class="p-5">
     <div class="main-block">
              <h4 class="main-title text-center mb-1">Согласование ACL <span class="badge badge-primary">approve</span></h4>
-             <p class="main-description">В данном списке нужно выбрать согласующего (обычно это руководитель проекта) и нажать на кнопку «Отправить»</p>
+             <p class="main-description m-0">В данном списке нужно выбрать согласующего (обычно это руководитель проекта) и нажать на кнопку «Отправить»</p>
+             {% if not APPROVE_OWNER %}<p class="text-info small pt-1"><i class="fa fa-info-circle"></i>
+                 К сожалению, мы знаем ответственного за данный проект, для согласования выберите своего руководителя либо сотрудника УИБ</p>
+             {% endif %}
         </div>
+                         {% if messages %}
+                                  {% for message in messages %}
+                                      {% if message.tags == 'error' %}
+                                          <div class="alert alert-danger">
+                                      {% else %}
+                                          <div class="alert alert-warning">
+                                      {% endif %}
+                                        {{ message }}
+                                      </div>
+                                  {% endfor %}
 
-<form class="p-1">
+                        {% endif %}
+
+
+
+<form class="p-1" method="post">
     <div class="form-group row">
         <div class="col-sm-3 pl-0">
             <label for="project_name" class="col-sm-2 text-secondary">Проект:</label>
         </div>
         <div class="col">
-            <input type="text" name="project_name" class="text-primary border-0" value="Легкий вход" style="outline: 0">
+            <input type="text" name="project_name" class="text-primary border-0" value="{{ PROJECT }}" style="outline: 0">
+            {% csrf_token %}
         </div>
     </div>
 
@@ -27,21 +45,33 @@
                 <div class="ae-dropdown dropdown">
                     <div class="ae-select">
                         <span class="mr-1">
+                            {% if APPROVE_OWNER %}
                                 <img src="/static/img/user.png" style="margin-top: -5px; max-width: 32px; max-height: 32px;">
+                            {% endif %}
                             </span>
-                        <span class="ae-select-content"></span>
+                        <span class="ae-select-content" name="app_person"></span>
+                         <input type='hidden' value="{{ APPROVE_OWNER.username }}" class="approve_person" name='approve_person'>
+                         <input type='hidden' value="{{ acl_id }}" class="uid_field" name='uid'>
                         <i class="fas fa-chevron-down down-icon"></i>
                     </div>
-                    <ul class="dropdown-menu ae-hide">
-                        <li class='selected'><a><span class="mr-1"><img src="/static/img/user.png"></span>Бнятов Сергей</a></li>
-                        <li><a><span class="mr-1"><img src="/static/img/user.png"></span>Рагулин Михаил</a></li>
-                        <li><a><span class="mr-1"><img src="/static/img/user.png"></span>Кишило Валерий</a></li>
+                    <ul class="dropdown-menu ae-hide" name="user_list">
+                        {% if APPROVE_OWNER %}
+                            <li class='selected' data="{{ APPROVE_OWNER.username }}" name="user_choise">
+                                <a>
+                                    <span class="mr-1"><img src="/static/img/user.png"></span>{{ APPROVE_OWNER.last_name }} {{ APPROVE_OWNER.first_name }}
+                                </a>
+                            </li>
+                        {% endif %}
+                        {% for user in APPROVE_LIST %}
+                             <li data="{{ user.username }}"><a><span class="mr-1"><img src="/static/img/user.png"></span>{{ user.last_name }} {{ user.first_name }}</a></li>
+                        {% endfor %}
                     </ul>
                 </div>
             </div>
         </div>
          <div class="col">
-             <input type="button" class="btn btn-success" value="Отправить">
+{#             {{ form }}#}
+             <input type="submit" class="btn btn-success" value="Отправить">
          </div>
      </div>
 </form>
@@ -52,7 +82,18 @@ $(document).ready(function(){
    $('.ae-select-content').text($('.dropdown-menu > li.selected').text());
       var newOptions = $('.dropdown-menu > li');
 		newOptions.click(function() {
+		    if ($('.ae-select > span > img').length == 0)
+            {
+                $('.ae-select > span').append('<img src="" style="margin-top: -5px; max-width: 32px; max-height: 32px;">');
+                let el = $(this).find('img');
+                if (el)
+                {
+                     $('.ae-select > span > img').attr('src', $(el[0]).attr('src'));
+                }
+            }
       $('.ae-select-content').text($(this).text());
+      $('.approve_person').attr('value', $(this).attr('data'));
+
       $('.dropdown-menu > li').removeClass('selected');
       $(this).addClass('selected');
 		});

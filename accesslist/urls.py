@@ -46,14 +46,14 @@ urlpatterns = [
 
     re_path("approve/", include([
         url(r"^$", Acl_approve.as_view(), name="acl_approve_urls"),
-        url(r"^(?P<acl_id>[0-9a-f-]+)/$", Acl_approve.as_view(), name="acl_approve_urls"),
         url(r"^(?P<acl_id>[0-9a-f-]+)/new/$", Acl_approve.as_view(), name="acl_approve_urls"),
+        url(r"^(?P<acl_id>[0-9a-f-]+)/$", Acl_approve.as_view(), name="acl_approve_urls"),
     ])),
 
     re_path("pending/", include([
         url(r"^$", Acl_approve.as_view(), name="acl_pending_urls"),
-        url(r"^(?P<acl_id>[0-9a-f-]+)/$", Acl_pending.as_view(), name="acl_pending_urls"),
-        url(r"^(?P<acl_id>[0-9a-f-]+)/new/$", Acl_pending.as_view(), name="acl_pending_urls"),
+        url(r"^(?P<acl_id>[0-9a-f-]+)/$", Acl_pending.as_view(), name="acl_pending_urls"), #(?P<token>[0-9a-z]{10})/
+        #url(r"^(?P<acl_id>[0-9a-f-]+)/new/$", Acl_pending.as_view(), name="acl_pending_urls"),
     ])),
 
     path("checkip/<str:ip>/", CheckIp, name='check_ip_urls'),

@@ -14,13 +14,24 @@
               {% endif %}
           </li>
 
+         {% if status == 'WTE' %}
+            <li class="descr-item">
+                    <a class="descr-link" href="{% url 'acl_pending_urls' %}{{acl_id}}/">Согласование</a>
+            </li>
+        {% endif %}
+
           <li class="descr-item">
              {% if '/acl/overview/' in request.path %}
                 <a class="descr-link--active not-active" href="{{ request.path }}">Формирование Обращения</a>
              {% else %}
-                 <a class="descr-link not-active" href="{% url 'acloverview_urls' %}{{acl_id}}/">Формирование Обращения</a>
+                 {% if status == 'WTE' %}
+                    <a class="descr-link--active not-active" onclick="return false;" style="display: none">Формирование Обращения</a>
+                 {% else %}
+                     <a class="descr-link not-active" href="{% url 'acloverview_urls' %}{{acl_id}}/">Формирование Обращения</a>
+                 {% endif %}
              {% endif %}
           </li>
+
         </ul>
       </div>
 <div class="main">

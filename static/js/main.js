@@ -432,6 +432,11 @@ $(document).ready(function(){
 
 //Скрывать все элементы с классом alert после x времени
 $(function(){
+ if ($(".approve-dialog").length>0)
+ {
+      $(".main-block .col-sm-2").css({"margin-top":"-20px"});
+ }
+
  function hide_alert(){
    $('.alert').fadeOut();
  };
@@ -516,26 +521,24 @@ function if_form_empty(form)
 let form  = $("form[class='form-inline']");
 
 $(function(){
-      if (form && window.location.href.indexOf('welcome') == -1)
-      {   let el = $(form).find("input[type='text'],input[type='number'], textarea");
+      if (form && window.location.href.indexOf('welcome') == -1) {
+          let el = $(form).find("input[type='text'],input[type='number'], textarea");
           let r = if_form_empty($(form));
+          if (window.location.href.indexOf('approve') == -1) {
+              if (r && window.location.href.indexOf('info') == -1) {
+                  $("input[type='submit']").val("Пропустить");
+                  $(el).each(function (idx, val) {
+                      $(val).removeAttr('required');
+                  });
 
-          if (r && window.location.href.indexOf('info') == -1)
-          {
-               $("input[type='submit']").val("Пропустить");
-                $(el).each(function(idx, val) {
-                    $(val).removeAttr('required');
-                });
-
-          } else
-          {
-              $("input[type='submit']").val("Сохранить и продолжить");
-              $(el).each(function(idx, val) {
-                $(val).attr('required', 'required');
-             });
+              } else {
+                  $("input[type='submit']").val("Сохранить и продолжить");
+                  $(el).each(function (idx, val) {
+                      $(val).attr('required', 'required');
+                  });
+              }
           }
       }
-
 
 });
 

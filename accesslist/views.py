@@ -7,8 +7,8 @@ from django.http import HttpResponse
 from .models import ACL
 from ownerlist.models import Owners, Iplist
 import os
-from ownerlist.utils import make_doc, MakeMarkDown, request_handler, is_valid_uuid, ip_status, logger, get_client_ip
-from ownerlist.utils import FORM_APPLICATION_KEYS, FORM_URLS, BaseView, GitWorker, BASE_DIR, UpdateCallBackStatus
+from ownerlist.utils import make_doc, MakeMarkDown, request_handler, is_valid_uuid, ip_status, logger, get_client_ip, MakeTemporaryToken
+from ownerlist.utils import FORM_APPLICATION_KEYS, FORM_URLS, BaseView, GitWorker, BASE_DIR, UpdateCallBackStatus, ClearSessionMeta
 import json
 import uuid
 from django.views.decorators.csrf import csrf_exempt
@@ -17,9 +17,9 @@ from django.conf import settings
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.cache import cache
 import re
-import threading
 import sys
-from time import sleep
+from django.contrib.auth.models import User, Group
+from .forms import Approve_form
 
 class ObjectMixin:
     """Миксин обработки запросов и отобращение страниц"""
@@ -34,6 +34,7 @@ class ObjectMixin:
 
             if 'HTTP_REFERER' in request.META.keys():
                 if reverse(FORM_URLS[0]) in request.META.get('HTTP_REFERER'):
+                    # Заполняем uuid для нового acl
                     request.session['uuid'] = str(uuid.uuid4())
                     request.session['LOCAL_STORAGE'] = {}
                     request.session['taskid'] = None
@@ -45,17 +46,27 @@ class ObjectMixin:
                          return HttpResponseRedirect(reverse(FORM_URLS[0]))
                   elif str(acl_id) == request.session['uuid']:
                      return redirect(reverse(self.url, kwargs={'acl_id': request.session['uuid']}))
-
+            context = {}
             if '/new/' not in request.path:
                 tmp = get_object_or_404(ACL, id=str(acl_id))
                 request.session['LOCAL_STORAGE'] = json.loads(tmp.acltext)
                 request.session['taskid'] = tmp.taskid or ''
 
-            context = {'acl_id': str(acl_id),
+                if tmp.status == 'WTE':
+                    if tmp.owner == request.user or request.user.is_staff:
+                        context.update({'acl_owner': tmp.owner})
+                    if tmp.approve == request.user:
+                        context.update({'debtor': 'True',
+                                        'token': tmp.token})
+
+                    context.update({'status': str(tmp.status),
+                                    'app_person': tmp.approve})
+
+            context.update({'acl_id': str(acl_id),
                        'FULL_STORAGE': request.session['LOCAL_STORAGE'],
                        'FORM_APPLICATION_KEYS': FORM_APPLICATION_KEYS,
                        'template_name': self.template,
-                       }
+                       })
 
             if 'LOCAL_STORAGE' in request.session:
                 if self.template not in request.session['LOCAL_STORAGE']:
@@ -108,6 +119,7 @@ class ObjectMixin:
 class Aclhistory(BaseView, LoginRequiredMixin, View):
     """История запросов"""
     def get(self, request, acl_id=None):
+            ClearSessionMeta(request)
             if acl_id is not None:
                 if request.user.is_staff:
                     acllist= ACL.objects.filter(id__exact=acl_id)
@@ -171,59 +183,105 @@ class AclCreate_traffic(ObjectMixin, View):
     url = 'acltraffic_urls'
 
 
-class Acl_approve(ObjectMixin, View):
-    template = 'acl_approve.html'
-    url = 'acl_approve_urls'
+class Acl_approve(View):
+    """Функция для страницы согласования"""
+    def get(self, request, acl_id=None):
+        context = {}
+        if acl_id is None:
+            messages.warning(request, 'Неправильный запрос')
+            return redirect(reverse('acldemo_urls'))
+
+        tmp = get_object_or_404(ACL, id=str(acl_id))
+
+        if tmp.status == 'WTE':
+            #messages.warning(request, 'ACL уже ожидает согласование')
+            return redirect(reverse('acl_pending_urls', kwargs=({'acl_id': acl_id})))
+
+        form = Approve_form()
+        APPROVE_OWNER = User.objects.filter(groups__name=settings.APPROVE).filter(groups__name=tmp.project)
+        if APPROVE_OWNER:
+            # Берем только одного человека для согласования
+
+            APPROVE_OWNER = APPROVE_OWNER[0]
+            APPROVE_LIST = User.objects.filter(groups__name=settings.APPROVE).exclude(id__exact=APPROVE_OWNER.id)
+        else:
+            APPROVE_LIST = User.objects.filter(groups__name=settings.APPROVE)
+
+        context.update({'acl_id': str(acl_id),
+                        'FULL_STORAGE': request.session['LOCAL_STORAGE'],
+                        'FORM_APPLICATION_KEYS': FORM_APPLICATION_KEYS,
+                        'APPROVE_LIST': APPROVE_LIST,
+                        'APPROVE_OWNER': APPROVE_OWNER,
+                        'PROJECT': tmp.project,
+                        'form': form,
+                        })
+
+
+        return render(request, 'acl_approve.html', context=context)
+
+
+    def post(self, request, acl_id=None):
+        form = Approve_form(data=request.POST or None)
+        if form.is_valid():
+            tmp = get_object_or_404(ACL, id=str(acl_id))
+            if tmp.token == '':
+                tmp.token = MakeTemporaryToken()
+            user = form.cleaned_data['approve_person']
+            if not user:
+                messages.error('К сожалению, возникли проблемы с данным пользователям')
+            else:
+                user_obj = None
+                try:
+                    user_obj = User.objects.get(username__exact=user) or None
+                    if not user_obj.groups.filter(name=settings.APPROVE):
+                        user_obj = None
+                except User.DoesNotExist:
+                    messages.error(request, 'Выбранный пользователь не может согласовать данный ACL')
+
+                if user_obj:
+                        tmp.status = 'WTE'
+                        tmp.approve = user_obj
+                        tmp.save()
+                        response = redirect(reverse('acl_pending_urls', kwargs=({"acl_id": acl_id})))
+                        response['Location'] += "?token={}".format(tmp.token)
+                        return response
+        if not messages.get_messages(request):
+            messages.error(request, 'Произошла ошибка при изменении данных, вероятно невалидные данные в форме: {}'.format(form.errors))
+        return HttpResponseRedirect(reverse('acl_approve_urls', kwargs=({"acl_id": acl_id})))
+
 
 class Acl_pending(View):
     """Функция вывода информации об согласовании объекта"""
     def get(self, request, acl_id=None):
         if acl_id is None:
             return redirect(reverse(FORM_URLS[1]))
-
+        token = request.GET.get('token', '')
+        context = {}
         tmp = get_object_or_404(ACL, id=str(acl_id))
-        tmp = json.loads(tmp.acltext)
-        context = {'acl_id': str(acl_id),
-                   'LOCAL_STORAGE': tmp}
+
+
+        if token != tmp.token:
+            context.update({'IS_APPROVE': False})
+        else:
+            context.update({'IS_APPROVE': True})
+            #messages.warning(request, 'Не валидный токен, попробуйте запросить новый')
+            #return redirect(reverse(FORM_URLS[1]))
+        if tmp.status != 'WTE':
+            messages.warning(request, 'ACL вероятно уже согласован, либо редактируется кем-то другим')
+            return redirect(reverse('acl_approve_urls', kwargs={'acl_id': acl_id}))
+
+        context.update({'status': str(tmp.status)})
+        context.update({'acl_id': str(acl_id), 'LOCAL_STORAGE': json.loads(tmp.acltext)})
+        context.update({'APP_PERSON': tmp.approve})
+        context.update({'OWNER': tmp.owner})
+
 
         return render(request, 'acl_pending.html', context=context)
 
 class AclDemo(BaseView, View):
     """Страница приветствия"""
     def get(self, request):
-        request.session['LOCAL_STORAGE'] = {}
-        request.session['uuid'] = 0
-        request.session['taskid'] = None
-        if 'GIT_URL' in request.session:
-           del request.session['GIT_URL']
-
-        if 'file_download' in request.session:
-            try:
-                BASE = os.path.basename(request.session['file_download'])
-                if BASE:
-                    BASE = os.path.join(settings.BASE_DIR, 'static//docx//' + BASE)
-                    if os.path.exists(BASE):
-                        os.remove(BASE)
-            finally:
-                del request.session['file_download']
-                BASE = None
-
-        if 'file_download_md' in request.session:
-            try:
-                BASE = os.path.basename(request.session['file_download_md'])
-                if BASE:
-                    BASE = os.path.join(settings.BASE_DIR, 'static//md//' + BASE)
-                    if os.path.exists(BASE):
-                        os.remove(BASE)
-            finally:
-                del request.session['file_download_md']
-                BASE = None
-
-
-
-
-
-
+        ClearSessionMeta(request)
         return render(request, 'acl_demo.html')
 
 
@@ -255,14 +313,13 @@ def save__form(request, owner_form:None, acl_id)->None:
         if obj:
             obj.acltext = json.dumps(request.session['LOCAL_STORAGE'])
             obj.is_executed = False
-            # Не перезаписывать владельца ACL
+            # Не перезаписывать владельца ACL и статус событий
             if created:
                 obj.owner = request.user
-            #if created:
-            if len(request.session['LOCAL_STORAGE']) <= 1:
-                    obj.status = 'NOTFL'
-            else:
-                    obj.status = 'FL'
+                if len(request.session['LOCAL_STORAGE']) <= 1:
+                        obj.status = 'NOTFL'
+                else:
+                        obj.status = 'FL'
             obj.project = owner_form[4]
             obj.save()
 
@@ -274,7 +331,7 @@ def save__form(request, owner_form:None, acl_id)->None:
 class AclOver(BaseView, LoginRequiredMixin, View):
     """Страница формирования ACL файла и других активностей"""
     def get(self, request, acl_id=None):
-        if acl_id is None or 'LOCAL_STORAGE' not in request.session or 'uuid' not in request.session:
+        if acl_id is None or 'LOCAL_STORAGE' not in request.session: # or 'uuid' not in request.session
             return HttpResponseRedirect(reverse('acldemo_urls'))
 
         context = {'obj': acl_id,
@@ -282,10 +339,6 @@ class AclOver(BaseView, LoginRequiredMixin, View):
                    'file_md': None,
                    'gitproc': None
                    }
-        # obj = None
-        # file_download = None
-        # file_md = None
-        # gitproc = None
         if 'uuid' in request.session is not None:
                     if '/new/' in request.path:
                         if str(acl_id) != request.session['uuid']:
@@ -293,72 +346,38 @@ class AclOver(BaseView, LoginRequiredMixin, View):
                     elif str(acl_id) == request.session['uuid']:
                         return redirect(reverse('acloverview_urls', kwargs={'acl_id': request.session['uuid']}))
 
+
+
         """Проверяем состояние массива с данными"""
         if len(request.session['LOCAL_STORAGE']) >= 1: #and all(KEY in request.session['LOCAL_STORAGE'] for KEY in FORM_APPLICATION_KEYS):
-                # if 'action_make_docx' in request.session:
-                #             file_download = 'None'
-                #             try:
-                #                 file_download = make_doc(request, request.session['LOCAL_STORAGE'], str(acl_id))
-                #                 request.session['file_download'] = file_download
-                #                 del request.session['action_make_docx']
-                #
-                #             except PermissionError:
-                #                 messages.error(request, 'К сожалению, мы не смогли создать файл, так как нехватает прав.')
-                #                 logger.warning('Ошибка при создании файла')
-                #             except Exception as e:
-                #                 messages.error(request, 'К сожалению, при создании файла, что-то пошло не так. '
-                #                                         'Мы уже занимаемся устранением. {}'.format(e))
-                #
-                # if 'action_make_git' in request.session:
-                #     file_md = MakeMarkDown(request.session['LOCAL_STORAGE'], 'acl_{}'.format(str(acl_id))) or 'None'
-                #     file_md_abs = os.path.join(BASE_DIR, 'static/md/' + 'acl_{}'.format(str(acl_id)) + '.md')
-                #     request.session['file_download_md'] = file_md
-                #     del request.session['action_make_git']
-                #
-                #     if 'GIT_URL' in request.session:
-                #             if 'GIT_USERNAME' in request.session and 'GIT_PASSWORD' in request.session:
-                #                 GitWorketAsync(request,
-                #                 request.session['GIT_URL'], request.session['GIT_USERNAME'],
-                #                 request.session['GIT_PASSWORD'], None, file_md_abs)
-                #
-                #                 gitproc = list(self.request.session['GIT_STATUS'])[-1]
-                #
-                # owner_form = request.session['LOCAL_STORAGE'][FORM_APPLICATION_KEYS[0]]
-                # obj = save__form(request, owner_form, acl_id)
-                #
-                # del request.session['uuid']
-                # del request.session['LOCAL_STORAGE']
-                # del request.session['taskid']
-                # if 'GIT_URL' in request.session:
-                #     del request.session['GIT_URL']
-
-                #-------------------------------------------------------------------------------------------------------
-
-                if 'ACT_MAKE_DOCX' in request.session:
-                    #request.session['docx_download_status'] = True
-                    context['file_download'] = True
-
-                    #t = threading.Thread(target=make_doc, args=[request, request.session['LOCAL_STORAGE'], str(acl_id)])
-                    #t.setDaemon(True)
-                    #t.start()
-                if 'ACT_MAKE_GIT' in request.session:
-                    #request.session['git_upload_status'] = True
-                    context['gitproc'] = True
-
                 owner_form = request.session['LOCAL_STORAGE'][FORM_APPLICATION_KEYS[0]]
                 obj = save__form(request, owner_form, acl_id)
+        else:
+            messages.warning(request, 'Нехватает данных для формирования ACL')
+            return redirect(reverse(FORM_URLS[1], kwargs={'acl_id': request.session['uuid']}))
+
+        #Требовать согласование при формировании обращения
+        if 'ACT_MAKE_GIT' in request.session:
+            tmp = get_object_or_404(ACL, id=str(acl_id))
+            if tmp.status == 'FL':
+                t = reverse('acl_approve_urls', kwargs={'acl_id': acl_id})
+                return HttpResponseRedirect(t)
+
+            if tmp.status != 'APRV':
+                messages.warning(request, 'Данный ACL не получил согласования')
+                return HttpResponseRedirect(reverse('aclcreate_urls', kwargs={'acl_id': acl_id}))
+
+            context['gitproc'] = True
 
 
-                #-------------------------------------------------------------------------------------------------------
-                #ExemineTask()
-        #if obj:
+        if 'ACT_MAKE_DOCX' in request.session:
+                context['file_download'] = True
+        #if 'ACT_MAKE_GIT' in request.session:
+
+
 
         return render(request, 'acl_overview.html', context=context)
-        # else:
-        #     return render(request, 'acl_overview.html', context={'file_download': file_download,
-        #                                                          'file_md': file_md,
-        #                                                          'gitproc': gitproc,
-        #                                                          'acl_id': acl_id})
+
 
 @csrf_exempt
 def AclStageChange(request,  *args, **kwargs):
@@ -372,7 +391,7 @@ def AclStageChange(request,  *args, **kwargs):
 
         if (uuid!= '' and is_valid_uuid(uuid) and stage!=''):
                 try:
-                   acl = ACL.objects.get(id = uuid)
+                   acl = ACL.objects.get(id=uuid)
                    if acl:
                        acl.status = stage
                        acl.taskid = text

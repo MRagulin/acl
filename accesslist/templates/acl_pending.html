@@ -12,26 +12,53 @@
                 window.location.href = "/";
             </script>
         {% else %}
+            {% if APP_PERSON != request.user %}
+             <h4 class="main-title text-left mb-4">Ожидание согласования ACL <span class="badge badge-primary">approve</span></h4>
+                <div class="col">
+            {% else %}
+             <h4 class="main-title text-left mb-4">Согласование создания ACL <span class="badge badge-primary">approve</span></h4>
 
-             <h4 class="main-title text-left mb-2">Согласование создания ACL <span class="badge badge-primary">approve</span></h4>
              <div class="col">
-                 <div class="col-sm-2 font-italic pl-2" style="margin-left: -25px;">
+                 <div class="font-italic pl-2" style="margin-left: -25px;">
                      <p>Запрос от:</p>
                  </div>
+             {% endif %}
                  <div class="row border-bottom">
-                     <div style="display: flex;  justify-content: center;  align-items: center;">
+                    {% if APP_PERSON == request.user and IS_APPROVE%}
+                     <div style="display: flex; justify-content: center;" class="mr-5">
                           <img src="/static/img/user.png" style="margin-top: -5px; max-width: 32px; max-height: 32px;">
+                          <p class="ml-2 text-primary">{{ APP_PERSON.last_name}} {{ APP_PERSON.first_name}}</p>
                      </div>
 
-                     <div class="col-sm-4 col-md-3 col-lg-2">
-                         <p class="text-primary">Бнятов Сергей <br><span class="text-secondary small font-italic">Ведущий инжинер</span></p>
-                     </div>
+{#                     <div class="col-sm-4 col-md-3 col-lg-2">#}
+{#                         <p class="text-primary">{{ APP_PERSON.last_name}} {{ APP_PERSON.first_name}}</p>#}
+{#                     </div>#}
 
                      <div class="ml-5">
                          <button class="btn btn-secondary">Отклонить</button>
                          <button class="btn btn-success">Согласовать</button>
                      </div>
+                    {% else %}
+                     <div class="d-flex">
+                           <div style="display: flex;  justify-content: center;  align-items: center;">
+                              <img src="/static/img/user.png" style="margin-top: -5px; max-width: 32px; max-height: 32px;">
+                               <p class="ml-2 text-primary">{{ OWNER.last_name }} {{ OWNER.first_name }}</p>
+                         </div>
+                     </div>
+                        <div class="long-arrow-right"></div>
+                     <div class="d-flex">
+                           <div style="display: flex;  justify-content: center;">
+                              <img src="/static/img/user.png" style="margin-top: -5px; max-width: 32px; max-height: 32px;">
+                               <p class="ml-2 text-primary">{{ APP_PERSON.last_name }} {{ APP_PERSON.first_name }}</p>
+                         </div>
+
+                     </div>
+                    {% endif %}
                  </div>
+                 <div class="font-italic pl-2 pt-2" style="margin-left: -25px;">
+                     <p>Содержимое ACL:</p>
+                 </div>
+
                     {% for key in  LOCAL_STORAGE.items %}
                         {% if key.0 == 'acl_create_info.html' %}
                     <div class="col-12 mt-5">
