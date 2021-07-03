@@ -83,11 +83,11 @@
               <td>{{ acllist.project }}</td>
               <td style="max-width: 100px;!important;">
                   <p class="badge
-                  {% if acllist.status == 'FL' %}badge-info
-                  {% elif acllist.status == 'WTE'%}badge-warning
-                  {% elif acllist.status == 'NOTFL'%}badge-light
-                  {% elif acllist.status == 'CMP'%}badge-success
-                  {% elif acllist.status == 'CNL'%}badge-secondary
+                  {% if acllist.status == 'FL' %} badge-info
+                  {% elif acllist.status == 'WTE'%} badge-warning
+                  {% elif acllist.status == 'NOTFL'%} badge-light
+                  {% elif acllist.status == 'APRV'%} badge-success
+                  {% elif acllist.status == 'CNL'%} badge-secondary
                   {% endif %}
                     ">
                       {{ acllist.get_status_display }}

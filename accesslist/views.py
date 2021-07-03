@@ -20,6 +20,8 @@ import re
 import sys
 from django.contrib.auth.models import User, Group
 from .forms import Approve_form
+from django.db.models import Q
+
 
 class ObjectMixin:
     """Миксин обработки запросов и отобращение страниц"""
@@ -55,6 +57,11 @@ class ObjectMixin:
                 if tmp.status == 'WTE':
                     if tmp.owner == request.user or request.user.is_staff:
                         context.update({'acl_owner': tmp.owner})
+                    else:
+                        response = HttpResponseRedirect(reverse('acl_pending_urls', kwargs=({'acl_id': acl_id})))
+                        response['Location'] += "?token={}".format(tmp.token)
+                        return response
+
                     if tmp.approve == request.user:
                         context.update({'debtor': 'True',
                                         'token': tmp.token})
@@ -129,7 +136,7 @@ class Aclhistory(BaseView, LoginRequiredMixin, View):
                 if request.user.is_staff:
                     acllist = ACL.objects.order_by("-created", "-pkid")
                 else:
-                    acllist = ACL.objects.filter(owner_id=request.user.id).order_by("-created", "-pkid") #owner__email__iexact=request.user.email
+                    acllist = ACL.objects.filter(Q(owner_id=request.user.id) | Q(approve__exact=request.user)).order_by("-created", "-pkid") #owner__email__iexact=request.user.email
 
             paginator = Paginator(acllist, 10)
             page_number = request.GET.get('page', 1)
@@ -213,6 +220,8 @@ class Acl_approve(View):
                         'APPROVE_LIST': APPROVE_LIST,
                         'APPROVE_OWNER': APPROVE_OWNER,
                         'PROJECT': tmp.project,
+                        'STATUS': tmp.status,
+                        'REASON': tmp.taskid,
                         'form': form,
                         })
 
@@ -266,6 +275,9 @@ class Acl_pending(View):
             context.update({'IS_APPROVE': True})
             #messages.warning(request, 'Не валидный токен, попробуйте запросить новый')
             #return redirect(reverse(FORM_URLS[1]))
+        if tmp.status == 'APRV':
+            return redirect(reverse('acloverview_urls', kwargs={'acl_id': acl_id}))
+
         if tmp.status != 'WTE':
             messages.warning(request, 'ACL вероятно уже согласован, либо редактируется кем-то другим')
             return redirect(reverse('acl_approve_urls', kwargs={'acl_id': acl_id}))
@@ -313,13 +325,16 @@ def save__form(request, owner_form:None, acl_id)->None:
         if obj:
             obj.acltext = json.dumps(request.session['LOCAL_STORAGE'])
             obj.is_executed = False
-            # Не перезаписывать владельца ACL и статус событий
+            # Не перезаписывать владельца ACL
             if created:
                 obj.owner = request.user
-                if len(request.session['LOCAL_STORAGE']) <= 1:
-                        obj.status = 'NOTFL'
-                else:
-                        obj.status = 'FL'
+
+            if len(request.session['LOCAL_STORAGE']) <= 1:
+                  obj.status = 'NOTFL'
+            else:
+                if not created and obj.status == 'NOTFL':
+                    obj.status = 'FL'
+
             obj.project = owner_form[4]
             obj.save()
 
@@ -344,22 +359,26 @@ class AclOver(BaseView, LoginRequiredMixin, View):
                         if str(acl_id) != request.session['uuid']:
                             return HttpResponseRedirect(reverse(FORM_URLS[0]))
                     elif str(acl_id) == request.session['uuid']:
-                        return redirect(reverse('acloverview_urls', kwargs={'acl_id': request.session['uuid']}))
+                        return redirect(reverse('acloverview_urls', kwargs={'acl_id': acl_id}))
 
-
+        tmp = get_object_or_404(ACL, id=str(acl_id))
 
         """Проверяем состояние массива с данными"""
-        if len(request.session['LOCAL_STORAGE']) >= 1: #and all(KEY in request.session['LOCAL_STORAGE'] for KEY in FORM_APPLICATION_KEYS):
-                owner_form = request.session['LOCAL_STORAGE'][FORM_APPLICATION_KEYS[0]]
-                obj = save__form(request, owner_form, acl_id)
+        # and all(KEY in request.session['LOCAL_STORAGE'] for KEY in FORM_APPLICATION_KEYS):
+
+        if len(request.session['LOCAL_STORAGE']) > 1: #or tmp.status == 'NOTFL'
+            owner_form = request.session['LOCAL_STORAGE'][FORM_APPLICATION_KEYS[0]]
+            obj = save__form(request, owner_form, acl_id)
         else:
             messages.warning(request, 'Нехватает данных для формирования ACL')
-            return redirect(reverse(FORM_URLS[1], kwargs={'acl_id': request.session['uuid']}))
+            return redirect(reverse(FORM_URLS[1], kwargs={'acl_id': acl_id}))
+
+
 
         #Требовать согласование при формировании обращения
         if 'ACT_MAKE_GIT' in request.session:
-            tmp = get_object_or_404(ACL, id=str(acl_id))
-            if tmp.status == 'FL':
+
+            if tmp.status in ['FL', 'CNL']:
                 t = reverse('acl_approve_urls', kwargs={'acl_id': acl_id})
                 return HttpResponseRedirect(t)
 
@@ -382,26 +401,33 @@ class AclOver(BaseView, LoginRequiredMixin, View):
 @csrf_exempt
 def AclStageChange(request,  *args, **kwargs):
     if request.method == 'POST':
-        #messages.info(request, 'Статус изменен')
         result = {'status': 'Статус изменен'}
 
-        uuid =  request.POST.get('uuid', '')
+        uuid = request.POST.get('uuid', '')
         text = request.POST.get('text', '')
         stage = request.POST.get('stage', '')
+        if stage not in ['NOTFL', 'FL', 'CMP', 'WTE','APRV', 'CNL']:
+            result = {'error': 'Ошибка данных'}
+        else:
+            if stage == 'WTE':
+                result = {'error': 'Нельзя изменить статус на данный тип'}
+            else:
+                if (uuid!= '' and is_valid_uuid(uuid) and stage!=''):
+                        try:
+                            if text == '' and stage == 'CNL':
+                                text = "Отклонено согласующим без указании причины"
+                            acl = ACL.objects.get(id=uuid)
+                            if acl:
+                               acl.status = stage
+                               acl.taskid = text
+                               acl.approve = None
+                               acl.save()
 
-        if (uuid!= '' and is_valid_uuid(uuid) and stage!=''):
-                try:
-                   acl = ACL.objects.get(id=uuid)
-                   if acl:
-                       acl.status = stage
-                       acl.taskid = text
-                       acl.save()
-
-                except ACL.DoesNotExist:
-                    return HttpResponse(json.dumps('Ошибка, таких данных нет'), content_type="application/json")
-
-                return HttpResponse(json.dumps(result), content_type="application/json")
-        return HttpResponse(json.dumps('Ошибка данных'), content_type="application/json")
+                        except ACL.DoesNotExist:
+                            result = {'error': 'Ошибка, таких данных нет'}
+                else:
+                    result = {'error': 'Ошибка данных'}
+        return HttpResponse(json.dumps(result), content_type="application/json")
     return HttpResponse(status=405)
 
 @csrf_exempt

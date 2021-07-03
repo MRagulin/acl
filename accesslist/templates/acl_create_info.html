@@ -35,7 +35,7 @@
                       <div class="d-flex">
                           <p class="pr-2">Ожидает согласования:</p>
                           {% if acl_owner %}
-                                <a class="text-danger font-weight-bold" style="cursor: pointer">Отменить</a>
+                                <a class="text-danger font-weight-bold approve__cancel" style="cursor: pointer">Отменить</a>
                            {% endif %}
                       </div>
                       <div class="p-1">
@@ -53,7 +53,7 @@
                           <p class="pr-2">Ожидается Ваше согласование</p>
                       </div>
                       <div class="p-2 text-center">
-                         <a class="text-success font-weight-bold" href="{% url 'acl_pending_urls' %}{{ acl_id }}/?token={{ token }}">Согласовать</a>
+                         <a class="text-primary font-weight-bold" href="{% url 'acl_pending_urls' %}{{ acl_id }}/?token={{ token }}">Согласовать</a>
                       </div>
                   </div>
 
@@ -410,6 +410,5 @@
         $("input:checkbox[name='action_make_git']").prop('checked', false);
     });
 </script>
-
 
 {% endblock %}

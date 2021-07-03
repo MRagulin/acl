@@ -17,13 +17,12 @@
                 <div class="col">
             {% else %}
              <h4 class="main-title text-left mb-4">Согласование создания ACL <span class="badge badge-primary">approve</span></h4>
-
              <div class="col">
                  <div class="font-italic pl-2" style="margin-left: -25px;">
                      <p>Запрос от:</p>
                  </div>
              {% endif %}
-                 <div class="row border-bottom">
+                 <div class="row border-bottom d-inline-flex">
                     {% if APP_PERSON == request.user and IS_APPROVE%}
                      <div style="display: flex; justify-content: center;" class="mr-5">
                           <img src="/static/img/user.png" style="margin-top: -5px; max-width: 32px; max-height: 32px;">
@@ -35,8 +34,8 @@
 {#                     </div>#}
 
                      <div class="ml-5">
-                         <button class="btn btn-secondary">Отклонить</button>
-                         <button class="btn btn-success">Согласовать</button>
+                         <button class="btn btn-secondary btn-cancel-acl">Отклонить</button>
+                         <button class="btn btn-success btn-approve-acl">Согласовать</button>
                      </div>
                     {% else %}
                      <div class="d-flex">
@@ -54,6 +53,9 @@
 
                      </div>
                     {% endif %}
+                 <div class="justify-content-end">
+                     <a href="{% url 'aclcreate_urls' %}{{ acl_id }}/" class="card-link text-center text-dark ml-5"><i class="fas fa-backward pr-1"></i>Вернутся к ACL</a>
+                 </div>
                  </div>
                  <div class="font-italic pl-2 pt-2" style="margin-left: -25px;">
                      <p>Содержимое ACL:</p>
@@ -187,4 +189,33 @@
                  </div>
         </div>
     </div>
+<div class="modal modal-stage-cancel" tabindex="-1" role="dialog" wfd-invisible="true" style="display: none;" aria-hidden="true">
+<div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Отклонить обращение</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">×</span>
+        </button>
+      </div>
+<div class="modal-body">
+<form action="/acl/change/" method="post" name="stage-data" id="stage-data">
+   <div class="form-group">
+    <label for="stage-descr">Причина:</label>
+    <textarea class="form-control" id="tage-descr" type="text" rows="3" maxlength="64" autofocus="">Неправильно заполнен ACL</textarea>
+  </div>
+
+
+
+  <div class="modal-footer">
+        <button type="submit" class="btn btn-secondary btn-submit" value="Сохранить">Отклонить</button>
+        <button type="button" class="btn btn-secondary btn-cancel" data-dismiss="modal" value="Закрыть">Закрыть</button>
+      </div>
+</form>
+    </div>
+  </div>
+</div>
+</div>
+
+</div>
 {% endblock%}

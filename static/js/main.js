@@ -19,6 +19,12 @@ const protocols = ['TCP', 'UDP', 'ICMP', 'IGMP', 'IGMPv3', 'RIP', 'RIP2', 'VRRP'
 function hasNumber(myString) {
   return /\d/.test(myString);
 }
+
+function sleep(delay) {
+    var start = new Date().getTime();
+    while (new Date().getTime() < start + delay);
+}
+
 function resolvDomain(domain = '', el = null){
         if (domain == '')
             return ''
@@ -185,6 +191,32 @@ $(document).ready(function(){
        $(this).hide();
     });
 
+
+    $(".btn-cancel-acl").click(function(){
+    $(".modal-stage-cancel").modal('show');
+    //let uid = extractUuid(window.location.href);
+    //#ChangeACLStatus('CNL', uid);
+    });
+
+    $(".btn-approve-acl").click(function(){
+        let uid = extractUuid(window.location.href);
+        ChangeACLStatus('APRV', uid);
+    });
+
+    $(".modal-stage-cancel").submit(function(e){
+        e.preventDefault();
+        let t = $("#tage-descr").text().trim();
+        if (t != '')
+        {
+            let uid = extractUuid(window.location.href);
+            ChangeACLStatus('CNL', uid, t);
+        } else
+        {
+            ShowNotify(idx=0, text="Нужно указать причину отклонения")
+        }
+
+    });
+
     $(".btn-remove").click(function() {
         if (!confirm(message[8])) return false;
 
@@ -245,8 +277,8 @@ $(document).ready(function(){
             }
 
         }
-
     });
+
     $(".input__ip__internal").change(function(el){
         if (ValidateIPaddress(this.value) == true) {
             $.getJSON("/acl/checkip/" + this.value + '/',).done(function (data) {
@@ -472,25 +504,24 @@ $(".help-icon-mask").click(function(){
     $(".modal-help-mask").modal('show');
 });
 
-$(".modal-stage").submit(function (e) {
-    e.preventDefault();
-    let stage = $("#stage-names").find(':selected').attr('data');
-    let uuid =  $(".table-history input:checkbox:checked").attr('data');
-    let text = $("#tage-descr").val().trim();
-
-    if (uuid && stage)
-    {
-         $.post('/acl/change/', {stage, uuid, text}).done(function(data){
+function ChangeACLStatus(stage='', uuid='', text='', DoSuccess)
+{
+             $.post('/acl/change/', {stage, uuid, text}).done(function(data){
                 try{
                     let status = JSON.parse(JSON.stringify(data));
 
                     if (status.hasOwnProperty('status') )
                     {
                         ShowNotify(idx=2, text=status['status']);
+                        if (DoSuccessChange)
+                        {
+                            DoSuccessChange();
+                        }
                     } else
                     {
                         ShowNotify(idx=0, text=status['error']);
                     }
+
 
                 } catch (e) {
                     console.error(status);
@@ -499,11 +530,31 @@ $(".modal-stage").submit(function (e) {
                 ShowNotify(idx=0, text='Произошла ошибка при изменении элементов');
                 return false;
             });
+}
+$(".approve__cancel").click(function (e) {
+    e.preventDefault();
+    let uid = extractUuid(window.location.href);
+    ChangeACLStatus('FL', uid);
+});
+
+$(".modal-stage").submit(function (e) {
+    e.preventDefault();
+    let stage = $("#stage-names").find(':selected').attr('data');
+    let uuid =  $(".table-history input:checkbox:checked").attr('data');
+    let text = $("#tage-descr").val().trim();
+
+    if (uuid && stage)
+    {
+        ChangeACLStatus(stage, uuid, text, DoSuccessChange);
 
     }
+});
+
+function DoSuccessChange(){
+    sleep(1000);
     $(".modal-stage").modal('hide');
     window.location.href = '/acl/history/';
-});
+}
 
 function if_form_empty(form)
 {
@@ -592,3 +643,5 @@ if ($(val).find(".d-flex").length >0)
                                  }
                              });
 }
+
+
