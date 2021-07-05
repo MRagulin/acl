@@ -54,7 +54,8 @@
                      </div>
                     {% endif %}
                  <div class="justify-content-end">
-                     <a href="{% url 'aclcreate_urls' %}{{ acl_id }}/" class="card-link text-center text-dark ml-5"><i class="fas fa-backward pr-1"></i>Вернутся к ACL</a>
+                     <a href="{% url 'aclcreate_urls' %}{{ acl_id }}/" class="card-link text-center text-secondary ml-5"><i class="fas fa-backward pr-1"></i>Вернутся к ACL</a>
+                     <a href="#" class="card-link text-center text-secondary  ml-5" onclick="location.reload()"><i class="fas fa-sync-alt pr-1"></i>Обновить</a>
                  </div>
                  </div>
                  <div class="font-italic pl-2 pt-2" style="margin-left: -25px;">

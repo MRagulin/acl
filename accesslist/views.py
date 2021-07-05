@@ -21,7 +21,7 @@ import sys
 from django.contrib.auth.models import User, Group
 from .forms import Approve_form
 from django.db.models import Q
-
+from django.core.mail import EmailMessage, send_mail
 
 class ObjectMixin:
     """Миксин обработки запросов и отобращение страниц"""
@@ -425,6 +425,23 @@ def AclStageChange(request,  *args, **kwargs):
 
                         except ACL.DoesNotExist:
                             result = {'error': 'Ошибка, таких данных нет'}
+                        if stage == 'APRV':
+                            try:
+                                e = EmailMessage('Согласование обращения', 'ACL лист согласован', 'acl@alfastrah.ru',
+                                                 to=[acl.owner.email])
+                                e.send()
+                            except:
+                                pass
+
+                        elif stage == 'WTE':
+                            try:
+                                e = EmailMessage('Согласование обращения',
+                                                 'Требуется ваше согласование: https://acl.vesta.ru/acl/pending/{}/?token={}'.format(uuid, acl.token),
+                                                 'acl@alfastrah.ru',
+                                                 to=[acl.approve.email])
+                                e.send()
+                            except:
+                                pass
                 else:
                     result = {'error': 'Ошибка данных'}
         return HttpResponse(json.dumps(result), content_type="application/json")
