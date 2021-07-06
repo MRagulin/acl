@@ -60,7 +60,7 @@
               <th>#</th>
               <th></th>
               <th scope="col">Проект</th>
-              <th scope="col">Статус</th>
+              <th scope="col" style="min-width: 150px">Статус</th>
               <th scope="col">Пользователь</th>
               <th scope="col">Дата создания</th>
               <th scope="col">UUID</th>
@@ -95,13 +95,13 @@
               </td>
               <td style="text-align: start">
 
-                  <div class="font-weight-bold text-secondary text-center d-inline-flex">
+                  <div class="font-weight-bold text-secondary d-inline-flex">
                       <div class="user__icon"></div>
                       {{ acllist.owner.last_name}} {{ acllist.owner.first_name}}
                   </div>
-                  <div class="font-weight-light text-secondary text-center">
-                      {{ acllist.owner.department}}
-                  </div>
+{#                  <div class="font-weight-light text-secondary text-center">#}
+{#                      {{ acllist.owner.department}}#}
+{#                  </div>#}
               </td>
               <td>{{ acllist.created}}</td>
               <td class="text-secondary">{{ acllist.id}}</td>

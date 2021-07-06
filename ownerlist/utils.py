@@ -160,7 +160,7 @@ def request_handler(request, namespace=''):
                     request.session.modified = True
 
     else:
-        if namespace == FORM_APPLICATION_KEYS[-1]: #last
+        if namespace == FORM_APPLICATION_KEYS[-2]: #Traffic page
             str_pattern = 'input__domain_source'
         else:
             str_pattern = 'input__ip'
