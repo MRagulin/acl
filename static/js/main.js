@@ -504,7 +504,7 @@ $(".help-icon-mask").click(function(){
     $(".modal-help-mask").modal('show');
 });
 
-function ChangeACLStatus(stage='', uuid='', text='', DoSuccess)
+function ChangeACLStatus(stage='', uuid='', text='', DoSuccessFunction)
 {
              $.post('/acl/change/', {stage, uuid, text}).done(function(data){
                 try{
@@ -513,9 +513,9 @@ function ChangeACLStatus(stage='', uuid='', text='', DoSuccess)
                     if (status.hasOwnProperty('status') )
                     {
                         ShowNotify(idx=2, text=status['status']);
-                        if (DoSuccessChange)
+                        if (DoSuccessFunction)
                         {
-                            DoSuccessChange();
+                            DoSuccessFunction();
                         }
                     } else
                     {

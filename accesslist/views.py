@@ -286,8 +286,6 @@ class Acl_pending(View):
         context.update({'acl_id': str(acl_id), 'LOCAL_STORAGE': json.loads(tmp.acltext)})
         context.update({'APP_PERSON': tmp.approve})
         context.update({'OWNER': tmp.owner})
-
-
         return render(request, 'acl_pending.html', context=context)
 
 class AclDemo(BaseView, View):
