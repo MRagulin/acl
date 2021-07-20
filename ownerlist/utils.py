@@ -52,7 +52,6 @@ traffic_column = ["Hostname (Источник)", "IP Address (Источник)	
 
 logger = logging.getLogger(__name__)
 
-
 class BaseView(View):
     def dispatch(self, request, *args, **kwargs):
         try:

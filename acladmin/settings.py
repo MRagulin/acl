@@ -200,10 +200,10 @@ LDAP_AUTH_USER_FIELDS = {
     "first_name": "givenName",
     "last_name": "sn",
     "email": "mail",
-    "phone": "homephone",
+    #"phone": "homephone",
     "department": "departament",
-    "full_name": "displayname",
-    "mphone": "telephonenumber",
+    #"full_name": "displayname",
+    #"mphone": "telephonenumber",
     "ad_groups": "group_dns",
 
 }

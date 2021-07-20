@@ -556,6 +556,10 @@ function DoSuccessChange(){
     window.location.href = '/acl/history/';
 }
 
+function refresh(){
+        sleep(3000);
+        window.location.reload();
+}
 function if_form_empty(form)
 {
     let result = true;

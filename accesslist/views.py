@@ -425,18 +425,169 @@ def AclStageChange(request,  *args, **kwargs):
                             result = {'error': 'Ошибка, таких данных нет'}
                         if stage == 'APRV':
                             try:
-                                e = EmailMessage('Согласование обращения', 'ACL лист согласован', 'acl@alfastrah.ru',
+                                EMAIL_APPROVE = """\
+                                <!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<title>Согласование обращения</title>
+<style>
+.container{
+margin: 0 auto; 
+width: 600px;
+height: 400px;
+border: 1px solid #ccc;
+border-left: 3px solid #6a68d9;
+}
+.header{
+border-bottom: 1px solid #ccc;
+padding: 5px;
+margin: 15px;
+display: flex;
+}
+.header_text{
+color: #6a68d9;
+padding-right: 40px;
+}
+.header_text_portal{
+    padding: 20px;
+    color: #484848;
+    font-weight: bold;
+    border-left: 1px solid #484848;
+	}
+.logo{
+padding-right: 40px;
+padding-bottom: 10px;
+background: no-repeat url(data:image/png;base64,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);}
+
+.container_body{
+margin: 15px;
+min-height: 165px;
+}
+.container_footer{
+display: flex;
+align-items: center;
+}
+.footer{
+color: #484848b8;
+padding: 15px;
+border-top: 1px solid #ccc;	
+}
+</style>	
+</head>
+<body>
+<div class="container" style="margin-top:10px">
+<div class="header">
+<div class="header_text_body">
+<h4 class="header_text"><span class="logo"></span>Cогласование</h4>
+</div>
+<div class="header_text_portal">
+ACL Портал
+</div>
+</div>
+<div class="container_body">
+<h4>Статус вашего запроса ACL изменён.</h4>
+<div class="container_footer">
+<p style="font-weight:bold">Подробнее: </p><a href="http://acl.vesta.ru/acl/approve/%s/" style="color:#1a73e8;padding-left: 10px">Перейти на портал</a>
+</div>
+</div>
+<div class="footer">
+<p>Данное сообщение было сгенерировано автоматически порталом acl.vesta.ru, не отвечайте на данное сообщение.</p>
+</div>
+</div>
+</body>
+</html>
+""" %(uuid)
+                                e = EmailMessage('Согласование обращения', EMAIL_APPROVE, 'acl@alfastrah.ru',
                                                  to=[acl.owner.email])
+                                e.content_subtype = "html"
                                 e.send()
                             except:
                                 pass
 
                         elif stage == 'WTE':
                             try:
+                                EMAIL_REQUEST = """
+                                <!DOCTYPE html>
+                                <html lang="ru">
+                                <head>
+                                <meta charset="utf-8">
+                                <title>Согласование обращения</title>
+                                <style>
+                                .container{
+                                margin: 0 auto; 
+                                width: 600px;
+                                height: 400px;
+                                border: 1px solid #ccc;
+                                border-left: 3px solid #6a68d9;
+                                }
+                                .header{
+                                border-bottom: 1px solid #ccc;
+                                padding: 5px;
+                                margin: 15px;
+                                display: flex;
+                                }
+                                .header_text{
+                                color: #6a68d9;
+                                padding-right: 40px;
+                                }
+                                .header_text_portal{
+                                    padding: 20px;
+                                    color: #484848;
+                                    font-weight: bold;
+                                    border-left: 1px solid #484848;
+                                	}
+                                .logo{
+                                padding-right: 40px;
+                                padding-bottom: 10px;
+                                background: no-repeat url(data:image/png;base64,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);}
+
+                                .container_body{
+                                margin: 15px;
+                                min-height: 165px;
+                                }
+                                .container_footer{
+                                display: flex;
+                                align-items: center;
+                                }
+                                .footer{
+                                color: #484848b8;
+                                padding: 15px;
+                                border-top: 1px solid #ccc;	
+                                }
+                                </style>	
+                                </head>
+                                <body>
+                                <div class="container">
+                                <div class="header">
+                                <div class="header_text_body">
+                                <h4 class="header_text"><span class="logo"></span>Cогласование</h4>
+                                </div>
+                                <div class="header_text_portal">
+                                ACL Портал
+                                </div>
+                                </div>
+                                <div class="container_body">
+                                <h4>Ожидается ваше согласование</h4>
+                                <p>Запрос от: <span style="font-weight:bold">%s</span></p>
+                                <p>ragulinma@alfastrah.ru</p>
+                                <div class="container_footer">
+                                <p style="font-weight:bold">Подробнее: </p><a href="https://acl.vesta.ru/acl/pending/%s/?token=%s" style="color:#1a73e8;padding-left: 10px">Перейти на портал</a>
+                                </div>
+                                </div>
+                                <div class="footer">
+                                <p>Данное сообщение было сгенерировано автоматически порталом acl.vesta.ru, не отвечайте на данное сообщение.</p>
+                                </div>
+                                </div>
+                                </body>
+                                </html>
+                                """ %(acl.owner.last_name + " " + acl.owner.first_name, uuid, acl.token)
+
                                 e = EmailMessage('Согласование обращения',
-                                                 'Требуется ваше согласование: https://acl.vesta.ru/acl/pending/{}/?token={}'.format(uuid, acl.token),
+                                                 EMAIL_REQUEST ,
                                                  'acl@alfastrah.ru',
                                                  to=[acl.approve.email])
+                                e.content_subtype = "html"
                                 e.send()
                             except:
                                 pass
