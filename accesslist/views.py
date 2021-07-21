@@ -237,7 +237,7 @@ class Acl_approve(View):
                 tmp.token = MakeTemporaryToken()
             user = form.cleaned_data['approve_person']
             if not user:
-                messages.error('К сожалению, возникли проблемы с данным пользователям')
+                messages.error(request, 'К сожалению, возникли проблемы с данным пользователям')
             else:
                 user_obj = None
                 try:
@@ -488,7 +488,7 @@ ACL Портал
 <div class="container_body">
 <h4>Статус вашего запроса ACL изменён.</h4>
 <div class="container_footer">
-<p style="font-weight:bold">Подробнее: </p><a href="http://acl.vesta.ru/acl/approve/%s/" style="color:#1a73e8;padding-left: 10px">Перейти на портал</a>
+<p style="font-weight:bold">Подробнее: </p><a href="https://acl.vesta.ru/acl/approve/%s/" style="color:#1a73e8;padding-left: 10px">Перейти на портал</a>
 </div>
 </div>
 <div class="footer">

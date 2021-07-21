@@ -6,6 +6,9 @@ from django.conf import *
 from ownerlist.utils import BASE_DIR
 from django.apps import apps
 import os
+from .forms import email_form
+from django.core.mail import EmailMessage
+from django.contrib import messages
 
 def __check_in_buf__(data, value, buff, deep=100, idx=5)->bool:
     """Функция проверки дубликатов в буфере ошибок из лог файла"""
@@ -110,3 +113,17 @@ class PanelView(BaseView, LoginRequiredMixin, View):
                         })
 
             return render(request, 'panel.html', context=context)
+
+    def post(self, request):
+        e_form = email_form(data=request.POST or None)
+        if e_form.is_valid():
+            e = EmailMessage('Тестовое письмо', e_form.cleaned_data['body'], 'acl@alfastrah.ru',
+                             to=[e_form.cleaned_data['email']])
+            e.content_subtype = "html"
+            if e.send(fail_silently=True):
+                messages.info(request, 'Письмо отправленно.')
+            else:
+                messages.error(request, 'Что-то пошло не так.')
+        else:
+            messages.error(request, 'Форма не валидная, нужно проверить данные')
+        return render(request, 'panel.html')
