@@ -84,10 +84,10 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
         'NAME': 'aclproject',
-        'USER':'postgres',
-        'PASSWORD':'ABCabc123',
+        'USER': 'postgres',
+        'PASSWORD': 'ABCabc123',
         'HOST': '127.0.0.1',
-        'PORT':'5432',
+        'PORT': '5432',
     }
 }
 
@@ -219,10 +219,13 @@ LDAP_AUTH_CONNECTION_USERNAME = 'aduser'
 LDAP_AUTH_CONNECTION_PASSWORD = 'adpassword'
 
 
-
+import base64
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_USE_TLS = True
-EMAIL_HOST = '127.0.0.1'
-EMAIL_PORT = 25
+EMAIL_ADMIN = base64.b64decode('cmFndWxpbm1hQGFsZmFzdHJhaC5ydQ==')
+EMAIL_ADMIN = EMAIL_ADMIN.decode('UTF-8')
+
+EMAIL_USE_TLS = False
+EMAIL_HOST = 'localhost'
+EMAIL_PORT = 1025
 EMAIL_HOST_USER = ''
 EMAIL_HOST_PASSWORD = ''

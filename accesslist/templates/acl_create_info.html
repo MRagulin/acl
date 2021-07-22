@@ -31,33 +31,40 @@
                     </div>
                     {% if status == 'WTE' %}
                         {% if not debtor %}
-                     <div class="justify-content-end approve-dialog">
-                      <div class="d-flex">
-                          <p class="pr-2">Ожидает согласования:</p>
-                          {% if acl_owner %}
-                                <a class="text-danger font-weight-bold approve__cancel" style="cursor: pointer">Отменить</a>
-                           {% endif %}
-                      </div>
-                      <div class="p-1">
-                          <div class="ae-select"><span class="mr-1">
-                              <img src="/static/img/user.png" style="margin-top: -5px; max-width: 32px; max-height: 32px;">
-                          </span>
-                              <span class="ae-select-content font-weight-light" style="color:#0a4e97">{{ app_person.last_name }} {{ app_person.first_name }}</span>
+                        <div class="justify-content-end approve-dialog">
+                            <div class="d-flex">
+                                <p class="pr-2">Ожидает согласования:</p>
+                                  {% if acl_owner %}
+                                        <a class="text-danger font-weight-bold approve__cancel" style="cursor: pointer">Отменить</a>
+                                   {% endif %}
+                            </div>
+                              <div class="p-1">
+                                  <div class="ae-select"><span class="mr-1">
+                                      <img src="/static/img/user.png" style="margin-top: -5px; max-width: 32px; max-height: 32px;">
+                                  </span>
+                                      <span class="ae-select-content font-weight-light" style="color:#0a4e97">{{ app_person.last_name }} {{ app_person.first_name }}</span>
+                                  </div>
+                              </div>
+                        </div>
+
+                          {% else %}
+                             <div class="justify-content-end approve-dialog">
+                              <div class="d-flex">
+                                  <p class="pr-2">Ожидается Ваше согласование</p>
+                              </div>
+                              <div class="p-2 text-center">
+                                 <a class="text-primary font-weight-bold" href="{% url 'acl_pending_urls' %}{{ acl_id }}/?token={{ token }}">Согласовать</a>
+                              </div>
                           </div>
-                      </div>
-                  </div>
-
-                  {% else %}
-                     <div class="justify-content-end approve-dialog">
-                      <div class="d-flex">
-                          <p class="pr-2">Ожидается Ваше согласование</p>
-                      </div>
-                      <div class="p-2 text-center">
-                         <a class="text-primary font-weight-bold" href="{% url 'acl_pending_urls' %}{{ acl_id }}/?token={{ token }}">Согласовать</a>
-                      </div>
-                  </div>
-
-                  {% endif %}
+                        {% endif %}
+                  {% elif status == 'APRV'%}
+                     <div class="justify-content-end pr-5">
+                         <p class="text-success">ACL cогласован</p>
+                    </div>
+                  {% elif status == 'CNL'%}
+                     <div class="justify-content-end pr-5">
+                         <p class="text-secondary">ACL отклонён</p>
+                    </div>
                   {% endif %}
 
                     {%  if 'new' not in request.path %}

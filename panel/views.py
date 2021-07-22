@@ -114,16 +114,16 @@ class PanelView(BaseView, LoginRequiredMixin, View):
 
             return render(request, 'panel.html', context=context)
 
-    def post(self, request):
-        e_form = email_form(data=request.POST or None)
-        if e_form.is_valid():
-            e = EmailMessage('Тестовое письмо', e_form.cleaned_data['body'], 'acl@alfastrah.ru',
-                             to=[e_form.cleaned_data['email']])
-            e.content_subtype = "html"
-            if e.send(fail_silently=True):
-                messages.info(request, 'Письмо отправленно.')
-            else:
-                messages.error(request, 'Что-то пошло не так.')
-        else:
-            messages.error(request, 'Форма не валидная, нужно проверить данные')
-        return render(request, 'panel.html')
+    # def post(self, request):
+    #     e_form = email_form(data=request.POST or None)
+    #     if e_form.is_valid():
+    #         e = EmailMessage('Тестовое письмо', e_form.cleaned_data['body'], 'acl@alfastrah.ru',
+    #                          to=[e_form.cleaned_data['email']])
+    #         e.content_subtype = "html"
+    #         if e.send(fail_silently=True):
+    #             messages.info(request, 'Письмо отправленно.')
+    #         else:
+    #             messages.error(request, 'Что-то пошло не так.')
+    #     else:
+    #         messages.error(request, 'Форма не валидная, нужно проверить данные')
+    #     return render(request, 'panel.html')

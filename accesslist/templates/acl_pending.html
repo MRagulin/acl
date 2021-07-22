@@ -23,7 +23,7 @@
                  </div>
              {% endif %}
                  <div class="row border-bottom d-inline-flex">
-                    {% if APP_PERSON == request.user and IS_APPROVE%}
+                    {% if APP_PERSON == request.user or IS_APPROVE%}
                      <div style="display: flex; justify-content: center;" class="mr-5">
                           <img src="/static/img/user.png" style="margin-top: -5px; max-width: 32px; max-height: 32px;">
                           <p class="ml-2 text-primary">{{ APP_PERSON.last_name}} {{ APP_PERSON.first_name}}</p>
