@@ -185,7 +185,11 @@ function ShowNotify(idx = 0, text='Error')
     });
 
 }
-
+function goBack()
+{
+    sleep(2000);
+    window.location.href = "/acl/history";
+}
 $(document).ready(function(){
     $("#notifyMessage").click(function(){
        $(this).hide();
@@ -200,7 +204,7 @@ $(document).ready(function(){
 
     $(".btn-approve-acl").click(function(){
         let uid = extractUuid(window.location.href);
-        ChangeACLStatus('APRV', uid);
+        ChangeACLStatus('APRV', uid, goBack);
     });
 
     $(".modal-stage-cancel").submit(function(e){
@@ -209,7 +213,7 @@ $(document).ready(function(){
         if (t != '')
         {
             let uid = extractUuid(window.location.href);
-            ChangeACLStatus('CNL', uid, t);
+            ChangeACLStatus('CNL', uid, t, goBack);
         } else
         {
             ShowNotify(idx=0, text="Нужно указать причину отклонения")
@@ -513,10 +517,7 @@ function ChangeACLStatus(stage='', uuid='', text='', DoSuccessFunction)
                     if (status.hasOwnProperty('status') )
                     {
                         ShowNotify(idx=2, text=status['status']);
-                        if (DoSuccessFunction)
-                        {
-                            DoSuccessFunction();
-                        }
+
                     } else
                     {
                         ShowNotify(idx=0, text=status['error']);
@@ -529,7 +530,12 @@ function ChangeACLStatus(stage='', uuid='', text='', DoSuccessFunction)
             }).fail(function(){
                 ShowNotify(idx=0, text='Произошла ошибка при изменении элементов');
                 return false;
-            });
+            }).always(function () {
+                if (DoSuccessFunction)
+                        {
+                            DoSuccessFunction();
+                        }
+             });
 }
 $(".approve__cancel").click(function (e) {
     e.preventDefault();

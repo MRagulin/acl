@@ -279,8 +279,9 @@ class Acl_pending(View):
         if token != tmp.token:
             context.update({'IS_APPROVE': False})
             if not request.user or request.user != tmp.owner:
-                messages.warning(request, 'Вы не можете долучить доступ к данному ACL')
-                return redirect(reverse('acldemo_urls'))
+                if not request.user.is_staff:
+                    messages.warning(request, 'Вы не можете долучить доступ к данному ACL')
+                    return redirect(reverse('acldemo_urls'))
         else:
             context.update({'IS_APPROVE': True})
             #messages.warning(request, 'Не валидный токен, попробуйте запросить новый')
@@ -440,8 +441,8 @@ def AclStageChange(request,  *args, **kwargs):
                                                  to=[acl.owner.email])
                                 e.content_subtype = "html"
                                 e.send(fail_silently=settings.DEBUG)
-                        elif stage == 'WTE':
-                            pass
+                        # elif stage == 'WTE':
+                        #     pass
                 else:
                     result = {'error': 'Ошибка данных'}
         return HttpResponse(json.dumps(result), content_type="application/json")
